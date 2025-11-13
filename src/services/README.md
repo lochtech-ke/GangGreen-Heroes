@@ -116,6 +116,89 @@ const { data: subscription } = authService.onAuthStateChange((user) => {
 subscription.subscription.unsubscribe();
 ```
 
+## Profile Service (`profile.service.ts`)
+
+The profile service handles user profile management, updates, and avatar uploads.
+
+### Features
+
+- Get user profile
+- Update profile information
+- Upload and delete avatar images
+- Update forest preference
+- Profile validation
+- Profile completeness calculation
+
+### Usage Examples
+
+#### Get user profile
+
+```typescript
+import { profileService } from '@/services';
+
+const { profile, error } = await profileService.getProfile(userId);
+if (error) {
+  console.error('Failed to fetch profile:', error);
+} else {
+  console.log('Profile:', profile);
+}
+```
+
+#### Update profile
+
+```typescript
+const { profile, error } = await profileService.updateProfile(userId, {
+  full_name: 'Jane Doe',
+  phone: '+254712345678',
+  organization: 'Green Initiative',
+  location: 'Nairobi, Kenya',
+});
+
+if (error) {
+  console.error('Failed to update profile:', error);
+} else {
+  console.log('Updated profile:', profile);
+}
+```
+
+#### Upload avatar
+
+```typescript
+const file = event.target.files[0]; // From file input
+const { url, error } = await profileService.uploadAvatar(userId, file);
+
+if (error) {
+  console.error('Failed to upload avatar:', error);
+} else {
+  console.log('Avatar uploaded:', url);
+}
+```
+
+#### Delete avatar
+
+```typescript
+const { error } = await profileService.deleteAvatar(userId, avatarUrl);
+if (error) {
+  console.error('Failed to delete avatar:', error);
+}
+```
+
+#### Update forest preference
+
+```typescript
+const { error } = await profileService.updateForestPreference(userId, 'karura');
+if (error) {
+  console.error('Failed to update forest preference:', error);
+}
+```
+
+#### Check profile completeness
+
+```typescript
+const completeness = profileService.getProfileCompleteness(profile);
+console.log(`Profile is ${completeness}% complete`);
+```
+
 ## Supabase Client (`supabase.ts`)
 
 The base Supabase client configuration used by all services.

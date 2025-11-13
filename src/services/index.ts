@@ -5,3 +5,4 @@
 
 export { supabase } from './supabase';
 export { authService } from './auth.service';
+export { profileService } from './profile.service';
