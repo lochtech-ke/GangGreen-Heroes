@@ -62,11 +62,15 @@ The platform pilots conservation efforts in three key Kenyan forests:
 - ✅ Tailwind CSS integrated
 - ✅ Supabase client configured
 - ✅ Development environment ready
+- ✅ TypeScript type definitions (user types, auth interfaces)
+- ✅ Database schema (20 tables with indexes and triggers)
+- ✅ Row Level Security policies configured
+- ✅ Storage buckets setup (tree-images, documents, avatars, nft-badges)
 
 ### In Progress
 
-- 🚧 Database schema implementation
-- 🚧 Row Level Security policies
+- 🚧 Authentication service implementation
+- 🚧 User profile management
 
 ### Coming Soon
 
@@ -119,6 +123,16 @@ VITE_ANTUGROW_API_KEY=your_antugrow_api_key
 VITE_MAPBOX_TOKEN=your_mapbox_token
 ```
 
+### Database Setup
+
+The database schema is ready to deploy. Follow the [Migration Instructions](MIGRATION_INSTRUCTIONS.md) or [Quick Deploy Guide](supabase/QUICK_DEPLOY.md) to set up your Supabase database with:
+
+- 20 tables (users, initiatives, trees, carbon credits, web3, gamification, etc.)
+- 80+ indexes for optimized queries
+- Row Level Security policies for all tables
+- 4 storage buckets (tree-images, documents, avatars, nft-badges)
+- PostGIS extension for geospatial features
+
 ## 📝 Available Scripts
 
 ### Development
@@ -134,8 +148,21 @@ npm run lint         # Run ESLint
 npm run format       # Format code with Prettier
 ```
 
-### Testing & Smart Contracts
-Testing and smart contract scripts will be added as development progresses. See the [Technical Guide](docs/TECHNICAL_GUIDE.md) for planned testing infrastructure.
+### Testing
+```bash
+npm run test         # Run unit tests (coming soon)
+npm run test:e2e     # Run end-to-end tests (coming soon)
+npm run test:coverage # Generate coverage report (coming soon)
+```
+
+### Smart Contracts
+```bash
+npx hardhat compile  # Compile smart contracts (coming soon)
+npx hardhat test     # Test smart contracts (coming soon)
+npx hardhat deploy   # Deploy contracts (coming soon)
+```
+
+See the [Technical Guide](docs/TECHNICAL_GUIDE.md) for planned testing infrastructure.
 
 ## 📁 Project Structure
 
@@ -144,12 +171,23 @@ ganggreen-platform/
 ├── src/
 │   ├── components/      # React components (auth, dashboard, initiatives, etc.)
 │   ├── services/        # Business logic and API clients
+│   │   ├── supabase.ts        # Supabase client configuration
+│   │   └── auth.service.ts    # Authentication service (in progress)
 │   ├── contracts/       # Smart contracts (Solidity)
 │   ├── hooks/           # Custom React hooks
 │   ├── contexts/        # React Context providers
 │   ├── types/           # TypeScript type definitions
+│   │   └── user.types.ts      # User, auth, and profile types
 │   └── utils/           # Utility functions
+│       ├── constants.ts       # Application constants
+│       └── helpers.ts         # Helper functions
 ├── public/              # Static assets
+├── supabase/            # Database migrations and configuration
+│   ├── migrations/      # SQL migration files
+│   │   ├── 000_all_migrations.sql    # Complete schema (20 tables)
+│   │   └── 010_rls_policies.sql      # Row Level Security policies
+│   └── storage/         # Storage bucket configuration
+│       └── buckets.sql        # Storage buckets and policies
 ├── tests/               # Test files
 ├── docs/                # Comprehensive documentation
 │   ├── TECHNICAL_GUIDE.md          # Developer documentation
@@ -160,6 +198,61 @@ ganggreen-platform/
     ├── specs/           # Project specifications
     └── steering/        # AI steering rules
 ```
+
+## 🔧 TypeScript Types & API
+
+### User Types
+
+The platform uses strongly-typed TypeScript interfaces for type safety:
+
+```typescript
+// User roles
+type UserRole = 'admin' | 'organization' | 'community' | 'individual';
+type ForestPreference = 'kakamega' | 'karura' | 'mau';
+
+// User profile interface
+interface UserProfile {
+  full_name: string;
+  phone?: string;
+  organization?: string;
+  location?: string;
+  avatar_url?: string;
+}
+
+// Complete user object
+interface User {
+  id: string;
+  email: string;
+  role: UserRole;
+  forest_preference?: ForestPreference;
+  created_at: string;
+  profile?: UserProfile;
+}
+```
+
+### Authentication
+
+```typescript
+// Registration data
+interface RegisterData {
+  email: string;
+  password: string;
+  full_name: string;
+  role: UserRole;
+  forest_preference?: ForestPreference;
+  phone?: string;
+  organization?: string;
+  location?: string;
+}
+
+// Login credentials
+interface LoginCredentials {
+  email: string;
+  password: string;
+}
+```
+
+All type definitions are located in `src/types/` and imported throughout the application for consistent typing.
 
 ## 📚 Documentation
 

@@ -11,9 +11,9 @@
     "format": "prettier --write \"src/**/*.{ts,tsx,css}\""
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.81.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "@supabase/supabase-js": "^2.39.0",
     "react-router-dom": "^6.21.0"
   },
   "devDependencies": {

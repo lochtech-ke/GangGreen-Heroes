@@ -549,29 +549,97 @@ CREATE INDEX idx_web3_wallets_primary ON web3_wallets(user_id, is_primary) WHERE
 
 #### Authentication Service (`src/services/auth.service.ts`)
 
-**Status**: 📋 Not yet implemented
+**Status**: ✅ Implemented (Task 3.1 Complete)
 
-**Planned API**:
+**Implementation**:
 
 ```typescript
-// Register new user
-async function register(email: string, password: string, userData: UserProfile): Promise<User>
+import { supabase } from './supabase';
+import type {
+  User,
+  RegisterData,
+  LoginCredentials,
+  AuthResponse,
+  UserRole,
+} from '../types/user.types';
 
-// Login user
-async function login(email: string, password: string): Promise<Session>
+class AuthService {
+  // Register new user with profile creation
+  async register(data: RegisterData): Promise<AuthResponse>
+  
+  // Login with email/password
+  async login(credentials: LoginCredentials): Promise<AuthResponse>
+  
+  // Logout current user
+  async logout(): Promise<{ error: Error | null }>
+  
+  // Get current authenticated user with profile
+  async getCurrentUser(): Promise<User | null>
+  
+  // Get current session
+  async getSession(): Promise<Session | null>
+  
+  // Request password reset email
+  async requestPasswordReset(email: string): Promise<{ error: Error | null }>
+  
+  // Update password
+  async updatePassword(newPassword: string): Promise<{ error: Error | null }>
+  
+  // Role-based access control
+  hasRole(user: User | null, role: UserRole): boolean
+  hasAnyRole(user: User | null, roles: UserRole[]): boolean
+  isAdmin(user: User | null): boolean
+  isOrganization(user: User | null): boolean
+  
+  // Subscribe to auth state changes
+  onAuthStateChange(callback: (user: User | null) => void)
+}
 
-// Logout user
-async function logout(): Promise<void>
+export const authService = new AuthService();
+```
 
-// Reset password
-async function resetPassword(email: string): Promise<void>
+**Usage Examples**:
 
-// Update password
-async function updatePassword(newPassword: string): Promise<void>
+```typescript
+// Register a new user
+const { user, error } = await authService.register({
+  email: 'user@example.com',
+  password: 'SecurePass123',
+  full_name: 'John Doe',
+  role: 'individual',
+  forest_preference: 'kakamega',
+});
+
+// Login
+const { user, error } = await authService.login({
+  email: 'user@example.com',
+  password: 'SecurePass123',
+});
 
 // Get current user
-async function getCurrentUser(): Promise<User | null>
+const user = await authService.getCurrentUser();
+
+// Check roles
+if (authService.isAdmin(user)) {
+  // Admin-only functionality
+}
+
+// Subscribe to auth changes
+const { data } = authService.onAuthStateChange((user) => {
+  console.log('Auth state changed:', user);
+});
 ```
+
+**Features**:
+- ✅ User registration with automatic profile creation
+- ✅ Three-step registration (auth user → users table → user_profiles table)
+- ✅ Rollback on failure to maintain data integrity
+- ✅ Login with email/password
+- ✅ Session management
+- ✅ Password reset flow
+- ✅ Role-based access control helpers
+- ✅ Auth state change subscriptions
+- ✅ Comprehensive error handling
 
 #### Initiative Service (`src/services/initiative.service.ts`)
 
