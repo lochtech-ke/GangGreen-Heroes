@@ -90,16 +90,9 @@ VITE_MAPBOX_TOKEN=your_mapbox_token
 
 ### Development
 ```bash
-npm run dev          # Start development server
-npm run build        # Build for production
+npm run dev          # Start development server (http://localhost:5173)
+npm run build        # Build for production (TypeScript + Vite)
 npm run preview      # Preview production build
-```
-
-### Testing
-```bash
-npm run test         # Run unit tests
-npm run test:e2e     # Run end-to-end tests
-npm run test:coverage # Generate coverage report
 ```
 
 ### Code Quality
@@ -108,12 +101,8 @@ npm run lint         # Run ESLint
 npm run format       # Format code with Prettier
 ```
 
-### Smart Contracts
-```bash
-npx hardhat compile  # Compile smart contracts
-npx hardhat test     # Test smart contracts
-npx hardhat deploy   # Deploy contracts
-```
+### Testing & Smart Contracts
+Testing and smart contract scripts will be added as development progresses. See the [Technical Guide](docs/TECHNICAL_GUIDE.md) for planned testing infrastructure.
 
 ## 📁 Project Structure
 
