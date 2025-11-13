@@ -129,10 +129,27 @@ ganggreen-platform/
 │   └── utils/           # Utility functions
 ├── public/              # Static assets
 ├── tests/               # Test files
+├── docs/                # Comprehensive documentation
+│   ├── TECHNICAL_GUIDE.md          # Developer documentation
+│   ├── USER_GUIDE.md               # End user manual
+│   ├── GITHUB_PROJECT_UPDATES.md   # Project management guide
+│   └── DOCUMENTATION_SUMMARY.md    # Documentation overview
 └── .kiro/               # Kiro AI configuration
     ├── specs/           # Project specifications
     └── steering/        # AI steering rules
 ```
+
+## 📚 Documentation
+
+Comprehensive documentation is available in the `docs/` directory:
+
+- **[Quick Reference](docs/QUICK_REFERENCE.md)** - ⚡ Essential commands, code snippets, and quick tips
+- **[Technical Guide](docs/TECHNICAL_GUIDE.md)** - Architecture, API docs, database schema, smart contracts
+- **[User Guide](docs/USER_GUIDE.md)** - Complete user manual with step-by-step instructions
+- **[GitHub Project Updates](docs/GITHUB_PROJECT_UPDATES.md)** - Project board setup and task management
+- **[Documentation Summary](docs/DOCUMENTATION_SUMMARY.md)** - Overview of all documentation
+
+**New to the project?** Start with the [Quick Reference](docs/QUICK_REFERENCE.md) for essential commands and code snippets!
 
 ## 👥 Target Users
 
