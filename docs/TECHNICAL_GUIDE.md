@@ -1008,8 +1008,12 @@ WITH CHECK (auth.uid() = planted_by);
 
 ### Authentication Context
 
+**Status**: 📋 Planned - To be implemented in Task 3.3
+
+**Planned Implementation**:
+
 ```typescript
-// src/contexts/AuthContext.tsx
+// src/contexts/AuthContext.tsx (NOT YET CREATED)
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/services/supabase';
@@ -1082,10 +1086,16 @@ export const useAuth = () => {
 
 ## Web3 Integration
 
+**Status**: 📋 Planned - Milestone 4 (Weeks 8-10)
+
 ### Web3 Service
 
+**Status**: 📋 Not yet implemented
+
+**Planned Implementation**:
+
 ```typescript
-// src/services/web3.service.ts
+// src/services/web3.service.ts (NOT YET CREATED)
 import { ethers } from 'ethers';
 import GangGreenBadgeABI from '@/contracts/abis/GangGreenBadge.json';
 import DonationManagerABI from '@/contracts/abis/DonationManager.json';
@@ -1157,36 +1167,44 @@ export const web3Service = {
 
 ### Environment Variables
 
+**Current Configuration** (`.env`):
+
 ```env
-# Supabase
+# Supabase (✅ Configured)
 VITE_SUPABASE_URL=https://wobpryllvdjaapzjbsxx.supabase.co
-VITE_SUPABASE_ANON_KEY=your_anon_key
+VITE_SUPABASE_ANON_KEY=sb_publishable_A5qSpuvL1M7QhqkB2bkqUQ_QmE9dpra
 
-# Antugrow API
+# Antugrow API (📋 Planned)
 VITE_ANTUGROW_API_URL=https://api.antugrow.com
-VITE_ANTUGROW_API_KEY=your_api_key
+VITE_ANTUGROW_API_KEY=your_antugrow_api_key_here
 
-# Maps
-VITE_MAPBOX_TOKEN=your_mapbox_token
+# Maps (📋 Planned)
+VITE_MAPBOX_TOKEN=your_mapbox_token_here
 
-# Web3
-VITE_BADGE_CONTRACT_ADDRESS=0x...
-VITE_DONATION_CONTRACT_ADDRESS=0x...
-VITE_POLYGON_RPC_URL=https://polygon-rpc.com
+# Web3 (📋 Planned - Milestone 4)
+VITE_CHAIN_ID=80001
+VITE_NETWORK_NAME=mumbai
 ```
 
 ### Build & Deploy
 
+**Current Status**: ✅ Development environment ready
+
 ```bash
-# Install dependencies
+# Install dependencies (✅ Complete)
 npm install
 
-# Build for production
+# Start development server (✅ Working)
+npm run dev
+
+# Build for production (⏳ Not yet tested)
 npm run build
 
-# Deploy to Vercel
+# Deploy to Vercel (📋 Planned - Milestone 6)
 vercel --prod
 ```
+
+**Development Server**: Running on `http://localhost:5173` with Vite HMR
 
 ### CI/CD Pipeline (GitHub Actions)
 

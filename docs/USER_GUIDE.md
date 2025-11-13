@@ -6,6 +6,50 @@
 
 ---
 
+## 🚧 Development Status
+
+**Last Updated**: November 13, 2025
+
+The #GangGreen platform is currently in **active development**. This user guide describes the complete vision and planned functionality. Features are being implemented in phases over a 15-week timeline.
+
+### Implementation Progress
+
+| Milestone | Status | Timeline | Features |
+|-----------|--------|----------|----------|
+| **Foundation** | 🚧 25% Complete | Weeks 1-2 | Project setup ✅, Database 🚧, Auth 📋, UI 📋 |
+| **Core Features** | 📋 Planned | Weeks 3-5 | Initiatives, Trees, AI Monitoring |
+| **Marketplace** | 📋 Planned | Weeks 6-7 | Carbon Credits, Impact Dashboard |
+| **Web3** | 📋 Planned | Weeks 8-10 | Wallets, Crypto Donations, NFTs |
+| **Gamification** | 📋 Planned | Weeks 11-12 | Points, Quests, Referrals |
+| **Launch** | 📋 Planned | Weeks 13-15 | Testing, Security, Deployment |
+
+**Legend**: ✅ Complete | 🚧 In Progress | 📋 Planned
+
+### What's Available Now
+
+**For Developers**:
+- ✅ Local development environment
+- ✅ React + TypeScript + Vite setup
+- ✅ Tailwind CSS styling
+- ✅ Supabase client configured
+- ✅ Basic landing page demo
+
+**For End Users**:
+- ⏳ Platform not yet publicly accessible
+- ⏳ User registration coming in Sprint 1
+- ⏳ Core features coming in Sprints 2-5
+
+### When Will Features Be Available?
+
+- **User Accounts**: Sprint 1 (Week 2)
+- **Tree Initiatives**: Sprint 2 (Week 5)
+- **Carbon Marketplace**: Sprint 3 (Week 7)
+- **Web3 Features**: Sprint 4 (Week 10)
+- **Gamification**: Sprint 5 (Week 12)
+- **Public Launch**: Sprint 6 (Week 15)
+
+---
+
 ## Table of Contents
 
 1. [Getting Started](#getting-started)
@@ -27,7 +71,34 @@
 
 ## Getting Started
 
-### Creating Your Account
+**Platform Status**: 🚧 In Development
+
+The #GangGreen platform is currently under active development. This guide describes the planned features and functionality. Many features are not yet available.
+
+### Current Status
+
+**✅ Available Now:**
+- Development preview at `http://localhost:5173` (for developers)
+- Basic landing page showcasing the three pilot forests
+- Project information and mission statement
+
+**🚧 In Development:**
+- User registration and authentication
+- Database setup and configuration
+- Core platform features
+
+**📋 Coming Soon:**
+- User accounts and profiles
+- Tree planting initiatives
+- Carbon credit marketplace
+- Web3 wallet integration
+- NFT badges and gamification
+
+### Creating Your Account (Coming Soon)
+
+**Status**: 📋 Planned for Sprint 1 (Weeks 1-2)
+
+Once authentication is implemented, you'll be able to:
 
 1. **Visit the Platform**: Navigate to the #GangGreen platform
 2. **Click "Sign Up"**: Located in the top right corner
@@ -40,13 +111,17 @@
 4. **Verify Your Email**: Check your inbox for a verification link
 5. **Complete Your Profile**: Add a profile picture and bio
 
-### Logging In
+### Logging In (Coming Soon)
+
+**Status**: 📋 Planned for Sprint 1
 
 1. Click "Login" in the top right corner
 2. Enter your email and password
 3. Click "Sign In"
 
-### Forgot Password?
+### Forgot Password? (Coming Soon)
+
+**Status**: 📋 Planned for Sprint 1
 
 1. Click "Forgot Password" on the login page
 2. Enter your email address
@@ -57,10 +132,12 @@
 
 ## User Roles
 
+**Status**: 📋 Planned - Role-based features will be implemented throughout development
+
 ### Individual
 Perfect for anyone who wants to support conservation efforts through donations and participation.
 
-**What you can do**:
+**What you can do** (when implemented):
 - Join tree planting initiatives
 - Purchase carbon credits
 - Make crypto donations
@@ -131,7 +208,11 @@ Platform administrators with full access to manage and moderate the platform.
 
 ## Tree Planting Initiatives
 
-### Browsing Initiatives
+**Status**: 📋 Planned for Sprint 2 (Weeks 3-5)
+
+### Browsing Initiatives (Coming Soon)
+
+Once implemented, you'll be able to:
 
 1. Click "Initiatives" in the main navigation
 2. Use filters to find initiatives:
