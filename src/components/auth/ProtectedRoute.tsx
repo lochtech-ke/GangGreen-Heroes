@@ -1,7 +1,8 @@
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
+import { useAuthContext } from '../../contexts/AuthContext';
 import { authService } from '../../services/auth.service';
-import type { User, UserRole } from '../../types/user.types';
+import type { UserRole } from '../../types/user.types';
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -14,27 +15,7 @@ export function ProtectedRoute({
   requiredRoles,
   redirectTo = '/login',
 }: ProtectedRouteProps) {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      const currentUser = await authService.getCurrentUser();
-      setUser(currentUser);
-      setLoading(false);
-    };
-
-    checkAuth();
-
-    // Subscribe to auth state changes
-    const { data: authListener } = authService.onAuthStateChange((updatedUser) => {
-      setUser(updatedUser);
-    });
-
-    return () => {
-      authListener?.subscription.unsubscribe();
-    };
-  }, []);
+  const { user, loading } = useAuthContext();
 
   if (loading) {
     return (

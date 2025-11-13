@@ -1,26 +1,10 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { authService } from '../services/auth.service';
-import type { User } from '../types/user.types';
+import { useAuth } from '../hooks/useAuth';
 
 export function DashboardPage() {
-  const navigate = useNavigate();
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const loadUser = async () => {
-      const currentUser = await authService.getCurrentUser();
-      setUser(currentUser);
-      setLoading(false);
-    };
-
-    loadUser();
-  }, []);
+  const { user, loading, logout } = useAuth();
 
   const handleLogout = async () => {
-    await authService.logout();
-    navigate('/login');
+    await logout();
   };
 
   if (loading) {
