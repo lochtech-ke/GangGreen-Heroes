@@ -107,75 +107,121 @@
 
 ## Database Schema
 
-**Status**: 🚧 In Progress - Schema designed, awaiting implementation in Supabase
+**Status**: ✅ Schema Complete - 9 migrations created with 19 tables
+
+**Completed**: 
+1. ✅ SQL migration scripts created (001-009)
+2. ✅ All 19 tables defined with proper constraints
+3. ✅ Performance indexes configured
+4. ✅ Triggers for automatic timestamp updates
+5. ✅ PostGIS extension for geospatial data
 
 **Next Steps**: 
-1. Execute SQL migrations in Supabase dashboard
-2. Configure Row Level Security policies
-3. Set up storage buckets
-4. Create performance indexes
+1. Execute migrations in Supabase dashboard
+2. Configure Row Level Security policies (Task 2.2)
+3. Set up storage buckets (Task 2.3)
+4. Test database connections
 
 ### Core Tables
 
-#### users (Supabase Auth)
-Managed by Supabase Auth - stores authentication data.
+#### users
+**Status**: ✅ Migration created (001_create_users_and_profiles.sql)
 
-**Status**: ⏳ Awaiting configuration
+```sql
+CREATE TABLE users (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  email TEXT UNIQUE NOT NULL,
+  role TEXT NOT NULL CHECK (role IN ('admin', 'organization', 'community', 'individual')),
+  forest_preference TEXT CHECK (forest_preference IN ('kakamega', 'karura', 'mau')),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+```
 
 #### user_profiles
-**Status**: ⏳ Awaiting creation
+**Status**: ✅ Migration created (001_create_users_and_profiles.sql)
 
 ```sql
 CREATE TABLE user_profiles (
-  id UUID PRIMARY KEY REFERENCES auth.users(id),
-  email TEXT NOT NULL,
-  full_name TEXT,
-  role TEXT CHECK (role IN ('individual', 'community_member', 'organization', 'admin')),
-  forest_preference TEXT CHECK (forest_preference IN ('kakamega', 'karura', 'mau')),
-  avatar_url TEXT,
-  bio TEXT,
+  id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+  full_name TEXT NOT NULL,
+  phone TEXT,
+  organization TEXT,
   location TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
+  avatar_url TEXT,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 ```
 
 #### initiatives
+**Status**: ✅ Migration created (002_create_initiatives.sql)
+
 ```sql
 CREATE TABLE initiatives (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   title TEXT NOT NULL,
   description TEXT,
   forest TEXT NOT NULL CHECK (forest IN ('kakamega', 'karura', 'mau')),
-  organization_id UUID REFERENCES user_profiles(id),
-  target_trees INTEGER NOT NULL,
-  trees_planted INTEGER DEFAULT 0,
-  target_area_hectares DECIMAL,
-  location GEOGRAPHY(POINT, 4326),
-  status TEXT CHECK (status IN ('planning', 'active', 'completed', 'paused')),
-  start_date DATE,
+  target_trees INTEGER NOT NULL CHECK (target_trees > 0),
+  trees_planted INTEGER DEFAULT 0 CHECK (trees_planted >= 0),
+  start_date DATE NOT NULL,
   end_date DATE,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
+  status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'completed', 'paused')),
+  location GEOGRAPHY(POINT, 4326) NOT NULL,
+  area_hectares DECIMAL(10, 2) CHECK (area_hectares > 0),
+  organization_id UUID REFERENCES users(id) ON DELETE SET NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  CONSTRAINT valid_date_range CHECK (end_date IS NULL OR end_date >= start_date)
+);
+```
+
+#### initiative_participants
+**Status**: ✅ Migration created (002_create_initiatives.sql)
+
+```sql
+CREATE TABLE initiative_participants (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  initiative_id UUID REFERENCES initiatives(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  trees_contributed INTEGER DEFAULT 0 CHECK (trees_contributed >= 0),
+  joined_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(initiative_id, user_id)
 );
 ```
 
 #### trees
+**Status**: ✅ Migration created (003_create_trees.sql)
+
 ```sql
 CREATE TABLE trees (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  initiative_id UUID REFERENCES initiatives(id),
+  initiative_id UUID REFERENCES initiatives(id) ON DELETE CASCADE,
   species TEXT NOT NULL,
-  planted_by UUID REFERENCES user_profiles(id),
   planted_date DATE NOT NULL,
-  location GEOGRAPHY(POINT, 4326),
-  forest TEXT CHECK (forest IN ('kakamega', 'karura', 'mau')),
-  health_status TEXT CHECK (health_status IN ('healthy', 'needs_attention', 'critical', 'deceased')),
-  height_cm DECIMAL,
-  diameter_cm DECIMAL,
+  location GEOGRAPHY(POINT, 4326) NOT NULL,
+  planted_by UUID REFERENCES users(id) ON DELETE SET NULL,
   antugrow_id TEXT UNIQUE,
-  last_monitored_at TIMESTAMPTZ,
-  created_at TIMESTAMPTZ DEFAULT NOW()
+  current_height_cm DECIMAL(10, 2) CHECK (current_height_cm >= 0),
+  current_diameter_cm DECIMAL(10, 2) CHECK (current_diameter_cm >= 0),
+  health_status TEXT CHECK (health_status IN ('healthy', 'stressed', 'diseased', 'dead')),
+  last_monitored TIMESTAMP WITH TIME ZONE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+```
+
+#### tree_images
+**Status**: ✅ Migration created (003_create_trees.sql)
+
+```sql
+CREATE TABLE tree_images (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  tree_id UUID REFERENCES trees(id) ON DELETE CASCADE,
+  image_url TEXT NOT NULL,
+  captured_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  antugrow_analysis JSONB,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 ```
 

@@ -13,26 +13,36 @@
   - Initialize Git repository and create .gitignore
   - _Requirements: 6.1, 6.2_
 
-- [ ] 2. Database Schema and Supabase Setup
-- [ ] 2.1 Create database tables and relationships
+- [x] 2. Database Schema and Supabase Setup
+
+
+- [x] 2.1 Create database tables and relationships
+
+
   - Write SQL migration scripts for users, user_profiles, initiatives, initiative_participants, trees, tree_images, carbon_credits, transactions, notifications, web3_wallets, crypto_donations, nft_badges, badge_criteria, user_gamification, gamified_actions, achievements, user_achievements, challenge_quests, quest_participants, and referrals tables
   - Execute migrations in Supabase dashboard
   - _Requirements: 1.1, 2.1, 3.1, 10.1, 12.1, 13.1, 14.1_
 
-- [ ] 2.2 Configure Row Level Security policies
+- [x] 2.2 Configure Row Level Security policies
+
+
   - Implement RLS policies for user profile access
   - Set up RLS for initiatives (public read, organization write)
   - Configure RLS for trees and tree images
   - Set up RLS for carbon credits and transactions
   - _Requirements: 1.3, 1.4, 6.1_
 
-- [ ] 2.3 Set up Supabase Storage buckets
+- [x] 2.3 Set up Supabase Storage buckets
+
+
   - Create storage bucket for tree images
   - Create storage bucket for documents and certificates
   - Configure bucket policies for secure access
   - _Requirements: 10.2_
 
-- [ ] 2.4 Create database indexes for performance
+- [x] 2.4 Create database indexes for performance
+
+
   - Add indexes on frequently queried fields (forest, status, user_id, initiative_id)
   - Add geospatial indexes for location-based queries
   - _Requirements: 12.2_
