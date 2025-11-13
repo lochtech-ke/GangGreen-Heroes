@@ -60,12 +60,16 @@
   - _Requirements: 1.1, 1.2, 1.5_
   - _Completed: November 13, 2025_
 
-- [ ] 3.2 Build authentication UI components
-  - Create LoginForm component with validation
-  - Create RegisterForm component with role selection and forest preference
-  - Create ProtectedRoute component for route guarding
-  - Build password reset request and confirmation forms
+- [x] 3.2 Build authentication UI components
+  - [x] Create LoginForm component with validation
+  - [x] Create RegisterForm component with role selection and forest preference
+  - [x] Create ProtectedRoute component for route guarding
+  - [x] Build PasswordResetRequest and PasswordResetConfirm components
+  - [x] Create LoginPage, RegisterPage, ResetPasswordPage, DashboardPage
+  - [x] Integrate routing with React Router
+  - [x] Add comprehensive component documentation (README.md)
   - _Requirements: 1.1, 1.2, 1.3, 1.5_
+  - _Completed: November 13, 2025_
 
 - [ ] 3.3 Create authentication context and hooks
   - Implement AuthContext for global auth state

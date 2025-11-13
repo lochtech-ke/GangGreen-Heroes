@@ -236,6 +236,32 @@ The #GangGreen platform is in the initial development phase with foundational in
 
 ---
 
+### 9. Onboarding Chatbot 📋 PLANNED
+
+**Status**: Task 31 planned for Sprint 6 or later
+
+**Features**:
+- AI-powered FAQ system with 27 questions
+- Semantic matching with 70% confidence threshold
+- Context-aware responses (5-message history)
+- Escalation to human support
+- Quick action buttons
+- Mobile-responsive chat widget
+- Accessibility compliant (WCAG 2.1 AA)
+
+**Components**:
+- Chat Widget UI (React component)
+- Chat Engine Service (orchestration)
+- Semantic Matcher (TF-IDF + cosine similarity)
+- Context Manager (conversation state)
+- Response Generator (personalization)
+- Escalation Handler (support tickets)
+- Knowledge Base (JSON with 27 FAQs)
+
+**Estimated Start**: Week 13+ (after core features complete)
+
+---
+
 ## Technology Stack Status
 
 ### Frontend Dependencies ✅

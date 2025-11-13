@@ -64,8 +64,9 @@ The #GangGreen platform is currently in **active development**. This user guide 
 10. [Impact Dashboard](#impact-dashboard)
 11. [Notifications](#notifications)
 12. [Mobile App](#mobile-app)
-13. [FAQ](#faq)
-14. [Support](#support)
+13. [Onboarding Chatbot](#onboarding-chatbot)
+14. [FAQ](#faq)
+15. [Support](#support)
 
 ---
 
@@ -795,9 +796,151 @@ A: Contact support at support@ganggreen.org to request account deletion.
 
 ---
 
+## Onboarding Chatbot
+
+**Status**: 📋 Planned for Sprint 6 or later
+
+### What is the Chatbot?
+
+The #GangGreen Onboarding Chatbot is your AI-powered assistant that helps you navigate the platform, answers questions, and provides support 24/7.
+
+**Features**:
+- Instant answers to 27 common questions
+- Context-aware responses based on your conversation
+- Quick action buttons for common tasks
+- Escalation to human support when needed
+- Available on all pages
+
+### Using the Chatbot
+
+1. **Open the Chat**: Click the green chat bubble in the bottom-right corner
+2. **Ask a Question**: Type your question or select a quick action
+3. **Get Instant Answers**: The chatbot responds within seconds
+4. **Follow Up**: Ask related questions - the chatbot remembers context
+5. **Get Help**: If the chatbot can't help, it connects you to human support
+
+### What the Chatbot Can Help With
+
+**Getting Started**:
+- "What is Gang Green and how can I get involved?"
+- "How do I sign up as an individual?"
+- "How do I sign up a corporation or organization?"
+- "What are the sponsorship opportunities?"
+
+**Finding Projects**:
+- "How do I find active climate action projects?"
+- "How do I join a project?"
+- "Can I see completed projects and their outcomes?"
+- "How can my community group list a project?"
+
+**Education & Gamification**:
+- "What educational tools are available?"
+- "How does AI personalize my experience?"
+- "How does the gamification system work?"
+
+**Community Building**:
+- "How do I join or create a local group?"
+- "Can schools and youth groups participate?"
+- "How do I engage others in climate action?"
+
+**Impact Verification**:
+- "How is project impact verified and tracked?"
+- "How do I get updates on project progress?"
+- "Can I share my impact externally?"
+
+**Sponsorship & Partnerships**:
+- "What are the corporate sponsorship options?"
+- "Can we create employee engagement challenges?"
+- "How do NGOs and educational institutions partner?"
+
+**Support & Troubleshooting**:
+- "I'm having trouble logging in"
+- "My badges or rewards are missing"
+- "How do I report a bug or provide feedback?"
+
+### Quick Actions
+
+The chatbot provides quick action buttons for common tasks:
+- **Getting Started**: Learn about the platform
+- **Find Projects**: Browse active initiatives
+- **How to Join**: Step-by-step participation guide
+- **Contact Support**: Connect with human support
+
+### Context-Aware Responses
+
+The chatbot remembers your conversation:
+- Maintains history of last 5 messages
+- Understands follow-up questions
+- Provides personalized responses based on your user type
+- Suggests related questions
+
+### When to Escalate
+
+The chatbot will connect you to human support when:
+- Your question is too complex or specific
+- The chatbot's confidence is below 70%
+- You explicitly request human assistance
+- Two attempts to answer haven't resolved your issue
+
+### Escalation Process
+
+1. Chatbot detects need for human support
+2. Offers to create a support ticket
+3. Includes your conversation history
+4. Provides expected response time (within 24 hours)
+5. Gives you a ticket number for tracking
+
+### Chatbot Features
+
+**Smart Matching**:
+- Uses semantic matching to understand your question
+- Handles typos and different phrasings
+- Ranks multiple possible answers
+
+**Privacy & Security**:
+- Conversations are private and secure
+- No sensitive information logged
+- Rate limited to prevent abuse (10 queries/minute)
+- Input sanitized to prevent attacks
+
+**Accessibility**:
+- Full keyboard navigation support
+- Screen reader compatible
+- WCAG 2.1 AA compliant
+- High contrast mode available
+
+**Mobile Optimized**:
+- Full-screen overlay on mobile devices
+- Touch-friendly interface
+- Works offline (cached responses)
+- Minimal data usage
+
+### Tips for Best Results
+
+1. **Be Specific**: "How do I register a tree?" vs "How does this work?"
+2. **Use Keywords**: Include terms like "sign up", "donate", "project"
+3. **Ask Follow-ups**: The chatbot remembers context
+4. **Try Rephrasing**: If you don't get a good answer, rephrase your question
+5. **Use Quick Actions**: Click suggested buttons for common tasks
+
+### Chatbot Limitations
+
+The chatbot is designed for general questions and guidance. It cannot:
+- Access your account details or personal data
+- Make changes to your profile or settings
+- Process transactions or donations
+- Provide legal or financial advice
+- Answer questions outside the platform scope
+
+For account-specific issues, use the escalation feature to connect with human support.
+
+---
+
 ## Support
 
 ### Getting Help
+
+**AI Chatbot**: Available 24/7 in bottom-right corner (coming soon)
 
 **Email Support**: support@ganggreen.org
 **Response Time**: Within 24 hours

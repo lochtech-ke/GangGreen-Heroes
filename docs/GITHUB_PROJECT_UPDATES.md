@@ -487,6 +487,10 @@ As a [user type], I want to [action] so that [benefit].
 - ✅ Task planning and documentation
 - ✅ Project structure defined
 - ✅ Technology stack selected
+- ✅ Onboarding chatbot specification created
+  - Requirements document with 10 user stories
+  - Design document with architecture and component specs
+  - Implementation plan with 13 major tasks
 
 ### In Progress Tasks
 - 🚧 Task 2.2: Configure RLS policies (Next up)
@@ -498,6 +502,13 @@ As a [user type], I want to [action] so that [benefit].
 3. Execute migrations in Supabase dashboard
 4. Task 3.2: Build authentication UI components
 5. Task 3.3: Create authentication context and hooks
+
+### Planned Features (Future Sprints)
+- Task 31: Onboarding Chatbot (Sprint 6 or later)
+  - AI-powered FAQ system with 27 questions
+  - Semantic matching and context awareness
+  - Escalation to human support
+  - Mobile-responsive chat widget
 
 ### Blocked Tasks
 - None currently

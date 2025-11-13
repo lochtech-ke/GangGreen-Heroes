@@ -1645,6 +1645,321 @@ jobs:
 
 ---
 
+## Onboarding Chatbot System
+
+**Status**: 📋 Planned - Specification complete, implementation pending
+
+### Overview
+
+The Gang Green Onboarding Chatbot is an AI-powered conversational interface designed to guide users through platform features, answer FAQs, and provide support. The chatbot uses semantic matching, context awareness, and intelligent escalation to deliver a seamless user experience.
+
+### Architecture
+
+```
+User Interface (Chat Widget)
+         ↓
+   Chat Engine Service
+         ↓
+    ┌────┴────┬────────────┬──────────────┐
+    ↓         ↓            ↓              ↓
+Query      Context    Semantic      Response
+Processor  Manager    Matcher       Generator
+    ↓         ↓            ↓              ↓
+    └─────────┴────────────┴──────────────┘
+                     ↓
+              Knowledge Base (JSON)
+                     ↓
+            Escalation Handler
+                     ↓
+              Support Service
+```
+
+### Core Components
+
+#### 1. Chat Widget Component
+
+**Location**: `src/components/chatbot/ChatWidget.tsx` (planned)
+
+**Features**:
+- Floating chat button in bottom-right corner
+- Expandable chat interface with message history
+- Quick action buttons for common queries
+- Typing indicators and loading states
+- Mobile-responsive (full-screen on mobile)
+- Minimize/maximize functionality
+
+**Props Interface**:
+```typescript
+interface ChatWidgetProps {
+  isOpen: boolean;
+  onToggle: () => void;
+  initialMessage?: string;
+  position?: 'bottom-right' | 'bottom-left';
+}
+```
+
+#### 2. Chat Engine Service
+
+**Location**: `src/services/chatbot/chatEngine.service.ts` (planned)
+
+**Responsibilities**:
+- Orchestrate query processing pipeline
+- Manage conversation state
+- Coordinate between components
+- Handle error scenarios
+
+**Interface**:
+```typescript
+interface ChatEngineService {
+  processQuery(query: string, conversationId: string): Promise<ChatResponse>;
+  initializeConversation(): string;
+  clearConversation(conversationId: string): void;
+  getConversationHistory(conversationId: string): Message[];
+}
+
+interface ChatResponse {
+  answer: string;
+  confidence: number;
+  matchedQuestion?: string;
+  suggestedActions?: QuickAction[];
+  requiresEscalation: boolean;
+}
+```
+
+#### 3. Semantic Matcher
+
+**Location**: `src/services/chatbot/semanticMatcher.ts` (planned)
+
+**Algorithm**:
+- TF-IDF vectorization for keyword matching
+- Cosine similarity for semantic comparison
+- Fuzzy string matching for typo tolerance
+- Context weighting (20% boost for related topics)
+
+**Interface**:
+```typescript
+interface SemanticMatcher {
+  findBestMatch(query: string, knowledgeBase: KnowledgeBaseEntry[]): MatchResult;
+  calculateSimilarity(query: string, question: string): number;
+  rankMatches(query: string, questions: string[]): RankedMatch[];
+}
+
+interface MatchResult {
+  entry: KnowledgeBaseEntry;
+  confidence: number;
+  similarityScore: number;
+}
+```
+
+**Confidence Threshold**: 70% - queries below this trigger escalation
+
+#### 4. Context Manager
+
+**Location**: `src/services/chatbot/contextManager.ts` (planned)
+
+**Features**:
+- Maintains 5-message conversation history
+- Tracks topics discussed and user journey
+- 20-minute session timeout
+- localStorage persistence across sessions
+
+**Interface**:
+```typescript
+interface ContextManager {
+  addMessage(conversationId: string, message: Message): void;
+  getContext(conversationId: string): ConversationContext;
+  updateContext(conversationId: string, updates: Partial<ConversationContext>): void;
+  clearContext(conversationId: string): void;
+  isContextExpired(conversationId: string): boolean;
+}
+
+interface ConversationContext {
+  conversationId: string;
+  userId?: string;
+  messageHistory: Message[];
+  topicsDiscussed: string[];
+  lastIntent: Intent;
+  startTime: Date;
+  lastActivityTime: Date;
+  userType?: 'individual' | 'corporate' | 'partner' | 'sponsor';
+}
+```
+
+#### 5. Response Generator
+
+**Location**: `src/services/chatbot/responseGenerator.ts` (planned)
+
+**Features**:
+- Formats responses from knowledge base
+- Personalizes based on user context
+- Generates follow-up suggestions
+- Adds quick action buttons
+
+**Interface**:
+```typescript
+interface ResponseGenerator {
+  generate(matchResult: MatchResult, context: ConversationContext): GeneratedResponse;
+  personalize(response: string, context: ConversationContext): string;
+  addFollowUps(response: GeneratedResponse, context: ConversationContext): GeneratedResponse;
+}
+
+interface GeneratedResponse {
+  text: string;
+  confidence: number;
+  followUpActions: QuickAction[];
+  relatedQuestions: string[];
+  metadata: {
+    sourceQuestion: string;
+    personalized: boolean;
+  };
+}
+```
+
+#### 6. Escalation Handler
+
+**Location**: `src/services/chatbot/escalationHandler.ts` (planned)
+
+**Escalation Triggers**:
+- Confidence below 70%
+- User explicitly requests human support
+- Two failed resolution attempts
+- Complex queries requiring personalized assistance
+
+**Interface**:
+```typescript
+interface EscalationHandler {
+  shouldEscalate(confidence: number, attemptCount: number): boolean;
+  createSupportTicket(conversation: ConversationContext): Promise<SupportTicket>;
+  getContactInfo(): ContactInfo;
+  trackEscalation(conversationId: string, reason: EscalationReason): void;
+}
+
+interface SupportTicket {
+  ticketId: string;
+  conversationId: string;
+  userId?: string;
+  messageHistory: Message[];
+  priority: 'low' | 'medium' | 'high';
+  category: string;
+  createdAt: Date;
+}
+```
+
+### Knowledge Base
+
+**Location**: `src/data/chatbot-knowledge-base.json` (planned)
+
+**Structure**:
+```json
+[
+  {
+    "question": "What is Gang Green and how can I get involved?",
+    "answer": "Gang Green is a tech-powered, community-centric climate action platform...",
+    "category": "getting-started",
+    "keywords": ["about", "join", "get started", "involved"],
+    "relatedQuestions": [
+      "How do I sign up as an individual?",
+      "How do I sign up a corporation or organization?"
+    ]
+  }
+]
+```
+
+**Coverage**: 27 FAQ entries across 7 categories:
+1. Getting Started (Q1-Q5)
+2. Finding and Joining Projects (Q6-Q9)
+3. Education and Gamification (Q10-Q12)
+4. Community Building (Q13-Q15)
+5. Impact Verification (Q16-Q18)
+6. Sponsorship and Partnerships (Q19-Q21)
+7. Future Projects and Support (Q22-Q27)
+
+### Database Tables
+
+#### support_tickets
+
+```sql
+CREATE TABLE support_tickets (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  conversation_id TEXT NOT NULL,
+  user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+  message_history JSONB NOT NULL,
+  priority TEXT NOT NULL CHECK (priority IN ('low', 'medium', 'high')),
+  category TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'in_progress', 'resolved', 'closed')),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  resolved_at TIMESTAMP WITH TIME ZONE
+);
+
+CREATE INDEX idx_support_tickets_user ON support_tickets(user_id);
+CREATE INDEX idx_support_tickets_status ON support_tickets(status);
+CREATE INDEX idx_support_tickets_created_at ON support_tickets(created_at DESC);
+```
+
+#### chatbot_analytics
+
+```sql
+CREATE TABLE chatbot_analytics (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  event_type TEXT NOT NULL,
+  conversation_id TEXT NOT NULL,
+  user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+  timestamp TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  metadata JSONB
+);
+
+CREATE INDEX idx_chatbot_analytics_event_type ON chatbot_analytics(event_type);
+CREATE INDEX idx_chatbot_analytics_conversation ON chatbot_analytics(conversation_id);
+CREATE INDEX idx_chatbot_analytics_timestamp ON chatbot_analytics(timestamp DESC);
+```
+
+### Performance Targets
+
+- Query processing time: < 500ms (95th percentile)
+- Knowledge base load time: < 2 seconds
+- UI render time: < 100ms
+- Memory usage: < 50MB for typical conversation (20 messages)
+
+### Security Features
+
+1. **Input Sanitization**: All user input sanitized to prevent XSS
+2. **Rate Limiting**: 10 queries per minute per user
+3. **Content Security**: DOMPurify for markdown rendering
+4. **Data Privacy**: Conversation data anonymized in analytics
+
+### Accessibility
+
+- WCAG 2.1 AA compliant
+- Full keyboard navigation support
+- Screen reader compatible with ARIA labels
+- Focus trap when widget is open
+- High contrast mode support
+
+### Mobile Optimization
+
+- Full-screen overlay on mobile devices
+- Bottom sheet style with drag-to-close
+- Touch targets minimum 44px
+- Optimized for slow connections
+
+### Integration Points
+
+1. **Supabase Auth**: Detect logged-in users for personalization
+2. **Analytics Service**: Track chatbot usage and conversion
+3. **Notification System**: Alert users when support responds
+4. **Main App**: Embedded in all pages via ChatWidget component
+
+### Future Enhancements
+
+- Multi-language support
+- Voice input capability
+- Rich media responses (images, videos)
+- Proactive suggestions based on current page
+- Sentiment analysis for prioritized escalation
+- Integration with project-specific data
+
+---
+
 ## Support & Resources
 
 - **Supabase Docs**: https://supabase.com/docs
@@ -1654,4 +1969,4 @@ jobs:
 
 ---
 
-*Last Updated: November 2025*
+*Last Updated: November 13, 2025*
