@@ -25,6 +25,11 @@ The platform integrates with Antugrow's API for advanced tree monitoring, growth
 - **Impact Metrics**: Quantifiable measurements of environmental outcomes
 - **Antugrow API**: Third-party service providing tree monitoring, growth tracking, and AI image analysis capabilities
 - **Pilot Forest**: One of the three designated forest conservation areas (Kakamega, Karura, or Mau Forest)
+- **Web3 Wallet**: A cryptocurrency wallet (e.g., MetaMask) used for blockchain transactions
+- **Cryptocurrency Donation**: A contribution made using digital currencies such as Ethereum, USDC, or other supported tokens
+- **NFT Badge**: A non-fungible token awarded to users as a digital collectible for completing specific actions
+- **Gamified Action**: A platform activity that contributes to conservation goals and earns rewards
+- **Smart Contract**: Self-executing blockchain code that manages NFT minting and cryptocurrency transactions
 
 ## Requirements
 
@@ -160,7 +165,43 @@ The platform integrates with Antugrow's API for advanced tree monitoring, growth
 4. WHEN new initiatives are created, THE Platform SHALL require assignment to one of the three pilot forests
 5. WHEN users register, THE Platform SHALL allow users to select their primary forest of interest for personalized notifications
 
-### Requirement 12: Analytics and Performance Monitoring
+### Requirement 12: Web3 Cryptocurrency Donations
+
+**User Story:** As a donor, I want to contribute to conservation initiatives using cryptocurrency, so that I can support environmental efforts with digital assets and benefit from blockchain transparency.
+
+#### Acceptance Criteria
+
+1. WHEN a user connects a Web3 Wallet, THE Platform SHALL authenticate the wallet address and associate it with the user account
+2. WHEN a user initiates a cryptocurrency donation, THE Platform SHALL display supported cryptocurrencies (ETH, USDC, MATIC) and current exchange rates
+3. WHEN a donation transaction is submitted, THE Platform SHALL process the blockchain transaction and provide transaction hash for verification
+4. WHEN a blockchain transaction confirms, THE Platform SHALL update the initiative funding status within 2 minutes
+5. WHERE donation receipts are required, THE Platform SHALL generate blockchain-verifiable donation certificates with transaction details
+
+### Requirement 13: NFT Badge Reward System
+
+**User Story:** As a platform user, I want to earn NFT badges for completing conservation actions, so that I can collect digital rewards and showcase my environmental impact.
+
+#### Acceptance Criteria
+
+1. WHEN a user completes a gamified action (planting trees, donating, verifying trees), THE Platform SHALL calculate earned points and badge eligibility
+2. WHEN a user qualifies for an NFT badge, THE Platform SHALL mint the badge NFT to the user's connected wallet address
+3. WHERE multiple badge tiers exist (Bronze, Silver, Gold, Platinum), THE Platform SHALL award badges based on cumulative achievement thresholds
+4. WHEN a user views their profile, THE Platform SHALL display all earned NFT badges with metadata and rarity information
+5. WHEN an NFT badge is minted, THE Platform SHALL record the transaction on the blockchain and provide verification link
+
+### Requirement 14: Gamification and Achievement System
+
+**User Story:** As a community member, I want to participate in gamified conservation activities, so that I can earn rewards while contributing to environmental goals.
+
+#### Acceptance Criteria
+
+1. WHEN a user performs trackable actions (tree planting, donations, monitoring, referrals), THE Platform SHALL award points based on action value
+2. WHEN users accumulate points, THE Platform SHALL update leaderboards and display user rankings by forest and globally
+3. WHERE achievement milestones are defined, THE Platform SHALL unlock badges and rewards when users reach thresholds
+4. WHEN users complete challenge quests, THE Platform SHALL award bonus points and special edition NFT badges
+5. WHEN a user refers new participants, THE Platform SHALL credit referral bonuses to both referrer and referee
+
+### Requirement 15: Analytics and Performance Monitoring
 
 **User Story:** As a platform administrator, I want to monitor system performance and user behavior, so that I can optimize the platform and improve user experience.
 
