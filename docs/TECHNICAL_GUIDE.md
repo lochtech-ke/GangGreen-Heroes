@@ -541,9 +541,81 @@ CREATE INDEX idx_web3_wallets_primary ON web3_wallets(user_id, is_primary) WHERE
 
 ---
 
+## Type Definitions
+
+**Status**: ✅ User types implemented (Task 3.1 Complete)
+
+### User Types (`src/types/user.types.ts`)
+
+```typescript
+// User roles in the system
+export type UserRole = 'admin' | 'organization' | 'community' | 'individual';
+
+// Forest preferences for users
+export type ForestPreference = 'kakamega' | 'karura' | 'mau';
+
+// User profile information
+export interface UserProfile {
+  full_name: string;
+  phone?: string;
+  organization?: string;
+  location?: string;
+  avatar_url?: string;
+}
+
+// Complete user object
+export interface User {
+  id: string;
+  email: string;
+  role: UserRole;
+  forest_preference?: ForestPreference;
+  created_at: string;
+  profile?: UserProfile;
+}
+
+// Registration data
+export interface RegisterData {
+  email: string;
+  password: string;
+  full_name: string;
+  role: UserRole;
+  forest_preference?: ForestPreference;
+  phone?: string;
+  organization?: string;
+  location?: string;
+}
+
+// Login credentials
+export interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
+// Authentication response
+export interface AuthResponse {
+  user: User | null;
+  error: Error | null;
+}
+```
+
+**Type Exports** (`src/types/index.ts`):
+```typescript
+export type {
+  User,
+  UserProfile,
+  UserRole,
+  ForestPreference,
+  RegisterData,
+  LoginCredentials,
+  AuthResponse,
+} from './user.types';
+```
+
+---
+
 ## API Documentation
 
-**Status**: 📋 Planned - Service layer will be implemented after database setup
+**Status**: 🚧 In Progress - Authentication service implemented, other services planned
 
 ### Supabase Service Layer
 
