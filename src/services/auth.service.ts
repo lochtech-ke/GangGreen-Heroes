@@ -15,6 +15,7 @@ import type { Session, AuthChangeEvent } from '@supabase/supabase-js';
 class AuthService {
   /**
    * Register a new user with email and password
+   * Profile completion will be handled by the onboarding chatbot
    */
   async register(data: RegisterData): Promise<AuthResponse> {
     try {
@@ -24,7 +25,7 @@ class AuthService {
         password: data.password,
         options: {
           data: {
-            role: data.role,
+            role: data.role || 'individual',
             forest_preference: data.forest_preference,
           },
         },
@@ -41,11 +42,11 @@ class AuthService {
         };
       }
 
-      // Step 2: Create user record in users table
+      // Step 2: Create user record in users table with default role
       const { error: userError } = await supabase.from('users').insert({
         id: authData.user.id,
         email: data.email,
-        role: data.role,
+        role: data.role || 'individual',
         forest_preference: data.forest_preference,
       });
 
@@ -55,17 +56,23 @@ class AuthService {
         return { user: null, error: userError };
       }
 
-      // Step 3: Create user profile
-      const { error: profileError } = await supabase.from('user_profiles').insert({
-        id: authData.user.id,
-        full_name: data.full_name,
-        phone: data.phone,
-        organization: data.organization,
-        location: data.location,
-      });
+      // Step 3: Skip profile creation - will be handled by onboarding chatbot
+      // Profile will be created when user completes the onboarding flow
+      // Only create profile if additional data is provided (for backward compatibility)
+      if (data.full_name || data.phone || data.organization || data.location) {
+        const { error: profileError } = await supabase.from('user_profiles').insert({
+          id: authData.user.id,
+          full_name: data.full_name,
+          phone: data.phone,
+          organization: data.organization,
+          location: data.location,
+        });
 
-      if (profileError) {
-        return { user: null, error: profileError };
+        if (profileError) {
+          // Don't fail registration if profile creation fails
+          // User can complete profile through onboarding chatbot
+          console.warn('Profile creation failed, will be handled by onboarding:', profileError);
+        }
       }
 
       // Step 4: Fetch complete user data

@@ -18,12 +18,25 @@ The platform pilots conservation efforts in three key Kenyan forests:
 
 ## ✨ Core Features
 
+### Implemented ✅
+- **Dual Authentication** - Traditional email/password + Web3 wallet authentication (MetaMask, WalletConnect)
+- **User Profiles** - Complete profile management with role-based access control
+- **Protected Routes** - Role-based route protection with automatic redirects
+- **Session Management** - Persistent sessions with real-time auth state updates
+- **Landing Page** - Responsive hero section with feature showcase and pilot forest information
+
+### In Development 🚧
+- **Authentication Testing** - Comprehensive test suite (60% complete)
+- **Database Deployment** - RLS policies and storage bucket configuration
+
+### Planned 📋
 - **Tree Planting Initiatives** - Organizations create and manage conservation efforts with geospatial tracking
 - **Carbon Credit Marketplace** - Verified carbon credits trading with transparent verification
 - **Impact Dashboard** - Real-time metrics on trees planted, carbon sequestered, and area covered
 - **AI-Powered Tree Monitoring** - Integration with Antugrow API for growth tracking and health analysis
-- **Web3 Integration** - Cryptocurrency donations (ETH, MATIC, USDC) and NFT badge rewards
-- **Gamification** - Points, levels, achievements, leaderboards, and challenge quests to drive engagement
+- **Crypto Donations** - Accept ETH, MATIC, and USDC donations
+- **NFT Badge Rewards** - Blockchain-based achievement recognition
+- **Gamification** - Points, levels, achievements, leaderboards, and challenge quests
 - **Community Engagement** - Notifications, forums, and forest-specific participation
 
 ## 🛠️ Technology Stack
@@ -59,7 +72,7 @@ The platform pilots conservation efforts in three key Kenyan forests:
 ## 🚧 Development Status
 
 **Current Phase**: Sprint 2 - Authentication & Core Setup (Week 3)  
-**Progress**: 18% Complete (5.5 of 30 major tasks)  
+**Progress**: 20% Complete (6 of 30 major tasks)  
 **Status**: ✅ On Track
 
 ### What's Complete
@@ -70,19 +83,32 @@ The platform pilots conservation efforts in three key Kenyan forests:
 - ✅ Tailwind CSS integrated
 - ✅ Supabase client configured
 - ✅ Development environment ready
+- ✅ Landing page with hero section and feature showcase
 - ✅ TypeScript type definitions (user types, auth interfaces)
 - ✅ Database schema (20 tables with indexes and triggers)
 - ✅ Row Level Security policies configured
 - ✅ Storage buckets setup (tree-images, documents, avatars, nft-badges)
 
-**Authentication System** ✅ 90% Complete (3.6 of 4 tasks)
+**Authentication System** ✅ 95% Complete (3.8 of 4 tasks)
 - ✅ Authentication service with role-based access control
+- ✅ Traditional email/password authentication
+- ✅ Web3 wallet authentication (MetaMask, WalletConnect)
+- ✅ Dual authentication flow with method selection
 - ✅ Authentication UI components (login, register, password reset)
 - ✅ Protected routes with role validation
 - ✅ AuthContext provider for global state management
 - ✅ useAuth hook with 13 methods
 - ✅ Session persistence and real-time updates
+- ✅ Simplified registration flow (email/password only)
 - 🚧 Authentication tests (60% complete - 25+ tests written)
+
+**Profile Management** ✅ 100% Complete (Task 4)
+- ✅ Profile service with CRUD operations
+- ✅ Profile completion flow after registration
+- ✅ Profile editing with validation
+- ✅ Profile display component
+- ✅ Avatar upload support
+- ✅ Role and forest preference management
 
 **Testing Infrastructure** 🚧 60% Complete
 - ✅ Vitest configuration with React support
@@ -150,6 +176,37 @@ npm run dev
 
 The development server will start at `http://localhost:5173`
 
+### What You'll See
+
+When you run the development server, you'll see:
+
+- **Landing Page** (`/`) - Hero section with mission statement, feature cards, and pilot forest information
+- **Authentication Pages** - Dual authentication flow (email/password or Web3 wallet)
+- **Profile Page** (`/profile`) - Complete your profile after registration
+- **Dashboard** (`/dashboard`) - Protected user dashboard (requires authentication)
+
+The landing page includes:
+- Responsive header with authentication-aware navigation
+- Hero section highlighting the mission to catalyze a carbon-negative Africa
+- Feature grid showcasing tree planting, carbon credits, and Web3 integration
+- Pilot forest information (Kakamega, Karura, Mau)
+- Call-to-action buttons that adapt based on authentication status
+
+The authentication pages include:
+- **Login Page** - Choose between email/password or Web3 wallet authentication
+- **Register Page** - Simplified registration (email/password only)
+- **Profile Page** - Complete your profile after registration (name, role, forest preference, etc.)
+- **Password Reset** - Request and confirm password reset flows
+- **Web3 Login** - Connect MetaMask or WalletConnect for blockchain-based authentication
+- Seamless navigation between authentication flows and home page
+
+**New User Flow**:
+1. User registers with email and password
+2. Redirected to profile completion page
+3. User provides full name, role, forest preference, and optional details
+4. Profile saved and user redirected to dashboard
+5. User can edit profile anytime from the profile page
+
 ### Environment Variables
 
 Create a `.env` file in the root directory:
@@ -215,18 +272,26 @@ npx hardhat deploy   # Deploy contracts (coming soon)
 ganggreen-platform/
 ├── src/
 │   ├── components/      # React components
-│   │   └── auth/              # Authentication components
-│   │       ├── LoginForm.tsx           # Login form with validation
-│   │       ├── RegisterForm.tsx        # Registration form
-│   │       ├── ProtectedRoute.tsx      # Route guard component
-│   │       ├── PasswordResetRequest.tsx
-│   │       ├── PasswordResetConfirm.tsx
-│   │       ├── LoginForm.test.tsx      # Component tests
-│   │       ├── RegisterForm.test.tsx
-│   │       └── README.md               # Component documentation
+│   │   ├── auth/              # Authentication components
+│   │   │   ├── LoginForm.tsx           # Login form with validation
+│   │   │   ├── RegisterForm.tsx        # Simplified registration (email/password)
+│   │   │   ├── Web3Login.tsx           # Web3 wallet authentication
+│   │   │   ├── AuthOptions.tsx         # Authentication method selector
+│   │   │   ├── ProtectedRoute.tsx      # Route guard component
+│   │   │   ├── PasswordResetRequest.tsx
+│   │   │   ├── PasswordResetConfirm.tsx
+│   │   │   ├── LoginForm.test.tsx      # Component tests
+│   │   │   ├── RegisterForm.test.tsx
+│   │   │   ├── index.ts                # Component exports
+│   │   │   └── README.md               # Component documentation
+│   │   └── profile/           # Profile management components
+│   │       ├── ProfileEditForm.tsx     # Profile completion/editing
+│   │       ├── UserProfile.tsx         # Profile display
+│   │       └── README.md               # Profile documentation
 │   ├── services/        # Business logic and API clients
 │   │   ├── supabase.ts           # Supabase client configuration
 │   │   ├── auth.service.ts       # Authentication service
+│   │   ├── profile.service.ts    # Profile management service
 │   │   ├── auth.service.test.ts  # Service unit tests
 │   │   └── README.md             # Service documentation
 │   ├── contexts/        # React Context providers
@@ -236,10 +301,12 @@ ganggreen-platform/
 │   │   ├── useAuth.ts            # Authentication hook (13 methods)
 │   │   └── README.md             # Hook documentation
 │   ├── pages/           # Page components
-│   │   ├── LoginPage.tsx
-│   │   ├── RegisterPage.tsx
-│   │   ├── ResetPasswordPage.tsx
-│   │   └── DashboardPage.tsx
+│   │   ├── HomePage.tsx              # Landing page with hero section
+│   │   ├── LoginPage.tsx             # Login with auth options (email/Web3)
+│   │   ├── RegisterPage.tsx          # Simplified registration flow
+│   │   ├── ProfilePage.tsx           # Profile completion/editing
+│   │   ├── ResetPasswordPage.tsx     # Password reset flow
+│   │   └── DashboardPage.tsx         # Protected dashboard
 │   ├── test/            # Test configuration
 │   │   ├── setup.ts              # Global test setup
 │   │   └── README.md             # Testing guide (300+ lines)
@@ -267,6 +334,32 @@ ganggreen-platform/
     ├── specs/           # Project specifications
     └── steering/        # AI steering rules
 ```
+
+## 🔐 Authentication Flow
+
+The platform supports two authentication methods:
+
+### Traditional Email/Password Authentication
+
+1. **Registration** - User provides email and password
+2. **Profile Completion** - After signup, user is redirected to complete their profile
+3. **Login** - User signs in with email and password
+4. **Dashboard Access** - Authenticated users can access protected routes
+
+### Web3 Wallet Authentication
+
+1. **Connect Wallet** - User connects MetaMask or WalletConnect
+2. **Sign Message** - User signs a verification message
+3. **Profile Setup** - First-time users complete their profile
+4. **Dashboard Access** - Wallet-authenticated users can access the platform
+
+### Authentication Options Page
+
+The login page presents users with two options:
+- **Email Authentication** - Traditional email/password flow
+- **Web3 Authentication** - Connect wallet for blockchain-based auth
+
+Users can switch between methods seamlessly, and the platform supports linking both authentication methods to a single account.
 
 ## 🔧 TypeScript Types & API
 
@@ -304,13 +397,10 @@ interface User {
 The `authService` provides comprehensive authentication functionality:
 
 ```typescript
-// Registration
+// Registration (simplified - profile completion happens after)
 const { user, error } = await authService.register({
   email: 'user@example.com',
-  password: 'password123',
-  full_name: 'John Doe',
-  role: 'individual',
-  forest_preference: 'kakamega'
+  password: 'password123'
 });
 
 // Login
@@ -353,6 +443,28 @@ function MyComponent() {
   } = useAuth();
 
   // Use auth state and methods
+}
+```
+
+### useAuthContext Hook
+
+For simpler use cases where you only need auth state (not methods):
+
+```typescript
+import { useAuthContext } from './contexts/AuthContext';
+
+function HomePage() {
+  const { isAuthenticated } = useAuthContext();
+
+  return (
+    <div>
+      {isAuthenticated ? (
+        <button onClick={() => navigate('/dashboard')}>Dashboard</button>
+      ) : (
+        <button onClick={() => navigate('/login')}>Sign In</button>
+      )}
+    </div>
+  );
 }
 ```
 

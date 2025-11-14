@@ -1,5 +1,31 @@
 # Implementation Plan
 
+- [ ] 0. Simplify registration form and prepare for onboarding integration
+  - Update RegisterForm to only collect email and password
+  - Modify registration success handler to trigger chatbot onboarding
+  - Update auth service to return user ID and email on registration
+  - _Requirements: 0.1, 0.2_
+
+- [ ] 0.1 Simplify RegisterForm component
+  - Remove all fields except email, password, and confirm password from RegisterForm.tsx
+  - Remove validation logic for optional fields (name, role, phone, location, organization)
+  - Update form layout to be more compact with only essential fields
+  - Keep error handling and loading states
+  - _Requirements: 0.1_
+
+- [ ] 0.2 Update registration success flow
+  - Modify RegisterPage.tsx to accept userId and email from registration
+  - Add state management for chatbot onboarding trigger
+  - Pass onboarding props to ChatWidget component
+  - Prevent redirect to dashboard until onboarding is complete
+  - _Requirements: 0.2, 0.8_
+
+- [ ] 0.3 Update auth service registration response
+  - Ensure authService.register() returns userId and email on success
+  - Update RegisterData type to only require email and password
+  - Remove profile creation from registration flow (will be done by chatbot)
+  - _Requirements: 0.1, 0.7_
+
 - [ ] 1. Set up project structure and data foundation
   - Create directory structure for chatbot components and services
   - Add knowledge base JSON file with the 20 FAQ entries
@@ -23,8 +49,29 @@
   - Define `Message`, `ConversationContext`, `KnowledgeBaseEntry` interfaces in `src/types/chatbot.types.ts`
   - Define `ChatResponse`, `MatchResult`, `Intent` types
   - Define `QuickAction`, `ProcessedQuery` interfaces
+  - Define `OnboardingSession`, `OnboardingStep`, `OnboardingStepResult` interfaces
+  - Define `ProfileCompletionResult`, `OnboardingProgress` interfaces
   - Export all types for use across components
-  - _Requirements: 11.1_
+  - _Requirements: 11.1, 0.3_
+
+- [ ] 1.4 Implement OnboardingFlowManager service
+  - Create `src/services/chatbot/onboardingFlowManager.ts`
+  - Implement `startOnboarding()` to initialize onboarding session
+  - Implement `processOnboardingResponse()` to handle user answers and validate inputs
+  - Implement step progression logic (welcome → full_name → role → forest_preference → phone → location → organization → complete)
+  - Add validation for each field (email format, role options, forest options)
+  - Implement `skipCurrentStep()` for optional fields
+  - Implement `completeOnboarding()` to save profile to Supabase
+  - Add `getOnboardingProgress()` to track completion percentage
+  - _Requirements: 0.3, 0.4, 0.5, 0.6, 0.7_
+
+- [ ] 1.5 Write unit tests for onboarding flow
+  - Test onboarding session initialization
+  - Test step progression and validation
+  - Test skip logic for optional fields
+  - Test profile completion and database save
+  - Test error handling for invalid inputs
+  - _Requirements: 0.4, 0.5, 0.7_
 
 - [ ] 2. Implement knowledge base manager and semantic matcher
   - Build knowledge base loading and caching system
@@ -66,7 +113,9 @@
   - Implement context storage with 5-message history limit
   - Add `isContextExpired()` with 20-minute timeout check
   - Implement localStorage persistence for conversation state
-  - _Requirements: 9.1, 9.2, 9.3, 9.4_
+  - Add support for onboarding mode tracking in context
+  - Store onboarding session ID and progress in context
+  - _Requirements: 9.1, 9.2, 9.3, 9.4, 0.3_
 
 - [ ] 3.2 Implement QueryProcessor service
   - Create `src/services/chatbot/queryProcessor.ts`
@@ -126,11 +175,15 @@
 
 - [ ] 5.1 Implement ChatEngine service
   - Create `src/services/chatbot/chatEngine.service.ts`
-  - Implement `processQuery()` to orchestrate full pipeline
-  - Implement `initializeConversation()` to create new conversation ID
+  - Implement `processQuery()` to orchestrate full pipeline for general queries
+  - Implement `processOnboardingResponse()` to handle onboarding flow responses
+  - Implement `initializeConversation()` with mode parameter ('general' or 'onboarding')
+  - Implement `startOnboarding()` to begin post-registration profile completion
   - Implement `getConversationHistory()` to retrieve past messages
+  - Add `isOnboardingMode()` to check if conversation is in onboarding
   - Add error handling for each pipeline stage with fallback responses
-  - _Requirements: 1.1, 1.2, 8.1, 8.2_
+  - Route messages to OnboardingFlowManager when in onboarding mode
+  - _Requirements: 1.1, 1.2, 8.1, 8.2, 0.2, 0.3_
 
 - [ ] 5.2 Add analytics tracking to chat engine
   - Implement event tracking for query sent, response generated, escalation
@@ -147,10 +200,12 @@
 
 - [ ] 5.4 Write integration tests for chat engine
   - Test complete query-to-response pipeline
+  - Test onboarding flow from start to completion
+  - Test mode switching between general and onboarding
   - Test error handling and fallback responses
   - Test analytics event tracking
   - Test conversation initialization and history retrieval
-  - _Requirements: 1.1, 1.2, 8.1_
+  - _Requirements: 1.1, 1.2, 8.1, 0.8_
 
 - [ ] 6. Build chat widget UI components
   - Create main chat widget component with open/close functionality
@@ -164,8 +219,12 @@
   - Add message list with auto-scroll to bottom
   - Implement text input with submit on Enter key
   - Add typing indicator display
+  - Add onboarding progress bar when in onboarding mode
+  - Accept autoStartOnboarding, userId, and userEmail props
+  - Automatically initialize onboarding flow when autoStartOnboarding is true
+  - Disable close button during onboarding to ensure completion
   - Style with Tailwind CSS (bottom-right positioning, shadow, rounded corners)
-  - _Requirements: 1.1, 9.1_
+  - _Requirements: 1.1, 9.1, 0.1, 0.2_
 
 - [ ] 6.2 Create Message component
   - Create `src/components/chatbot/Message.tsx`
@@ -192,10 +251,12 @@
 
 - [ ] 6.5 Write component tests for UI
   - Test ChatWidget rendering and interactions
+  - Test onboarding mode initialization
+  - Test progress bar display during onboarding
   - Test Message component with user and bot messages
   - Test QuickActions button clicks
   - Test keyboard navigation and accessibility
-  - _Requirements: 1.1_
+  - _Requirements: 1.1, 0.2_
 
 - [ ] 7. Implement responsive design and accessibility
   - Add mobile-responsive layouts
@@ -225,24 +286,36 @@
   - Add feature flag for enable/disable
   - _Requirements: 1.1, 2.1, 8.1_
 
-- [ ] 8.1 Add ChatWidget to App.tsx
+- [ ] 8.1 Add ChatWidget to RegisterPage.tsx
+  - Import and render ChatWidget component in RegisterPage
+  - Add state for chatbot onboarding trigger (isOpen, userId, email)
+  - Update handleRegisterSuccess to set onboarding state
+  - Pass autoStartOnboarding, userId, and userEmail props to ChatWidget
+  - Delay dashboard redirect until onboarding is complete
+  - _Requirements: 0.2, 0.8_
+
+- [ ] 8.2 Add ChatWidget to App.tsx for general use
   - Import and render ChatWidget component in main layout
   - Pass user authentication context from Supabase Auth
   - Initialize chat engine service on app load
   - Add feature flag check to conditionally render chatbot
+  - Ensure chatbot is available on all pages after onboarding
   - _Requirements: 1.1_
 
-- [ ] 8.2 Connect authentication context
+- [ ] 8.3 Connect authentication context
   - Pass logged-in user info to chat engine for personalization
   - Pre-fill support tickets with user details
   - Customize welcome message based on user type
-  - _Requirements: 2.1, 10.3_
+  - Check if user has completed profile and skip onboarding if already done
+  - _Requirements: 2.1, 10.3, 0.8_
 
-- [ ] 8.3 Integrate with analytics service
+- [ ] 8.4 Integrate with analytics service
   - Connect chatbot analytics tracker to main analytics service
   - Track chatbot usage metrics (opens, queries, escalations)
-  - Add conversion tracking from chatbot to registration
-  - _Requirements: 8.1_
+  - Track onboarding completion rates and drop-off points
+  - Track average time to complete onboarding
+  - Add conversion tracking from registration to profile completion
+  - _Requirements: 8.1, 0.8_
 
 - [ ] 9. Add welcome flow and default quick actions
   - Implement welcome message on first open
@@ -338,16 +411,21 @@
   - Test complete user flows
   - Validate response accuracy
   - Test escalation workflows
+  - Test onboarding flow
   - Verify performance metrics
-  - _Requirements: 1.1, 1.2, 10.1, 10.2_
+  - _Requirements: 1.1, 1.2, 10.1, 10.2, 0.8_
 
 - [ ] 13.1 Write E2E tests for user flows
-  - Test new user asking about getting started
+  - Test new user registration and onboarding flow
+  - Test complete onboarding from start to profile save
+  - Test skipping optional fields during onboarding
+  - Test onboarding validation errors and retry
+  - Test existing user asking about getting started
   - Test follow-up question with context
   - Test unclear question handling
   - Test low confidence escalation flow
   - Test explicit support request
-  - _Requirements: 1.1, 1.2, 10.1, 10.2_
+  - _Requirements: 1.1, 1.2, 10.1, 10.2, 0.1, 0.8_
 
 - [ ] 13.2 Validate response accuracy
   - Test all 20 FAQ questions with exact phrasing

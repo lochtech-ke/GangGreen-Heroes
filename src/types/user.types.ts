@@ -21,8 +21,8 @@ export interface User {
 export interface RegisterData {
   email: string;
   password: string;
-  full_name: string;
-  role: UserRole;
+  full_name?: string;
+  role?: UserRole;
   forest_preference?: ForestPreference;
   phone?: string;
   organization?: string;

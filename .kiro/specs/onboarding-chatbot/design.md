@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Gang Green Onboarding Chatbot is a React-based conversational interface that provides intelligent, context-aware responses to user queries about the platform. The chatbot leverages a JSON knowledge base, semantic matching algorithms, and conversation context management to deliver a seamless user experience. The design prioritizes fast response times (<500ms), maintainability, and easy content updates.
+The Gang Green Onboarding Chatbot is a React-based conversational interface that provides intelligent, context-aware responses to user queries about the platform and guides new users through post-registration profile completion. The chatbot leverages a JSON knowledge base, semantic matching algorithms, conversation context management, and a structured onboarding flow to deliver a seamless user experience. The design prioritizes fast response times (<500ms), maintainability, easy content updates, and a friendly conversational onboarding experience that collects user profile information after simplified email/password registration.
 
 ## Architecture
 
@@ -12,6 +12,9 @@ The Gang Green Onboarding Chatbot is a React-based conversational interface that
 graph TB
     User[User Interface] --> ChatWidget[Chat Widget Component]
     ChatWidget --> ChatEngine[Chat Engine Service]
+    ChatEngine --> OnboardingFlow[Onboarding Flow Manager]
+    OnboardingFlow --> ProfileService[Profile Service]
+    ProfileService --> Supabase[(Supabase DB)]
     ChatEngine --> ContextMgr[Context Manager]
     ChatEngine --> QueryProcessor[Query Processor]
     QueryProcessor --> Matcher[Semantic Matcher]
@@ -25,11 +28,84 @@ graph TB
 ### Component Layers
 
 1. **Presentation Layer**: React components for chat UI
-2. **Service Layer**: Business logic for query processing and response generation
-3. **Data Layer**: JSON knowledge base and conversation state management
-4. **Integration Layer**: Support ticketing and analytics
+2. **Onboarding Layer**: Post-registration profile completion flow
+3. **Service Layer**: Business logic for query processing and response generation
+4. **Data Layer**: JSON knowledge base and conversation state management
+5. **Integration Layer**: Support ticketing, profile management, and analytics
 
 ## Components and Interfaces
+
+### 0. Onboarding Flow Manager
+
+**Location**: `src/services/chatbot/onboardingFlowManager.ts`
+
+**Responsibilities**:
+- Manage post-registration onboarding conversation flow
+- Collect user profile information step-by-step
+- Validate user inputs for each profile field
+- Save completed profile data to Supabase
+- Handle skip/retry logic for optional fields
+
+**Interface**:
+```typescript
+interface OnboardingFlowManager {
+  startOnboarding(userId: string, email: string): OnboardingSession;
+  processOnboardingResponse(sessionId: string, response: string): OnboardingStepResult;
+  skipCurrentStep(sessionId: string): OnboardingStepResult;
+  completeOnboarding(sessionId: string): Promise<ProfileCompletionResult>;
+  getOnboardingProgress(sessionId: string): OnboardingProgress;
+}
+
+interface OnboardingSession {
+  sessionId: string;
+  userId: string;
+  email: string;
+  currentStep: OnboardingStep;
+  collectedData: Partial<UserProfile>;
+  startedAt: Date;
+}
+
+type OnboardingStep = 
+  | 'welcome'
+  | 'full_name'
+  | 'role'
+  | 'forest_preference'
+  | 'phone'
+  | 'location'
+  | 'organization'
+  | 'complete';
+
+interface OnboardingStepResult {
+  message: string;
+  nextStep: OnboardingStep;
+  isValid: boolean;
+  validationError?: string;
+  progress: number; // 0-100
+}
+
+interface ProfileCompletionResult {
+  success: boolean;
+  profile?: UserProfile;
+  error?: string;
+}
+
+interface OnboardingProgress {
+  currentStep: OnboardingStep;
+  totalSteps: number;
+  completedSteps: number;
+  percentComplete: number;
+}
+```
+
+**Onboarding Flow Sequence**:
+1. **Welcome**: Greet user and explain profile completion
+2. **Full Name**: "What's your full name?"
+3. **Role**: "Are you joining as an individual, community member, or organization?"
+4. **Forest Preference**: "Which forest would you like to focus on? (Kakamega, Karura, or Mau)"
+5. **Phone** (optional): "What's your phone number? (You can skip this)"
+6. **Location** (optional): "Where are you located?"
+7. **Organization** (conditional): "What's your organization name?" (only if role is 'organization')
+8. **Complete**: Save profile and show welcome message
 
 ### 1. Chat Widget Component
 
@@ -49,6 +125,9 @@ interface ChatWidgetProps {
   onToggle: () => void;
   initialMessage?: string;
   position?: 'bottom-right' | 'bottom-left';
+  autoStartOnboarding?: boolean;
+  userId?: string;
+  userEmail?: string;
 }
 ```
 
@@ -131,9 +210,12 @@ interface QuickAction {
 ```typescript
 interface ChatEngineService {
   processQuery(query: string, conversationId: string): Promise<ChatResponse>;
-  initializeConversation(): string;
+  processOnboardingResponse(response: string, conversationId: string): Promise<ChatResponse>;
+  initializeConversation(mode?: 'general' | 'onboarding'): string;
+  startOnboarding(userId: string, email: string, conversationId: string): Promise<ChatResponse>;
   clearConversation(conversationId: string): void;
   getConversationHistory(conversationId: string): Message[];
+  isOnboardingMode(conversationId: string): boolean;
 }
 
 interface ChatResponse {
@@ -142,6 +224,8 @@ interface ChatResponse {
   matchedQuestion?: string;
   suggestedActions?: QuickAction[];
   requiresEscalation: boolean;
+  onboardingProgress?: OnboardingProgress;
+  isOnboardingComplete?: boolean;
 }
 ```
 
@@ -575,9 +659,88 @@ interface ErrorResponse {
 - Bottom sheet style with drag-to-close
 - Optimized touch targets (min 44px)
 
+## Simplified Registration Flow
+
+### Registration Page Changes
+
+**Current State**: Registration form collects email, password, full name, role, forest preference, phone, location, and organization in a single form.
+
+**New State**: Registration form only collects email and password.
+
+**Changes Required**:
+1. Update `RegisterForm.tsx` to only show email and password fields
+2. Remove validation for optional fields during registration
+3. After successful registration, automatically open chatbot with onboarding mode
+4. Pass user ID and email to chatbot for profile completion
+
+### Post-Registration Flow
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant RegisterForm
+    participant AuthService
+    participant ChatWidget
+    participant OnboardingFlow
+    participant ProfileService
+    participant Supabase
+
+    User->>RegisterForm: Enter email & password
+    RegisterForm->>AuthService: register(email, password)
+    AuthService->>Supabase: Create auth user
+    Supabase-->>AuthService: User created
+    AuthService-->>RegisterForm: Success (userId, email)
+    RegisterForm->>ChatWidget: Open with onboarding mode
+    ChatWidget->>OnboardingFlow: Start onboarding
+    OnboardingFlow-->>ChatWidget: Welcome message
+    
+    loop Profile Completion
+        User->>ChatWidget: Provide answer
+        ChatWidget->>OnboardingFlow: Process response
+        OnboardingFlow-->>ChatWidget: Next question
+    end
+    
+    OnboardingFlow->>ProfileService: Save profile
+    ProfileService->>Supabase: Insert user_profile
+    Supabase-->>ProfileService: Success
+    ProfileService-->>OnboardingFlow: Profile saved
+    OnboardingFlow-->>ChatWidget: Completion message
+    ChatWidget->>User: Redirect to dashboard
+```
+
+### Integration with Registration
+
+**RegisterPage.tsx Changes**:
+```typescript
+const handleRegisterSuccess = (userId: string, email: string) => {
+  // Open chatbot in onboarding mode
+  setChatbotOpen(true);
+  setChatbotOnboarding(true);
+  setChatbotUserId(userId);
+  setChatbotUserEmail(email);
+};
+```
+
+**ChatWidget Integration**:
+```typescript
+// In App.tsx or RegisterPage.tsx
+<ChatWidget
+  isOpen={chatbotOpen}
+  onToggle={() => setChatbotOpen(!chatbotOpen)}
+  autoStartOnboarding={chatbotOnboarding}
+  userId={chatbotUserId}
+  userEmail={chatbotUserEmail}
+/>
+```
+
 ## Integration Points
 
 ### 1. Supabase Integration
+
+**Profile Storage**:
+- Table: `user_profiles`
+- Store profile data collected during onboarding
+- Update existing profile if user completes onboarding later
 
 **Support Ticket Storage**:
 - Table: `support_tickets`
@@ -587,6 +750,7 @@ interface ErrorResponse {
 **Analytics Storage**:
 - Table: `chatbot_analytics`
 - Track usage metrics, popular queries, escalation rates
+- Track onboarding completion rates and drop-off points
 
 ### 2. Authentication Integration
 
@@ -594,6 +758,11 @@ interface ErrorResponse {
 - Detect logged-in users via Supabase Auth
 - Personalize responses based on user type (individual, corporate, partner)
 - Pre-fill support tickets with user information
+
+**Post-Registration Trigger**:
+- Automatically open chatbot after successful registration
+- Initialize onboarding flow with user ID and email
+- Track onboarding completion status in user metadata
 
 ### 3. Analytics Integration
 
@@ -695,6 +864,8 @@ interface ErrorResponse {
 6. **Learning System**: Track which responses are most helpful and optimize
 7. **Integration with Project Data**: Answer specific questions about user's projects
 8. **Chatbot Analytics Dashboard**: Admin interface for monitoring performance
+9. **Resume Onboarding**: Allow users who skipped onboarding to complete it later from settings
+10. **Smart Field Suggestions**: Pre-fill location based on IP, suggest organizations from database
 
 ### Technical Debt to Address
 

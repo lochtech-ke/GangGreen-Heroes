@@ -2,7 +2,7 @@
 
 ## Introduction
 
-The Gang Green Onboarding Chatbot is an AI-powered conversational interface designed to guide new and existing users through the platform's features, answer frequently asked questions, and facilitate user engagement. The chatbot serves as the primary support and discovery tool, helping users understand how to participate in climate action initiatives, sponsor projects, become partners, and navigate the platform's gamification and community features.
+The Gang Green Onboarding Chatbot is an AI-powered conversational interface designed to guide new and existing users through the platform's features, answer frequently asked questions, facilitate user engagement, and complete post-registration profile setup. The chatbot serves as the primary support and discovery tool, helping users understand how to participate in climate action initiatives, sponsor projects, become partners, and navigate the platform's gamification and community features. For new users, the chatbot provides a guided onboarding experience immediately after registration to collect additional profile information in a conversational manner.
 
 ## Glossary
 
@@ -13,8 +13,26 @@ The Gang Green Onboarding Chatbot is an AI-powered conversational interface desi
 - **Context Engine**: The component that maintains conversation history and user context during interactions
 - **Response Generator**: The component that formulates appropriate responses based on user queries and FAQ content
 - **Escalation Handler**: The component that routes complex queries to human support when needed
+- **Onboarding Flow**: The guided conversational sequence that collects user profile information after registration
+- **Profile Completion**: The process of gathering additional user details (role, location, preferences) through chatbot interaction
 
 ## Requirements
+
+### Requirement 0
+
+**User Story:** As a new user who just registered with email and password, I want to complete my profile through a conversational chatbot, so that I can provide additional information in a friendly, guided manner.
+
+#### Acceptance Criteria
+
+1. WHEN a user completes registration with only email and password, THE Chatbot System SHALL automatically open and initiate the onboarding flow
+2. WHEN the onboarding flow starts, THE Chatbot System SHALL greet the user by name and explain the profile completion process
+3. WHEN collecting profile information, THE Chatbot System SHALL ask one question at a time in a conversational manner
+4. THE Chatbot System SHALL collect the following information in sequence: full name, account type (individual, community, organization), forest preference, phone number, location, and organization name (if applicable)
+5. WHEN a user provides an answer, THE Response Generator SHALL validate the input and request clarification if invalid
+6. WHEN a user skips an optional field, THE Chatbot System SHALL acknowledge and proceed to the next question
+7. WHEN all required profile fields are collected, THE Chatbot System SHALL save the profile data to the user_profiles table
+8. WHEN profile completion is successful, THE Chatbot System SHALL display a welcome message and transition to general help mode
+9. IF profile completion fails, THEN THE Chatbot System SHALL offer to retry or allow the user to complete their profile later from settings
 
 ### Requirement 1
 

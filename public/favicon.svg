@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="greenGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10b981;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#059669;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Tree trunk -->
+  <rect x="42" y="55" width="16" height="25" fill="#78350f" rx="2"/>
+  
+  <!-- Tree foliage - three circles forming a tree shape -->
+  <circle cx="35" cy="45" r="18" fill="url(#greenGradient)"/>
+  <circle cx="65" cy="45" r="18" fill="url(#greenGradient)"/>
+  <circle cx="50" cy="30" r="20" fill="url(#greenGradient)"/>
+  
+  <!-- Hashtag symbol overlay -->
+  <g fill="#ffffff" opacity="0.9">
+    <rect x="38" y="25" width="3" height="20" rx="1"/>
+    <rect x="59" y="25" width="3" height="20" rx="1"/>
+    <rect x="33" y="30" width="20" height="3" rx="1"/>
+    <rect x="33" y="40" width="20" height="3" rx="1"/>
+  </g>
+  
+  <!-- Circle border -->
+  <circle cx="50" cy="50" r="48" fill="none" stroke="url(#greenGradient)" stroke-width="3"/>
+</svg>
