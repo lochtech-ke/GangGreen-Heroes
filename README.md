@@ -90,12 +90,14 @@ The platform pilots conservation efforts in three key Kenyan forests:
 - ✅ Landing page with hero section and feature showcase
 - ✅ TypeScript type definitions (user types, auth interfaces)
 - ✅ Database schema (20 tables with indexes and triggers)
+- ✅ Database trigger for automatic user record creation
 - ✅ Row Level Security policies configured
 - ✅ Storage buckets setup (tree-images, documents, avatars, nft-badges)
 
 **Authentication System** ✅ 95% Complete (3.8 of 4 tasks)
 - ✅ Authentication service with role-based access control
-- ✅ Traditional email/password authentication
+- ✅ Traditional email/password authentication with email confirmation support
+- ✅ Email verification flow with user-friendly confirmation screens
 - ✅ Web3 wallet authentication (MetaMask, WalletConnect)
 - ✅ Dual authentication flow with method selection
 - ✅ Authentication UI components (login, register, password reset)
@@ -103,7 +105,10 @@ The platform pilots conservation efforts in three key Kenyan forests:
 - ✅ AuthContext provider for global state management
 - ✅ useAuth hook with 13 methods
 - ✅ Session persistence and real-time updates
-- ✅ Simplified registration flow (email/password only)
+- ✅ Simplified registration flow with database trigger
+- ✅ Graceful error handling (no client-side rollback)
+- ✅ Optional profile creation during registration
+- ✅ Enhanced debug logging for registration troubleshooting
 - 🚧 Authentication tests (60% complete - 25+ tests written)
 
 **Profile Management** ✅ 100% Complete (Task 4)
@@ -230,6 +235,7 @@ The landing page includes:
 The authentication pages include:
 - **Login Page** - Choose between email/password or Web3 wallet authentication
 - **Register Page** - Simplified registration (email/password only)
+- **Email Confirmation** - User-friendly confirmation screen when email verification is required
 - **Profile Page** - Complete your profile after registration (name, role, forest preference, etc.)
 - **Password Reset** - Request and confirm password reset flows
 - **Web3 Login** - Connect MetaMask or WalletConnect for blockchain-based authentication
@@ -237,10 +243,22 @@ The authentication pages include:
 
 **New User Flow**:
 1. User registers with email and password
-2. Redirected to profile completion page
-3. User provides full name, role, forest preference, and optional details
-4. Profile saved and user redirected to dashboard
-5. User can edit profile anytime from the profile page
+2. User record automatically created via database trigger
+3. Email confirmation screen shown (if email verification is enabled)
+4. User clicks confirmation link in email to verify account
+5. Optional: Provide additional profile details during registration
+6. Onboarding chatbot guides profile completion
+7. User can edit profile anytime from the profile page
+
+**Email Confirmation**:
+- If Supabase email confirmation is enabled, users see a friendly confirmation screen
+- Clear instructions guide users to check their email
+- Spam folder reminder included
+- Users can proceed to login after confirming their email
+
+**Note**: The registration process has been optimized to prevent rollback issues. If profile creation fails during registration, the auth user is preserved and profile completion is deferred to the onboarding flow.
+
+**Debug Mode**: The registration form currently includes console logging for troubleshooting the registration flow. This will be removed in production.
 
 ### Environment Variables
 
@@ -379,7 +397,12 @@ The platform supports two authentication methods:
 ### Traditional Email/Password Authentication
 
 1. **Registration** - User provides email and password
-2. **Profile Completion** - After signup, user is redirected to complete their profile
+   - User record is automatically created via database trigger
+   - Email confirmation may be required (configurable in Supabase)
+   - Confirmation screen displays with instructions if email verification is needed
+   - Profile completion is optional during registration
+   - Full profile setup handled by onboarding chatbot
+2. **Email Verification** - User clicks confirmation link in email (if required)
 3. **Login** - User signs in with email and password
 4. **Dashboard Access** - Authenticated users can access protected routes
 
@@ -434,10 +457,17 @@ interface User {
 The `authService` provides comprehensive authentication functionality:
 
 ```typescript
-// Registration (simplified - profile completion happens after)
+// Registration (user record created automatically via database trigger)
 const { user, error } = await authService.register({
   email: 'user@example.com',
-  password: 'password123'
+  password: 'password123',
+  role: 'individual', // Optional, defaults to 'individual'
+  forest_preference: 'kakamega', // Optional
+  // Optional profile fields (for backward compatibility)
+  full_name: 'John Doe',
+  phone: '+254712345678',
+  organization: 'Green Initiative',
+  location: 'Nairobi, Kenya'
 });
 
 // Login
@@ -458,6 +488,23 @@ const isAdmin = authService.isAdmin(user);
 const hasRole = authService.hasRole(user, 'organization');
 const hasAnyRole = authService.hasAnyRole(user, ['admin', 'organization']);
 ```
+
+**Important**: The registration process has been updated to handle edge cases gracefully:
+- User records in the `users` table are created automatically via database trigger
+- Email confirmation flow is automatically detected and handled
+- User-friendly confirmation screen shown when email verification is required
+- Profile creation is optional and non-blocking
+- If profile creation fails, registration still succeeds
+- Profile completion is handled by the onboarding chatbot
+- No client-side rollback attempts (prevents auth/database inconsistencies)
+- Enhanced debug logging tracks the registration flow for troubleshooting
+
+**Email Confirmation Handling**:
+- The RegisterForm automatically detects when email confirmation is required
+- Displays a dedicated confirmation screen with clear instructions
+- Shows the user's email address for reference
+- Includes reminder to check spam folder
+- Gracefully handles the confirmation flow without errors
 
 ### useAuth Hook
 

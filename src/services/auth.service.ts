@@ -19,7 +19,10 @@ class AuthService {
    */
   async register(data: RegisterData): Promise<AuthResponse> {
     try {
+      console.log('[AuthService] Starting registration...', { email: data.email });
+      
       // Step 1: Create auth user
+      // Note: User record in 'users' table is automatically created by database trigger
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: data.email,
         password: data.password,
@@ -31,32 +34,24 @@ class AuthService {
         },
       });
 
+      console.log('[AuthService] SignUp response:', { authData, authError });
+
       if (authError) {
+        console.error('[AuthService] SignUp error:', authError);
         return { user: null, error: authError };
       }
 
       if (!authData.user) {
+        console.error('[AuthService] No user in auth data');
         return {
           user: null,
           error: new Error('User registration failed'),
         };
       }
 
-      // Step 2: Create user record in users table with default role
-      const { error: userError } = await supabase.from('users').insert({
-        id: authData.user.id,
-        email: data.email,
-        role: data.role || 'individual',
-        forest_preference: data.forest_preference,
-      });
+      console.log('[AuthService] Auth user created:', authData.user.id);
 
-      if (userError) {
-        // Rollback: delete auth user if user record creation fails
-        await supabase.auth.admin.deleteUser(authData.user.id);
-        return { user: null, error: userError };
-      }
-
-      // Step 3: Skip profile creation - will be handled by onboarding chatbot
+      // Step 2: Skip profile creation - will be handled by onboarding chatbot
       // Profile will be created when user completes the onboarding flow
       // Only create profile if additional data is provided (for backward compatibility)
       if (data.full_name || data.phone || data.organization || data.location) {
@@ -75,10 +70,13 @@ class AuthService {
         }
       }
 
-      // Step 4: Fetch complete user data
+      // Step 3: Fetch complete user data
+      console.log('[AuthService] Fetching complete user data...');
       const user = await this.getCurrentUser();
+      console.log('[AuthService] User data fetched:', user);
       return { user, error: null };
     } catch (error) {
+      console.error('[AuthService] Registration exception:', error);
       return {
         user: null,
         error: error instanceof Error ? error : new Error('Registration failed'),
@@ -137,7 +135,10 @@ class AuthService {
         data: { user: authUser },
       } = await supabase.auth.getUser();
 
+      console.log('[AuthService] getCurrentUser - authUser:', authUser?.id);
+
       if (!authUser) {
+        console.log('[AuthService] No auth user found');
         return null;
       }
 
@@ -148,7 +149,10 @@ class AuthService {
         .eq('id', authUser.id)
         .single();
 
+      console.log('[AuthService] User data from DB:', { userData, userError });
+
       if (userError || !userData) {
+        console.error('[AuthService] Failed to fetch user data:', userError);
         return null;
       }
 

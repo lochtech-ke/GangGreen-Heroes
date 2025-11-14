@@ -34,18 +34,36 @@ export function LoginForm({ onSuccess, onForgotPassword }: LoginFormProps) {
     }
 
     try {
+      console.log('[LoginForm] Attempting login for:', credentials.email);
       const { user, error: authError } = await authService.login(credentials);
 
+      console.log('[LoginForm] Login response:', { user, error: authError });
+
       if (authError) {
-        setError(authError.message || 'Login failed. Please check your credentials.');
+        console.error('[LoginForm] Login error:', authError);
+        
+        // Provide more helpful error messages
+        if (authError.message?.includes('Email not confirmed')) {
+          setError('Please confirm your email address before logging in. Check your inbox for the confirmation link.');
+        } else if (authError.message?.includes('Invalid login credentials')) {
+          setError('Invalid email or password. Please check your credentials and try again.');
+        } else {
+          setError(authError.message || 'Login failed. Please check your credentials.');
+        }
         setLoading(false);
         return;
       }
 
       if (user) {
+        console.log('[LoginForm] Login successful');
         onSuccess?.();
+      } else {
+        console.warn('[LoginForm] No user returned after login');
+        setError('Login succeeded but user data is unavailable. Please try again.');
+        setLoading(false);
       }
     } catch (err) {
+      console.error('[LoginForm] Login exception:', err);
       setError('An unexpected error occurred. Please try again.');
       setLoading(false);
     }

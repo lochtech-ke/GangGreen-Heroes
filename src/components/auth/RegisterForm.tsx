@@ -11,6 +11,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState<string>('');
   const [loading, setLoading] = useState(false);
+  const [needsEmailConfirmation, setNeedsEmailConfirmation] = useState(false);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -43,25 +44,73 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
     }
 
     try {
+      console.log('Starting registration for:', email);
       const { user, error: authError } = await authService.register({
         email,
         password,
       });
 
+      console.log('Registration response:', { user, error: authError });
+
       if (authError) {
+        console.error('Auth error:', authError);
         setError(authError.message || 'Registration failed. Please try again.');
-        setLoading(false);
+        return;
+      }
+
+      // Check if email confirmation is required
+      if (!user && !authError) {
+        console.log('Email confirmation required');
+        setNeedsEmailConfirmation(true);
         return;
       }
 
       if (user) {
+        console.log('Registration successful, user:', user);
         onSuccess?.(user.id, email);
+      } else {
+        console.warn('No user returned after registration');
+        setError('Registration completed but user data is unavailable. Please try logging in.');
       }
     } catch (err) {
+      console.error('Registration exception:', err);
       setError('An unexpected error occurred. Please try again.');
+    } finally {
       setLoading(false);
     }
   };
+
+  // Show email confirmation message if needed
+  if (needsEmailConfirmation) {
+    return (
+      <div className="w-full max-w-md mx-auto">
+        <div className="bg-white rounded-lg shadow-lg p-8">
+          <div className="text-center mb-6">
+            <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
+              <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <h2 className="text-2xl font-bold text-green-700 mb-2">
+              Check Your Email
+            </h2>
+            <p className="text-gray-600 mb-4">
+              We've sent a confirmation link to:
+            </p>
+            <p className="text-green-700 font-semibold mb-4">{email}</p>
+            <p className="text-sm text-gray-600">
+              Please click the link in the email to verify your account. After confirming, you can log in with your credentials.
+            </p>
+          </div>
+          <div className="border-t pt-4">
+            <p className="text-xs text-gray-500 text-center">
+              Didn't receive the email? Check your spam folder or try registering again.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-md mx-auto">
