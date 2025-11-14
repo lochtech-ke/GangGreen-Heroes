@@ -181,14 +181,20 @@
   - _Requirements: 2.1, 2.2, 2.3_
 
 - [ ] 6. Tree Registry and Monitoring
-- [ ] 6.1 Create tree service layer
+- [x] 6.1 Create tree service layer
+
+
+
   - Implement tree CRUD operations
   - Add tree filtering and search
   - Create tree-to-initiative linking
   - Implement tree statistics calculations
   - _Requirements: 10.1, 11.2_
 
-- [ ] 6.2 Build tree registry UI
+- [x] 6.2 Build tree registry UI
+
+
+
   - Create TreeRegistry list component
   - Build TreeCard display component
   - Implement TreeDetails page
@@ -196,7 +202,10 @@
   - Create species selector
   - _Requirements: 10.1, 11.2_
 
-- [ ] 6.3 Implement tree image upload
+- [x] 6.3 Implement tree image upload
+
+
+
   - Create TreeUpload component
   - Add image validation (type, size)
   - Implement upload to Supabase Storage
@@ -204,14 +213,20 @@
   - Add image capture date tracking
   - _Requirements: 10.2, 8.1_
 
-- [ ] 6.4 Write tree registry tests
+- [x] 6.4 Write tree registry tests
+
+
+
   - Unit tests for tree service
   - Integration tests for tree CRUD
   - Test image upload functionality
   - _Requirements: 10.1, 10.2_
 
 - [ ] 7. Antugrow API Integration
-- [ ] 7.1 Create Antugrow service wrapper
+- [x] 7.1 Create Antugrow service wrapper
+
+
+
   - Implement API client with authentication
   - Add tree registration endpoint integration
   - Create image analysis submission function
@@ -219,7 +234,10 @@
   - Add retry logic with exponential backoff
   - _Requirements: 10.1, 10.2, 10.3, 10.5_
 
-- [ ] 7.2 Build tree monitoring UI
+- [x] 7.2 Build tree monitoring UI
+
+
+
   - Create TreeHealthStatus component
   - Build TreeGrowthChart for visualization
   - Add AntugrowAnalysis display component
@@ -227,7 +245,10 @@
   - Create recommendations display
   - _Requirements: 10.2, 10.3, 10.4_
 
-- [ ] 7.3 Implement sync mechanism
+- [x] 7.3 Implement sync mechanism
+
+
+
   - Create background job for syncing Antugrow data
   - Add webhook handler for Antugrow updates
   - Implement data reconciliation logic
@@ -235,6 +256,9 @@
   - _Requirements: 10.3, 10.4_
 
 - [ ] 7.4 Write Antugrow integration tests
+
+
+
   - Mock Antugrow API responses
   - Test retry logic and error handling
   - Integration tests for data sync
