@@ -6,3 +6,4 @@
 export { supabase } from './supabase';
 export { authService } from './auth.service';
 export { profileService } from './profile.service';
+export { initiativeService } from './initiative.service';

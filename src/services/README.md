@@ -199,6 +199,174 @@ const completeness = profileService.getProfileCompleteness(profile);
 console.log(`Profile is ${completeness}% complete`);
 ```
 
+## Initiative Service (`initiative.service.ts`)
+
+The initiative service handles tree planting initiative management, filtering, participant tracking, and progress calculations.
+
+### Features
+
+- Create, read, update, and delete initiatives
+- Filter initiatives by forest, status, organization, or search term
+- Manage initiative participants (join/leave)
+- Track participant contributions
+- Calculate initiative progress and metrics
+- Support for geospatial data
+
+### Usage Examples
+
+#### Create an initiative
+
+```typescript
+import { initiativeService } from '@/services';
+
+const { initiative, error } = await initiativeService.createInitiative({
+  title: 'Kakamega Forest Restoration 2025',
+  description: 'Community-led initiative to plant 10,000 indigenous trees',
+  forest: 'kakamega',
+  target_trees: 10000,
+  start_date: '2025-01-01',
+  end_date: '2025-12-31',
+  location: {
+    type: 'Point',
+    coordinates: [34.8522, 0.2827], // [longitude, latitude]
+  },
+  area_hectares: 50,
+  organization_id: 'org-uuid',
+});
+
+if (error) {
+  console.error('Failed to create initiative:', error);
+} else {
+  console.log('Initiative created:', initiative);
+}
+```
+
+#### Get all initiatives with filters
+
+```typescript
+// Get all active initiatives in Kakamega forest
+const { initiatives, error } = await initiativeService.getInitiatives({
+  forest: 'kakamega',
+  status: 'active',
+});
+
+// Search initiatives
+const { initiatives, error } = await initiativeService.getInitiatives({
+  search: 'restoration',
+});
+
+// Get initiatives by organization
+const { initiatives, error } = await initiativeService.getInitiatives({
+  organization_id: 'org-uuid',
+});
+```
+
+#### Get single initiative
+
+```typescript
+const { initiative, error } = await initiativeService.getInitiative(initiativeId);
+if (error) {
+  console.error('Failed to fetch initiative:', error);
+} else {
+  console.log('Initiative:', initiative);
+}
+```
+
+#### Update initiative
+
+```typescript
+const { initiative, error } = await initiativeService.updateInitiative(initiativeId, {
+  title: 'Updated Initiative Title',
+  target_trees: 15000,
+  status: 'completed',
+});
+
+if (error) {
+  console.error('Failed to update initiative:', error);
+} else {
+  console.log('Initiative updated:', initiative);
+}
+```
+
+#### Join an initiative
+
+```typescript
+const { participant, error } = await initiativeService.joinInitiative(
+  initiativeId,
+  userId
+);
+
+if (error) {
+  console.error('Failed to join initiative:', error);
+} else {
+  console.log('Joined initiative:', participant);
+}
+```
+
+#### Leave an initiative
+
+```typescript
+const { error } = await initiativeService.leaveInitiative(initiativeId, userId);
+if (error) {
+  console.error('Failed to leave initiative:', error);
+}
+```
+
+#### Get participants
+
+```typescript
+const { participants, error } = await initiativeService.getParticipants(initiativeId);
+if (error) {
+  console.error('Failed to fetch participants:', error);
+} else {
+  console.log('Participants:', participants);
+}
+```
+
+#### Update participant contribution
+
+```typescript
+const { participant, error } = await initiativeService.updateParticipantContribution(
+  initiativeId,
+  userId,
+  50 // trees contributed
+);
+
+if (error) {
+  console.error('Failed to update contribution:', error);
+} else {
+  console.log('Contribution updated:', participant);
+}
+```
+
+#### Calculate initiative progress
+
+```typescript
+const progress = await initiativeService.calculateProgress(initiativeId);
+if (progress) {
+  console.log(`Progress: ${progress.progress_percentage}%`);
+  console.log(`Trees remaining: ${progress.trees_remaining}`);
+  console.log(`Days remaining: ${progress.days_remaining}`);
+  console.log(`On track: ${progress.is_on_track}`);
+}
+```
+
+#### Get initiative with participants
+
+```typescript
+const { initiative, error } = await initiativeService.getInitiativeWithParticipants(
+  initiativeId
+);
+
+if (error) {
+  console.error('Failed to fetch initiative:', error);
+} else {
+  console.log('Initiative:', initiative);
+  console.log('Participants count:', initiative.participants_count);
+  console.log('Participants:', initiative.participants);
+}
+```
+
 ## Supabase Client (`supabase.ts`)
 
 The base Supabase client configuration used by all services.

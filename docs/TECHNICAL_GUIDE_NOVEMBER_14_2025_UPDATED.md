@@ -1,8 +1,8 @@
 # #GangGreen Platform - Technical Guide
 
 **Last Updated**: November 14, 2025  
-**Version**: 3.0  
-**Status**: Sprint 2 Complete - Initiative Management System Fully Operational
+**Version**: 2.2  
+**Status**: Sprint 2 - Initiative Management System
 
 ---
 
@@ -59,26 +59,6 @@
 │  │  - Avatars         │                                    │
 │  └────────────────────┘                                    │
 └─────────────────────────────────────────────────────────────┘
-```
-
-### Component Flow
-
-```
-User Action
-   ↓
-React Component (UI)
-   ↓
-Service Layer (Business Logic)
-   ↓
-Supabase Client (API)
-   ↓
-PostgreSQL Database
-   ↓
-Response
-   ↓
-Component State Update
-   ↓
-UI Re-render
 ```
 
 ---
@@ -312,7 +292,7 @@ interface ProfileData {
 
 The initiative management system enables organizations to create and manage tree planting initiatives with geospatial tracking, participant management, and progress monitoring.
 
-**Status**: ✅ Complete (Service Layer + UI Components)
+**Status**: ✅ Service Layer Complete (Task 5.1)
 
 ### Type Definitions
 
@@ -482,63 +462,241 @@ class InitiativeService {
 }
 ```
 
-### Initiative Components
+### Usage Examples
 
-**Location**: `src/components/initiatives/`
+#### Create an Initiative
 
-#### 1. InitiativeCard
-
-**File**: `InitiativeCard.tsx` (150 lines)
-
-**Purpose**: Display initiative summary in card format
-
-**Props**:
 ```typescript
-interface InitiativeCardProps {
-  initiative: Initiative;
-  onClick?: () => void;
-}
+import { initiativeService } from '@/services';
+
+const { initiative, error } = await initiativeService.createInitiative({
+  title: 'Kakamega Forest Restoration 2025',
+  description: 'Community-led initiative to plant 10,000 indigenous trees',
+  forest: 'kakamega',
+  target_trees: 10000,
+  start_date: '2025-01-01',
+  end_date: '2025-12-31',
+  location: {
+    type: 'Point',
+    coordinates: [34.8522, 0.2827], // [longitude, latitude]
+  },
+  area_hectares: 50,
+  organization_id: 'org-uuid',
+});
 ```
 
-**Features**:
-- Initiative title and description
-- Progress bar with percentage
-- Status badge (active/completed/paused)
-- Forest badge
-- Tree counts (planted/target)
-- Area and timeline information
-- Hover effects and click handling
+#### Get Initiatives with Filters
 
-**Usage**:
 ```typescript
-<InitiativeCard
-  initiative={initiative}
-  onClick={() => navigate(`/initiatives/${initiative.id}`)}
-/>
+// Get all active initiatives in Kakamega forest
+const { initiatives, error } = await initiativeService.getInitiatives({
+  forest: 'kakamega',
+  status: 'active',
+});
+
+// Search initiatives
+const { initiatives, error } = await initiativeService.getInitiatives({
+  search: 'restoration',
+});
 ```
 
-#### 2. InitiativeForm
+#### Join an Initiative
 
-**File**: `InitiativeForm.tsx` (280 lines)
-
-**Purpose**: Form for creating new initiatives
-
-**Props**:
 ```typescript
-interface InitiativeFormProps {
-  organizationId: string;
-  onSuccess?: (initiative: Initiative) => void;
-  onCancel?: () => void;
-  initialData?: Partial<CreateInitiativeData>;
-}
+const { participant, error } = await initiativeService.joinInitiative(
+  initiativeId,
+  userId
+);
 ```
 
-**Features**:
-- Title and description inputs
-- Forest selector dropdown
-- Target trees and area inputs
-- Date range picker
-- Locupabase Client
+#### Update Participant Contribution
+
+```typescript
+const { participant, error } = await initiativeService.updateParticipantContribution(
+  initiativeId,
+  userId,
+  50 // trees contributed
+);
+```
+
+#### Calculate Progress
+
+```typescript
+const progress = await initiativeService.calculateProgress(initiativeId);
+// Returns: { progress_percentage, trees_remaining, days_remaining, is_on_track }
+```
+
+### Key Features
+
+1. **Geospatial Support**
+   - GeoJSON format for location data
+   - Automatic conversion to/from PostGIS format
+   - Support for point-based locations
+
+2. **Filtering & Search**
+   - Filter by forest (kakamega, karura, mau)
+   - Filter by status (active, completed, paused)
+   - Filter by organization
+   - Full-text search on title and description
+
+3. **Participant Management**
+   - Join/leave initiatives
+   - Track individual contributions
+   - Prevent duplicate participants
+   - Get participant lists
+
+4. **Progress Tracking**
+   - Calculate completion percentage
+   - Track trees remaining
+   - Calculate days remaining
+   - Determine if on track (80% of expected progress)
+
+5. **Validation**
+   - Input validation for all operations
+   - Title length limits (200 characters)
+   - Positive values for trees and area
+   - Valid date ranges
+   - Proper coordinate format
+
+6. **Error Handling**
+   - Consistent error response format
+   - Descriptive error messages
+   - Graceful failure handling
+
+---
+
+## Database Schema
+
+### Tables
+
+#### users
+```sql
+CREATE TABLE users (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  email TEXT UNIQUE NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+```
+
+#### user_profiles
+```sql
+CREATE TABLE user_profiles (
+  id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+  full_name TEXT NOT NULL,
+  role TEXT NOT NULL CHECK (role IN ('admin', 'organization', 'community', 'individual')),
+  forest_preference TEXT CHECK (forest_preference IN ('kakamega', 'karura', 'mau')),
+  phone TEXT,
+  organization TEXT,
+  location TEXT,
+  avatar_url TEXT,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+```
+
+#### initiatives
+```sql
+CREATE TABLE initiatives (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  title TEXT NOT NULL,
+  description TEXT NOT NULL,
+  forest TEXT NOT NULL CHECK (forest IN ('kakamega', 'karura', 'mau')),
+  target_trees INTEGER NOT NULL CHECK (target_trees > 0),
+  trees_planted INTEGER DEFAULT 0 CHECK (trees_planted >= 0),
+  start_date DATE NOT NULL,
+  end_date DATE,
+  status TEXT DEFAULT 'active' CHECK (status IN ('active', 'completed', 'paused')),
+  location GEOMETRY(Point, 4326) NOT NULL,
+  area_hectares DECIMAL(10, 2) NOT NULL CHECK (area_hectares > 0),
+  organization_id UUID NOT NULL REFERENCES users(id),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Indexes for performance
+CREATE INDEX idx_initiatives_forest ON initiatives(forest);
+CREATE INDEX idx_initiatives_status ON initiatives(status);
+CREATE INDEX idx_initiatives_organization ON initiatives(organization_id);
+CREATE INDEX idx_initiatives_location ON initiatives USING GIST(location);
+```
+
+#### initiative_participants
+```sql
+CREATE TABLE initiative_participants (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  initiative_id UUID NOT NULL REFERENCES initiatives(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  trees_contributed INTEGER DEFAULT 0 CHECK (trees_contributed >= 0),
+  joined_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(initiative_id, user_id)
+);
+
+-- Indexes
+CREATE INDEX idx_participants_initiative ON initiative_participants(initiative_id);
+CREATE INDEX idx_participants_user ON initiative_participants(user_id);
+```
+
+### Row Level Security
+
+**initiatives policies**:
+```sql
+-- Anyone can view active initiatives
+CREATE POLICY "Anyone can view active initiatives"
+  ON initiatives FOR SELECT
+  USING (status = 'active' OR auth.uid() = organization_id);
+
+-- Organizations can create initiatives
+CREATE POLICY "Organizations can create initiatives"
+  ON initiatives FOR INSERT
+  WITH CHECK (auth.uid() = organization_id);
+
+-- Organizations can update their own initiatives
+CREATE POLICY "Organizations can update own initiatives"
+  ON initiatives FOR UPDATE
+  USING (auth.uid() = organization_id);
+```
+
+**initiative_participants policies**:
+```sql
+-- Users can view participants of initiatives they're part of
+CREATE POLICY "Users can view participants"
+  ON initiative_participants FOR SELECT
+  USING (true);
+
+-- Users can join initiatives
+CREATE POLICY "Users can join initiatives"
+  ON initiative_participants FOR INSERT
+  WITH CHECK (auth.uid() = user_id);
+
+-- Users can leave initiatives
+CREATE POLICY "Users can leave initiatives"
+  ON initiative_participants FOR DELETE
+  USING (auth.uid() = user_id);
+```
+
+### Storage Buckets
+
+1. **avatars** (Public, 2MB limit)
+   - User profile pictures
+   - Allowed: image/jpeg, image/png, image/webp
+
+2. **tree-images** (Public, 10MB limit)
+   - Tree monitoring photos
+   - Allowed: image/jpeg, image/png, image/webp
+
+3. **documents** (Private, 20MB limit)
+   - Certificates, reports
+   - Allowed: application/pdf, image/*
+
+4. **nft-badges** (Public, 5MB limit)
+   - NFT badge artwork
+   - Allowed: image/jpeg, image/png, image/svg+xml
+
+---
+
+## API Services
+
+### Supabase Client
 
 **Location**: `src/services/supabase.ts`
 
@@ -575,6 +733,12 @@ class ServiceName {
 export const serviceName = new ServiceName();
 ```
 
+### Available Services
+
+1. **authService** - Authentication operations
+2. **profileService** - User profile management
+3. **initiativeService** - Initiative management (NEW)
+
 ---
 
 ## Component Architecture
@@ -586,7 +750,7 @@ src/
 ├── components/
 │   ├── auth/              # Authentication components
 │   │   ├── LoginForm.tsx
-│   │   ├── RegisterForm.tsx (simplified)
+│   │   ├── RegisterForm.tsx
 │   │   ├── ProtectedRoute.tsx
 │   │   ├── PasswordResetRequest.tsx
 │   │   ├── PasswordResetConfirm.tsx
@@ -599,11 +763,16 @@ src/
 │   │   ├── ProfileEditForm.tsx
 │   │   ├── index.ts
 │   │   └── README.md
-│   └── common/            # Shared components (future)
+│   └── initiatives/       # Initiative components (PLANNED)
+│       ├── InitiativeCard.tsx
+│       ├── InitiativeForm.tsx
+│       ├── InitiativeDetails.tsx
+│       ├── InitiativeList.tsx
+│       └── README.md
 ├── pages/
 │   ├── HomePage.tsx
 │   ├── LoginPage.tsx
-│   ├── RegisterPage.tsx (enhanced)
+│   ├── RegisterPage.tsx
 │   ├── ResetPasswordPage.tsx
 │   ├── DashboardPage.tsx
 │   └── ProfilePage.tsx
@@ -611,6 +780,8 @@ src/
 │   ├── supabase.ts
 │   ├── auth.service.ts
 │   ├── profile.service.ts
+│   ├── initiative.service.ts (NEW)
+│   ├── index.ts
 │   └── README.md
 ├── contexts/
 │   ├── AuthContext.tsx
@@ -619,30 +790,10 @@ src/
 │   ├── useAuth.ts
 │   └── README.md
 └── types/
-    └── user.types.ts
+    ├── user.types.ts
+    ├── initiative.types.ts (NEW)
+    └── index.ts
 ```
-
-### Component Patterns
-
-#### 1. Form Components
-- Controlled inputs
-- Local state management
-- Validation before submission
-- Error display
-- Loading states
-- Success callbacks
-
-#### 2. Page Components
-- Route-level components
-- Compose smaller components
-- Handle navigation
-- Manage page-level state
-
-#### 3. Service Integration
-- Import service singleton
-- Call async methods
-- Handle { data, error } responses
-- Update UI based on results
 
 ---
 
@@ -678,14 +829,6 @@ Components use `useState` for:
 - Loading indicators
 - Error messages
 
-### Future: Zustand (Optional)
-
-For complex state management beyond auth:
-- Initiative filters
-- Tree registry state
-- Marketplace cart
-- Gamification progress
-
 ---
 
 ## Security
@@ -710,14 +853,6 @@ All tables have RLS enabled:
 2. **Server-Side**: Supabase database constraints
 3. **Sanitization**: Prevent XSS attacks
 
-### API Keys
-
-Environment variables (never committed):
-```
-VITE_SUPABASE_URL=https://wobpryllvdjaapzjbsxx.supabase.co
-VITE_SUPABASE_ANON_KEY=sb_publishable_A5qSpuvL1M7QhqkB2bkqUQ_QmE9dpra
-```
-
 ---
 
 ## Testing
@@ -739,8 +874,8 @@ VITE_SUPABASE_ANON_KEY=sb_publishable_A5qSpuvL1M7QhqkB2bkqUQ_QmE9dpra
 - ✅ Profile service (80% coverage)
 
 **Pending**:
-- ⏳ Onboarding chatbot
-- ⏳ Profile components
+- ⏳ Initiative service tests
+- ⏳ Initiative component tests
 - ⏳ Integration tests
 
 ### Running Tests
@@ -749,52 +884,6 @@ VITE_SUPABASE_ANON_KEY=sb_publishable_A5qSpuvL1M7QhqkB2bkqUQ_QmE9dpra
 npm test              # Run all tests
 npm run test:watch    # Watch mode
 npm run test:coverage # Coverage report
-```
-
-### Test Examples
-
-**Service Test**:
-```typescript
-describe('AuthService', () => {
-  it('should register user with email/password', async () => {
-    const result = await authService.register({
-      email: 'test@example.com',
-      password: 'password123',
-    });
-    
-    expect(result.error).toBeNull();
-    expect(result.user).toBeDefined();
-  });
-});
-```
-
-**Component Test**:
-```typescript
-describe('RegisterForm', () => {
-  it('should call onSuccess with userId and email', async () => {
-    const onSuccess = vi.fn();
-    render(<RegisterForm onSuccess={onSuccess} />);
-    
-    // Fill form and submit
-    fireEvent.change(screen.getByLabelText(/email/i), {
-      target: { value: 'test@example.com' }
-    });
-    fireEvent.change(screen.getByLabelText(/^password/i), {
-      target: { value: 'password123' }
-    });
-    fireEvent.change(screen.getByLabelText(/confirm/i), {
-      target: { value: 'password123' }
-    });
-    fireEvent.click(screen.getByRole('button', { name: /create/i }));
-    
-    await waitFor(() => {
-      expect(onSuccess).toHaveBeenCalledWith(
-        expect.any(String), // userId
-        'test@example.com'  // email
-      );
-    });
-  });
-});
 ```
 
 ---
@@ -824,98 +913,21 @@ VITE_SUPABASE_URL=https://wobpryllvdjaapzjbsxx.supabase.co
 VITE_SUPABASE_ANON_KEY=sb_publishable_A5qSpuvL1M7QhqkB2bkqUQ_QmE9dpra
 ```
 
-**Optional** (future):
-```
-VITE_ANTUGROW_API_URL=https://api.antugrow.com
-VITE_ANTUGROW_API_KEY=<secret>
-VITE_MAPBOX_TOKEN=<secret>
-```
-
-### Hosting
-
-**Recommended**: Vercel
-- Automatic deployments from Git
-- Environment variable management
-- HTTPS by default
-- Global CDN
-
-**Alternative**: Netlify, AWS Amplify
-
----
-
-## Performance
-
-### Metrics
-
-- Initial load: < 3 seconds
-- API response: < 500ms
-- Test execution: < 5 seconds
-
-### Optimization
-
-1. **Code Splitting**: React.lazy() for routes
-2. **Image Optimization**: WebP format, lazy loading
-3. **Caching**: Service worker (future)
-4. **Bundle Size**: Tree shaking, minification
-
 ---
 
 ## Future Enhancements
 
 ### Planned Features
 
-1. **Onboarding Chatbot** (Task 8.1) - In Progress
-2. **Initiative Management** (Task 5)
+1. **Initiative UI Components** (Task 5.2) - Next
+2. **Geospatial Features** (Task 5.3)
 3. **Tree Registry** (Task 6)
-4. **Carbon Marketplace** (Task 9)
-5. **Web3 Integration** (Task 10-11)
-6. **Gamification** (Task 13-15)
-
-### Technical Debt
-
-- Add E2E tests with Playwright
-- Implement error boundary components
-- Add analytics tracking
-- Optimize bundle size
-- Add service worker for offline support
+4. **Carbon Marketplace** (Task 8-9)
+5. **Web3 Integration** (Task 21-24)
+6. **Gamification** (Task 25-27)
 
 ---
 
-## Troubleshooting
-
-### Common Issues
-
-**Issue**: "Supabase client not initialized"
-**Solution**: Check environment variables are set
-
-**Issue**: "RLS policy violation"
-**Solution**: Ensure user is authenticated and accessing own data
-
-**Issue**: "Tests failing"
-**Solution**: Run `npm install` and check mock setup
-
-### Debug Mode
-
-```typescript
-// Enable Supabase debug logging
-const supabase = createClient(url, key, {
-  auth: {
-    debug: true
-  }
-});
-```
-
----
-
-## Resources
-
-- **Supabase Docs**: https://supabase.com/docs
-- **React Docs**: https://react.dev
-- **Vite Docs**: https://vitejs.dev
-- **Testing Library**: https://testing-library.com
-
----
-
-**Document Version**: 2.1  
+**Document Version**: 2.2  
 **Last Updated**: November 14, 2025  
-**Next Update**: Upon completion of Task 8.1 (Onboarding Chatbot)
+**Next Update**: Upon completion of Task 5.2 (Initiative UI Components)

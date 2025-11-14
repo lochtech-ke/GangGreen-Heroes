@@ -1,8 +1,8 @@
-# #GangGreen Platform - User Guide
+# #GangGreen Platform - User Guide (Complete)
 
-**Version**: 1.4  
-**Last Updated**: November 13, 2025  
-**Platform Status**: In Development - Sprint 2
+**Last Updated**: November 14, 2025  
+**Version**: 3.0  
+**Status**: Initiative Management System Fully Operational
 
 ---
 
@@ -12,45 +12,19 @@
 
 ---
 
-## 🚧 Development Status
+## 🎉 What's New (November 14, 2025)
 
-**Current Phase**: Sprint 2 - Authentication & Core Setup  
-**Completion**: 18% overall (5.6 of 31 tasks)  
-**Last Updated**: November 13, 2025
+### Initiative Management System - NOW LIVE!
 
-### What's Available Now
+The complete initiative management system is now operational with interactive maps and geospatial features:
 
-**✅ Implemented Features**:
-- User registration and authentication
-- Login and logout functionality
-- Password reset flow
-- Protected routes and role-based access
-- User profile management
-- Session persistence
-- Real-time auth state updates
-
-**🚧 In Development**:
-- Authentication test suite (60% complete)
-- Database deployment to Supabase
-- Storage bucket configuration
-
-**📋 Coming Soon**:
-- Tree planting initiatives (Sprint 3)
-- Tree registry and monitoring (Sprint 3)
-- Carbon credit marketplace (Sprint 4)
-- Web3 wallet integration (Sprint 5)
-- NFT badges and gamification (Sprint 6)
-
-### Implementation Timeline
-
-| Milestone | Status | Timeline | Features |
-|-----------|--------|----------|----------|
-| **Foundation** | ✅ 100% | Weeks 1-2 | Project setup, Database, Auth system |
-| **Core Features** | 📋 Planned | Weeks 3-5 | Initiatives, Trees, AI Monitoring |
-| **Marketplace** | 📋 Planned | Weeks 6-7 | Carbon Credits, Impact Dashboard |
-| **Web3** | 📋 Planned | Weeks 8-10 | Wallets, Crypto Donations, NFTs |
-| **Gamification** | 📋 Planned | Weeks 11-12 | Points, Quests, Referrals |
-| **Launch** | 📋 Planned | Weeks 13-15 | Testing, Security, Deployment |
+**Available Now**:
+- ✅ Browse active tree planting initiatives
+- ✅ View initiatives on interactive maps
+- ✅ Join conservation projects
+- ✅ Track initiative progress
+- ✅ See forest boundaries and locations
+- ✅ Create initiatives with visual location selection (organizations)
 
 ---
 
@@ -58,496 +32,424 @@
 
 1. [Getting Started](#getting-started)
 2. [Creating Your Account](#creating-your-account)
-3. [User Roles](#user-roles)
-4. [Account Management](#account-management)
-5. [Dashboard Overview](#dashboard-overview)
-6. [Security & Privacy](#security--privacy)
-7. [Troubleshooting](#troubleshooting)
-8. [FAQ](#faq)
+3. [Completing Your Profile](#completing-your-profile)
+4. [User Roles](#user-roles)
+5. [Your Dashboard](#your-dashboard)
+6. [Tree Planting Initiatives](#tree-planting-initiatives)
+7. [Using Interactive Maps](#using-interactive-maps)
+8. [Profile Management](#profile-management)
 9. [Support](#support)
+10. [FAQ](#faq)
 
 ---
 
 ## Getting Started
 
-### Accessing the Platform
+### What You'll Need
 
-**Development Environment**:
-- URL: `http://localhost:5173` (for developers)
-- Browser: Chrome, Firefox, Safari, or Edge (latest versions)
-- Internet connection required
+- Email address
+- Password (minimum 8 characters)
+- 2-3 minutes to complete your profile
 
-**Production Environment** (Coming Soon):
-- URL: TBD (will be announced)
-- Mobile-responsive design
-- Works on all modern browsers
+### Quick Start Steps
 
-### System Requirements
-
-**Minimum**:
-- Modern web browser (Chrome 90+, Firefox 88+, Safari 14+, Edge 90+)
-- Internet connection (broadband recommended)
-- JavaScript enabled
-- Cookies enabled
-
-**Recommended**:
-- Desktop or laptop for best experience
-- Mobile devices supported (responsive design)
-- Stable internet connection
+1. **Register** - Create your account with email and password (30 seconds)
+2. **Complete Profile** - Add your details and preferences (2 minutes)
+3. **Explore** - Start participating in conservation efforts
 
 ---
 
 ## Creating Your Account
 
-### Registration Process
+### Step 1: Visit the Registration Page
 
-1. **Navigate to Registration Page**
-   - Click "Sign Up" or "Register" button
-   - Or visit `/register` directly
+1. Go to the #GangGreen platform
+2. Click **"Sign Up"** or **"Get Started"**
+3. You'll see a simple registration form
 
-2. **Fill in Your Information**
+### Step 2: Enter Your Credentials
 
-   **Required Fields**:
-   - **Full Name**: Your complete name
-   - **Email Address**: Valid email for account verification
-   - **Password**: Minimum 8 characters
-   - **Confirm Password**: Must match password
-   - **Account Type**: Select your role (see User Roles below)
+**Required Information**:
+- **Email Address**: Your primary email
+- **Password**: Minimum 8 characters
+- **Confirm Password**: Re-enter your password
 
-   **Optional Fields**:
-   - **Phone Number**: Contact number (format: +254 700 000000)
-   - **Location**: Your city or region
-   - **Forest Preference**: Choose Kakamega, Karura, or Mau
-   - **Organization Name**: Required if selecting "Organization" role
+**Tips**:
+- Use a strong, unique password
+- Make sure you have access to your email
+- Password must be at least 8 characters
 
-3. **Submit Registration**
-   - Click "Create Account" button
-   - Wait for account creation (usually < 2 seconds)
-   - You'll be automatically logged in
+### Step 3: Create Account
 
-4. **Welcome to #GangGreen!**
-   - You'll be redirected to your dashboard
-   - Complete your profile for better experience
+1. Review your information
+2. Click **"Create Account"**
+3. Wait for confirmation (usually instant)
 
-### Registration Tips
+**What Happens Next**:
+- Your account is created immediately
+- You're logged in automatically
+- You'll be prompted to complete your profile
 
-✅ **Do**:
-- Use a valid email address you can access
-- Choose a strong password (mix of letters, numbers, symbols)
-- Select the role that best describes you
-- Provide accurate information
+---
 
-❌ **Don't**:
-- Use someone else's email
-- Share your password
-- Create multiple accounts
-- Provide false information
+## Completing Your Profile
 
-### Email Verification
+### Profile Information
 
-**Current Status**: Not yet implemented  
-**Coming Soon**: Email verification will be required for account activation
+After registration, complete your profile with:
+
+#### 1. Your Full Name
+- Required for personalization
+- Used in your public profile
+
+#### 2. How You Want to Participate
+Choose your role:
+- 🌱 **Individual** - Support through donations and participation
+- 🤝 **Community Member** - Active local conservation work
+- 🏢 **Organization** - Manage initiatives and projects
+
+#### 3. Organization Name (If Applicable)
+- Only required if you selected "Organization"
+- Your organization's official name
+
+#### 4. Forest Preference (Optional)
+Choose which forest to focus on:
+- 🌳 **Kakamega Forest** - Primary pilot site (238 km²)
+- 🌲 **Karura Forest** - Urban conservation area (10.5 km²)
+- 🌴 **Mau Forest** - Critical water tower ecosystem (400 km²)
+- ⏭️ **No preference** - Support all forests
+
+#### 5. Additional Information (Optional)
+- Phone number
+- Location
+- Profile picture
 
 ---
 
 ## User Roles
 
-The platform supports four user roles, each with different capabilities:
+### Individual 🌱
 
-### 1. Individual 👤
+Perfect for anyone who wants to support conservation efforts through donations and participation.
 
-**Best for**: Anyone who wants to support conservation through donations and participation
-
-**What you can do** (when implemented):
-- Join tree planting initiatives
-- Purchase carbon credits
-- Make crypto donations
-- Earn NFT badges and points
+**What you can do**:
+- Browse and view tree planting initiatives
+- View initiatives on interactive maps
+- Join initiatives (coming soon)
 - Track your environmental impact
-- View forest information
-- Participate in challenges
+- Purchase carbon credits (coming soon)
 
-**Access Level**: Basic
+**Best for**: Supporters, donors, environmental enthusiasts
 
-### 2. Community Member 🤝
+### Community Member 🤝
 
-**Best for**: Local community members actively participating in forest conservation
-
-**What you can do**:
-- Everything an Individual can do, plus:
-- Register trees you've planted
-- Upload tree monitoring photos
-- Participate in community challenges
-- Access forest-specific features
-- Contribute to local initiatives
-
-**Access Level**: Standard
-
-### 3. Organization 🏢
-
-**Best for**: NGOs, companies, and groups managing conservation initiatives
+Ideal for local community members actively participating in forest conservation.
 
 **What you can do**:
-- Everything Community Members can do, plus:
-- Create and manage initiatives
-- Generate carbon credits
-- Receive crypto donations
-- Access advanced analytics
-- Manage team members
-- Create custom reports
+- Everything an Individual can do
+- Join tree planting initiatives
+- Track personal contributions
+- Register trees you've planted (coming soon)
+- Upload tree monitoring photos (coming soon)
 
-**Access Level**: Advanced
+**Best for**: Local residents, volunteers, active participants
 
-**Requirements**:
-- Organization name required during registration
-- May require verification (future feature)
+### Organization 🏢
 
-### 4. Administrator 👑
-
-**Best for**: Platform administrators
+For NGOs, companies, and groups managing conservation initiatives.
 
 **What you can do**:
-- Full platform access
-- User management
-- Content moderation
-- System configuration
-- Analytics and reporting
+- Everything Community Members can do
+- **Create and manage initiatives**
+- Select initiative locations on interactive maps
+- Track participant contributions
+- Monitor initiative progress
+- Generate reports (coming soon)
 
-**Access Level**: Full
-
-**Note**: Admin accounts are created by existing administrators only
-
----
-
-## Account Management
-
-### Logging In
-
-1. **Navigate to Login Page**
-   - Click "Login" or "Sign In" button
-   - Or visit `/login` directly
-
-2. **Enter Credentials**
-   - Email address
-   - Password
-
-3. **Sign In**
-   - Click "Sign In" button
-   - Wait for authentication
-   - Redirected to dashboard
-
-### Forgot Password?
-
-1. **Request Password Reset**
-   - Click "Forgot password?" on login page
-   - Enter your email address
-   - Click "Send Reset Link"
-
-2. **Check Your Email**
-   - Look for password reset email
-   - Click the reset link
-   - Link expires in 1 hour
-
-3. **Set New Password**
-   - Enter new password (minimum 8 characters)
-   - Confirm new password
-   - Click "Update Password"
-
-4. **Login with New Password**
-   - Return to login page
-   - Use your new password
-
-### Logging Out
-
-**Method 1**: Dashboard
-- Click your profile picture or name
-- Select "Logout" from dropdown
-
-**Method 2**: Direct
-- Click "Logout" button (if visible)
-
-**What Happens**:
-- Session is terminated
-- You're redirected to login page
-- Local data is cleared
+**Best for**: NGOs, companies, conservation groups, schools
 
 ---
 
-## Dashboard Overview
+## Your Dashboard
 
-### Your Dashboard
+### What You'll See
 
-After logging in, you'll see your personal dashboard with:
+After completing your profile, you'll land on your personalized dashboard.
 
-**Profile Section**:
-- Your name and email
-- Account role
-- Forest preference
-- Organization (if applicable)
-- Location (if provided)
+**Dashboard Sections**:
 
-**Forest Information**:
-- Kakamega Forest card
-- Karura Forest card
-- Mau Forest card
+1. **Welcome Message**
+   - Personalized greeting with your name
+   - Quick stats about your impact
 
-**Quick Stats** (Coming Soon):
-- Trees planted
-- Carbon offset
-- Points earned
-- Badges collected
+2. **Your Profile Card**
+   - Name and email
+   - Role and forest preference
+   - Organization (if applicable)
+   - Location (if provided)
 
-**Activity Feed** (Coming Soon):
-- Recent actions
-- Milestone achievements
-- Community updates
+3. **Forest Information**
+   - Cards for each pilot forest
+   - Kakamega, Karura, and Mau
+   - Quick facts about each forest
 
-### Navigation
-
-**Main Menu**:
-- Dashboard (home)
-- Initiatives (coming soon)
-- Trees (coming soon)
-- Marketplace (coming soon)
-- Profile
-- Settings
-
-**User Menu** (top right):
-- Profile
-- Settings
-- Logout
+4. **Quick Actions**
+   - Browse initiatives ✅
+   - View initiatives on map ✅
+   - Join an initiative (coming soon)
+   - Register a tree (coming soon)
+   - Make a donation (coming soon)
 
 ---
 
-## Security & Privacy
+## Tree Planting Initiatives
 
-### Password Security
+### What Are Initiatives?
 
-**Requirements**:
-- Minimum 8 characters
-- Mix of letters and numbers recommended
-- Special characters recommended
-- No common passwords
+Tree planting initiatives are organized conservation projects where organizations coordinate efforts to plant trees, restore forests, and sequester carbon.
 
-**Best Practices**:
-- Use unique password for this platform
-- Don't share your password
-- Change password regularly
-- Use password manager
+**Status**: ✅ FULLY OPERATIONAL
 
-### Session Security
+### Browsing Initiatives
 
-**Features**:
-- Automatic session timeout (configurable)
-- Secure token storage
-- HTTPS encryption (production)
-- Session invalidation on logout
+#### List View
 
-**Tips**:
-- Always logout on shared computers
-- Don't save password on public devices
-- Clear browser data after use
+1. Navigate to "Initiatives" from the main menu
+2. See all active initiatives in a grid layout
+3. Each card shows:
+   - Initiative title and description
+   - Forest location (Kakamega, Karura, or Mau)
+   - Status (Active, Completed, Paused)
+   - Progress bar with percentage
+   - Trees planted vs. target
+   - Area in hectares
+   - Timeline (start and end dates)
 
-### Data Privacy
+#### Filtering Initiatives
 
-**What We Collect**:
-- Account information (name, email, role)
-- Profile information (optional fields)
-- Activity data (trees planted, donations)
-- Usage analytics (anonymous)
+Use the filter panel to find specific initiatives:
 
-**What We Don't Collect**:
-- Credit card information (handled by payment processor)
-- Sensitive personal data
-- Browsing history outside platform
+**Forest Filter**:
+- All Forests
+- Kakamega Forest
+- Karura Forest
+- Mau Forest
 
-**Your Rights**:
-- View your data
-- Update your information
-- Delete your account
-- Export your data (coming soon)
+**Status Filter**:
+- All Statuses
+- Active
+- Completed
+- Paused
 
-### Row Level Security
+**Search**:
+- Search by title or description
+- Real-time filtering as you type
 
-**Database Protection**:
-- You can only access your own data
-- Role-based access control
-- Automatic enforcement
-- No manual configuration needed
+#### Map View
 
-**What This Means**:
-- Your profile is private
-- Your transactions are secure
-- Your data is protected
-- Other users can't see your private information
+1. Click "View on Map" to see initiatives geographically
+2. Interactive map shows all initiatives as markers
+3. Markers are color-coded by status:
+   - 🟢 Green: Active initiatives
+   - 🔵 Blue: Completed initiatives
+   - 🟡 Yellow: Paused initiatives
+4. Click any marker to see initiative details
+5. Click "View Details" in popup to go to full page
 
----
+### Viewing Initiative Details
 
-## Troubleshooting
+Click on any initiative card or map marker to see full details:
 
-### Common Issues
+**Information Displayed**:
+- Full title and description
+- Status and forest badges
+- Progress section with:
+  - Progress bar showing completion percentage
+  - Trees planted vs. target
+  - Trees remaining
+  - Days remaining (if end date set)
+  - On-track indicator (green ✓ or red ⚠)
+- Details section:
+  - Timeline (start and end dates)
+  - Area in hectares
+  - Location coordinates
+  - Number of participants
+- Participant list (top 10 shown)
+- Join button (for non-participants)
 
-#### Can't Login
+### Joining an Initiative
 
-**Symptoms**: Login fails with error message
+**For Community Members and Individuals**:
 
-**Solutions**:
-1. Check email and password are correct
-2. Ensure Caps Lock is off
-3. Try password reset if forgotten
-4. Clear browser cache and cookies
-5. Try different browser
-6. Contact support if issue persists
+1. Browse initiatives or view on map
+2. Click on an initiative to view details
+3. Click the **"Join Initiative"** button
+4. You'll see a confirmation message
+5. Your name appears in the participant list
+6. You can now contribute trees to this initiative
 
-#### Registration Fails
-
-**Symptoms**: Can't create account
-
-**Solutions**:
-1. Check all required fields are filled
-2. Ensure password is at least 8 characters
-3. Verify passwords match
-4. Use different email if "already exists" error
-5. Check internet connection
-6. Try again in a few minutes
-
-#### Page Won't Load
-
-**Symptoms**: Blank page or loading spinner
-
-**Solutions**:
-1. Check internet connection
-2. Refresh page (F5 or Ctrl+R)
-3. Clear browser cache
-4. Try different browser
-5. Check if platform is under maintenance
-6. Contact support
-
-#### Logged Out Unexpectedly
-
-**Symptoms**: Redirected to login page
-
-**Possible Causes**:
-- Session expired (timeout)
-- Logged in on another device
-- Browser cleared cookies
-- Security logout triggered
-
-**Solutions**:
-1. Login again
-2. Check "Remember me" option (if available)
-3. Adjust session timeout in settings
-4. Ensure cookies are enabled
-
-### Error Messages
-
-**"Invalid credentials"**:
-- Email or password is incorrect
-- Try password reset
-
-**"Email already exists"**:
-- Account already registered with this email
-- Try logging in instead
-- Use password reset if forgotten
-
-**"Please fill in all required fields"**:
-- Complete all fields marked with *
-- Check for validation errors
-
-**"Passwords do not match"**:
-- Ensure password and confirm password are identical
-- Check for typos
-
-**"Network error"**:
-- Check internet connection
-- Try again in a moment
-- Contact support if persists
-
-### Browser Compatibility
-
-**Supported Browsers**:
-- ✅ Chrome 90+
-- ✅ Firefox 88+
-- ✅ Safari 14+
-- ✅ Edge 90+
-
-**Not Supported**:
-- ❌ Internet Explorer
-- ❌ Very old browser versions
-
-**Recommendation**: Use latest browser version for best experience
+**Note**: You can only join active initiatives. Completed or paused initiatives cannot be joined.
 
 ---
 
-## FAQ
+## Using Interactive Maps
 
-### General Questions
+### Initiative Map
 
-**Q: Is #GangGreen free to use?**  
-A: Yes! Creating an account and participating in initiatives is completely free. Some features like purchasing carbon credits will have costs.
+**Purpose**: See all initiatives on an interactive map
 
-**Q: Which forests can I support?**  
-A: Currently, we focus on three Kenyan forests: Kakamega, Karura, and Mau.
+**How to Use**:
+1. Navigate to the initiatives page
+2. Click "View on Map" (if available)
+3. Pan and zoom to explore
+4. Click markers to see initiative details
+5. Use the popup "View Details" button to navigate
 
-**Q: Do I need to choose a forest preference?**  
-A: No, it's optional. You can participate in initiatives across all forests.
+**Map Controls**:
+- **Zoom**: Use + and - buttons or scroll wheel
+- **Pan**: Click and drag to move around
+- **Markers**: Click to see popup with details
 
-**Q: Can I change my role after registration?**  
-A: Not currently. Contact support if you need to change your role.
+**Marker Colors**:
+- 🟢 Green: Active initiative
+- 🔵 Blue: Completed initiative
+- 🟡 Yellow: Paused initiative
+- 🔴 Red: Selected initiative (highlighted)
 
-**Q: Can I have multiple accounts?**  
-A: No, one account per person/organization. Multiple accounts may be suspended.
+### Forest Boundary Map
 
-### Account Questions
+**Purpose**: Visualize the three pilot forests
 
-**Q: How do I delete my account?**  
-A: Contact support at support@ganggreen.org to request account deletion.
+**How to Use**:
+1. Navigate to the forests page (if available)
+2. See colored polygons showing forest boundaries
+3. Click on a forest to see information
+4. View forest area and description
 
-**Q: Can I change my email address?**  
-A: Not currently. This feature is coming soon.
+**Forest Colors**:
+- 🟢 Green: Kakamega Forest
+- 🔵 Blue: Karura Forest
+- 🟣 Purple: Mau Forest
 
-**Q: What if I forget my password?**  
-A: Use the "Forgot password?" link on the login page to reset it.
+---
 
-**Q: How long does my session last?**  
-A: Sessions last until you logout or after a period of inactivity (configurable).
+## Creating an Initiative (Organizations Only)
 
-**Q: Is my data secure?**  
-A: Yes, we use industry-standard security including encryption, secure authentication, and Row Level Security.
+### Step-by-Step Guide
 
-### Technical Questions
+**Prerequisites**:
+- You must have an "Organization" role
+- You must be logged in
 
-**Q: What browsers are supported?**  
-A: Chrome, Firefox, Safari, and Edge (latest versions). Internet Explorer is not supported.
+**Steps**:
 
-**Q: Does the platform work on mobile?**  
-A: Yes, the platform is fully responsive and works on mobile devices.
+1. **Navigate to Create Initiative**
+   - Go to your dashboard
+   - Click "Create Initiative" button
 
-**Q: Do I need to install anything?**  
-A: No, it's a web application. Just use your browser.
+2. **Fill in Basic Information**
+   - **Title**: Give your initiative a descriptive name
+     - Example: "Kakamega Forest Restoration 2025"
+   - **Description**: Explain the goals and activities
+     - Be specific about what you plan to do
+   - **Target Forest**: Select from dropdown
+     - Kakamega, Karura, or Mau
 
-**Q: Can I use the platform offline?**  
-A: Not currently. Internet connection is required. Offline mode is planned for future.
+3. **Set Targets and Timeline**
+   - **Target Trees**: Number of trees you plan to plant
+     - Must be a positive number
+   - **Area**: Size of the planting area in hectares
+     - Must be a positive number
+   - **Start Date**: When the initiative begins
+     - Required field
+   - **End Date**: When the initiative ends (optional)
+     - Must be after start date
 
-**Q: What if I encounter a bug?**  
-A: Report it to support@ganggreen.org with details about what happened.
+4. **Select Location on Map**
+   
+   **Option A: Use Preset Locations**
+   - Click one of the preset buttons:
+     - "Kakamega Forest"
+     - "Karura Forest"
+     - "Mau Forest"
+   - The map marker will jump to that location
+   
+   **Option B: Click on Map**
+   - Click anywhere on the map
+   - The marker will move to that location
+   - Coordinates update automatically
+   
+   **Option C: Enter Coordinates Manually**
+   - Type latitude in the first field
+   - Type longitude in the second field
+   - The marker will update on the map
 
-### Future Features
+5. **Review and Submit**
+   - Check all information is correct
+   - Click "Create Initiative"
+   - Wait for confirmation
+   - You'll be redirected to the initiative details page
 
-**Q: When will tree planting features be available?**  
-A: Sprint 3 (Weeks 3-5) - estimated 2-3 weeks from now.
+### Tips for Creating Initiatives
 
-**Q: When can I purchase carbon credits?**  
-A: Sprint 4 (Weeks 6-7) - estimated 4-5 weeks from now.
+**Title**:
+- Keep it under 200 characters
+- Include the forest name and year
+- Make it descriptive and engaging
 
-**Q: When will Web3 features launch?**  
-A: Sprint 5 (Weeks 8-10) - estimated 6-8 weeks from now.
+**Description**:
+- Explain the purpose and goals
+- Mention the tree species (if known)
+- Include any special activities or events
+- Describe the expected impact
 
-**Q: When will gamification be available?**  
-A: Sprint 6 (Weeks 11-12) - estimated 9-10 weeks from now.
+**Location**:
+- Be as accurate as possible
+- Use the preset buttons for general forest areas
+- Click on the map for specific locations
+- Double-check coordinates before submitting
 
-**Q: When is the public launch?**  
-A: Sprint 7 (Weeks 13-15) - estimated 11-13 weeks from now.
+**Targets**:
+- Set realistic tree planting goals
+- Consider the area size and timeline
+- Account for seasonal factors
+- Plan for community participation
+
+---
+
+## Profile Management
+
+### Viewing Your Profile
+
+1. Click your profile picture in the top right
+2. Select **"View Profile"**
+3. See all your profile information
+
+### Editing Your Profile
+
+1. Go to your profile page
+2. Click **"Edit Profile"**
+3. Update any information:
+   - Full name
+   - Role
+   - Forest preference
+   - Organization
+   - Phone number
+   - Location
+4. Click **"Save Changes"**
+
+### Uploading a Profile Picture
+
+1. Go to **"Edit Profile"**
+2. Click on your current avatar or **"Upload Photo"**
+3. Select an image from your device
+4. Crop if needed
+5. Click **"Save"**
+
+**Photo Requirements**:
+- Maximum size: 2MB
+- Formats: JPG, PNG, WebP
+- Recommended: Square image, at least 200x200 pixels
 
 ---
 
@@ -555,42 +457,184 @@ A: Sprint 7 (Weeks 13-15) - estimated 11-13 weeks from now.
 
 ### Getting Help
 
+**Help Center** (coming soon):
+- Comprehensive FAQ
+- Video tutorials
+- Step-by-step guides
+
 **Email Support**:
-- Address: support@ganggreen.org
-- Response Time: Within 24 hours
-- Available: Monday-Friday, 9 AM - 5 PM EAT
+- support@ganggreen.org
+- Response within 24 hours
 
-**Documentation**:
-- User Guide: This document
-- Technical Guide: For developers
-- FAQ: Common questions answered
+**Community Forum** (coming soon):
+- Connect with other users
+- Share tips and experiences
+- Get peer support
 
-**Community** (Coming Soon):
-- Community forum
-- User discussions
-- Tips and tricks
+---
 
-### Reporting Issues
+## FAQ
 
-**Bug Reports**:
-1. Email support@ganggreen.org
-2. Include:
-   - What you were trying to do
-   - What happened instead
-   - Error messages (if any)
-   - Browser and device information
-   - Screenshots (if helpful)
+### Account & Registration
 
-**Feature Requests**:
-1. Email support@ganggreen.org
-2. Describe:
-   - What feature you'd like
-   - Why it would be useful
-   - How it should work
+**Q: Why do I need to complete my profile?**  
+A: Your profile helps us personalize your experience and connect you with relevant conservation opportunities. Some features require a complete profile.
 
-### Social Media
+**Q: Can I change my role later?**  
+A: Yes! You can update your role in your profile settings at any time.
 
-**Stay Connected** (Coming Soon):
+**Q: Is my information secure?**  
+A: Yes! We use industry-standard encryption and security practices. Your data is stored securely and never shared without your permission.
+
+### Initiatives
+
+**Q: How do I find initiatives near me?**  
+A: Use the map view to see initiatives geographically. You can also filter by forest to see initiatives in specific areas.
+
+**Q: Can I join multiple initiatives?**  
+A: Yes! You can join as many initiatives as you want. There's no limit.
+
+**Q: What happens when I join an initiative?**  
+A: You become a participant and your name appears in the participant list. You can track your contributions and receive updates about the initiative.
+
+**Q: Can I leave an initiative after joining?**  
+A: Yes, you can leave an initiative at any time. Your contributions will still be recorded.
+
+**Q: How is progress tracked?**  
+A: Progress is calculated based on trees planted vs. target trees. The system also tracks if an initiative is on track based on time elapsed and progress made.
+
+**Q: What does "on track" mean?**  
+A: An initiative is "on track" if it has achieved at least 80% of the expected progress based on time elapsed. For example, if 50% of the time has passed, at least 40% of trees should be planted.
+
+### Maps
+
+**Q: Why can't I see the map?**  
+A: Make sure you have a stable internet connection. The maps require loading map tiles from OpenStreetMap. If the problem persists, try refreshing the page.
+
+**Q: How accurate are the forest boundaries?**  
+A: The forest boundaries shown are approximate and simplified for visualization purposes. They provide a general idea of forest locations and sizes.
+
+**Q: Can I use the map on mobile?**  
+A: Yes! The maps are mobile-friendly and support touch gestures for panning and zooming.
+
+**Q: What do the marker colors mean?**  
+A: Green markers are active initiatives, blue markers are completed initiatives, and yellow markers are paused initiatives. Red markers indicate the currently selected initiative.
+
+### Creating Initiatives (Organizations)
+
+**Q: Who can create initiatives?**  
+A: Only users with the "Organization" role can create initiatives. If you're an organization and don't have this role, contact support.
+
+**Q: Can I edit an initiative after creating it?**  
+A: Yes, you can edit your own initiatives. Go to the initiative details page and click "Edit" (coming soon).
+
+**Q: Can I delete an initiative?**  
+A: Yes, you can delete initiatives you created. However, this action is permanent and cannot be undone.
+
+**Q: How do I select the right location?**  
+A: Use the preset buttons for general forest areas, or click on the map for specific locations. You can also enter coordinates manually if you know them.
+
+### Profile Management
+
+**Q: Can I delete my account?**  
+A: Yes. Contact support@ganggreen.org to request account deletion. This action is permanent and cannot be undone.
+
+**Q: How do I change my forest preference?**  
+A: Go to "Edit Profile" and select a different forest from the dropdown menu.
+
+**Q: What if I represent multiple organizations?**  
+A: Currently, each account can be associated with one organization. Contact support if you need to manage multiple organizations.
+
+### Technical Issues
+
+**Q: I didn't receive a verification email**  
+A: Check your spam folder. If still not found, click "Resend verification email" on the login page.
+
+**Q: I forgot my password**  
+A: Click "Forgot Password" on the login page and follow the instructions to reset it.
+
+**Q: The map is not loading**  
+A: Check your internet connection. Try refreshing the page. If the problem persists, try clearing your browser cache.
+
+---
+
+## What's Coming Next
+
+### Upcoming Features
+
+**Initiative Participation** (Next Week!)
+- Enhanced join/leave functionality
+- Contribution tracking interface
+- Participant management dashboard
+- Milestone notifications
+
+**Tree Registry** (December 2025)
+- Register trees you've planted
+- Upload monitoring photos
+- Track tree growth with AI
+
+**Carbon Marketplace** (January 2026)
+- Purchase verified carbon credits
+- Track your carbon offset
+- Download certificates
+
+**Web3 Integration** (February 2026)
+- Connect crypto wallet
+- Make cryptocurrency donations
+- Earn NFT badges
+
+**Gamification** (March 2026)
+- Earn points and levels
+- Complete challenges
+- Climb leaderboards
+- Unlock achievements
+
+---
+
+## Quick Reference
+
+### Initiative Status Colors
+
+- 🟢 **Green (Active)**: Initiative is currently accepting participants and planting trees
+- 🔵 **Blue (Completed)**: Initiative has reached its target or end date
+- 🟡 **Yellow (Paused)**: Initiative is temporarily paused
+
+### Forest Information
+
+**Kakamega Forest** 🌳
+- Location: Western Kenya
+- Area: 238 km²
+- Type: Indigenous rainforest
+- Coordinates: 0.2827°N, 34.8522°E
+
+**Karura Forest** 🌲
+- Location: Nairobi
+- Area: 10.5 km²
+- Type: Urban conservation area
+- Coordinates: -1.2411°N, 36.8344°E
+
+**Mau Forest** 🌴
+- Location: Rift Valley
+- Area: 400 km²
+- Type: Water tower ecosystem
+- Coordinates: -0.5°N, 35.5833°E
+
+### User Roles
+
+- 🌱 **Individual**: Support through donations and participation
+- 🤝 **Community Member**: Active local conservation work
+- 🏢 **Organization**: Manage initiatives and projects
+- 👑 **Admin**: Platform administration (staff only)
+
+---
+
+## Contact & Support
+
+**Email**: support@ganggreen.org  
+**Response Time**: Within 24 hours  
+**Hours**: Monday-Friday, 9 AM - 5 PM EAT
+
+**Social Media**:
 - Twitter: @GangGreenAfrica
 - Facebook: /GangGreenPlatform
 - Instagram: @ganggreen_africa
@@ -598,120 +642,10 @@ A: Sprint 7 (Weeks 13-15) - estimated 11-13 weeks from now.
 
 ---
 
-## Quick Start Checklist
-
-Ready to get started? Follow these steps:
-
-- [ ] Create your account
-- [ ] Verify your email (when available)
-- [ ] Complete your profile
-- [ ] Choose your forest preference
-- [ ] Explore the dashboard
-- [ ] Read about the three pilot forests
-- [ ] Wait for tree planting features (coming soon!)
-- [ ] Join your first initiative (coming soon!)
-- [ ] Plant or register your first tree (coming soon!)
-
----
-
-## Tips for Success
-
-### Getting the Most from #GangGreen
-
-1. **Complete Your Profile**
-   - Add all optional information
-   - Upload a profile picture (coming soon)
-   - Set your forest preference
-
-2. **Stay Informed**
-   - Check dashboard regularly
-   - Read notifications (coming soon)
-   - Follow social media (coming soon)
-
-3. **Engage with Community**
-   - Join initiatives (coming soon)
-   - Participate in challenges (coming soon)
-   - Share your impact (coming soon)
-
-4. **Track Your Impact**
-   - Monitor trees planted (coming soon)
-   - View carbon offset (coming soon)
-   - Celebrate milestones (coming soon)
-
-5. **Invite Friends**
-   - Share the platform
-   - Build your network
-   - Multiply your impact
-
----
-
-## Glossary
-
-**Carbon Credit**: Certificate representing 1 tonne of CO₂ removed from atmosphere
-
-**Initiative**: Organized tree planting project in a specific forest
-
-**NFT Badge**: Blockchain-based digital collectible recognizing achievements
-
-**RLS**: Row Level Security - database security ensuring data privacy
-
-**Supabase**: Backend platform powering the application
-
-**Web3**: Decentralized internet technologies including blockchain and crypto
-
-**Antugrow**: AI-powered tree monitoring and analysis service
-
----
-
-## About #GangGreen
-
-### Mission
-
-Catalyzing a carbon-negative Africa through technology-enabled forest conservation, community engagement, and transparent impact tracking.
-
-### Pilot Forests
-
-**Kakamega Forest**:
-- Primary pilot site
-- Tropical rainforest
-- Rich biodiversity
-- Community-based conservation
-
-**Karura Forest**:
-- Urban conservation area
-- Located in Nairobi
-- Recreation and education
-- Community involvement
-
-**Mau Forest**:
-- Critical water tower ecosystem
-- Largest indigenous forest in East Africa
-- Water source for millions
-- Restoration focus
-
-### Technology
-
-Built with modern web technologies:
-- React + TypeScript for frontend
-- Supabase for backend
-- PostgreSQL database
-- AI-powered tree monitoring
-- Blockchain integration (coming soon)
-
-### Hackathon
-
-Built for **Wangari Maathai Hackathon**:
-- Track 3: Community Engagement and Sustainability
-- Technology for Forest Conservation
-- Innovation in environmental action
-
----
-
 **Welcome to the #GangGreen community! Together, we're growing a carbon-negative Africa, one tree at a time.** 🌍🌳
 
 ---
 
-**Document Version**: 1.4  
-**Last Updated**: November 13, 2025  
-**Platform Status**: Sprint 2 - 50% Complete  
-**Next Update**: Upon completion of Sprint 2 or major feature addition
+**Document Version**: 3.0  
+**Last Updated**: November 14, 2025  
+**Next Update**: Upon launch of Initiative Participation Features (Week of November 18, 2025)
