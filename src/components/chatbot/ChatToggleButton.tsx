@@ -44,10 +44,11 @@ export function ChatToggleButton({
   return (
     <button
       onClick={onClick}
-      className={`fixed ${positionClasses} w-14 h-14 bg-green-600 text-white rounded-full shadow-lg hover:bg-green-700 transition-all duration-300 hover:scale-110 flex items-center justify-center z-50 ${
+      className={`fixed ${positionClasses} w-14 h-14 md:w-14 md:h-14 min-w-[56px] min-h-[56px] bg-green-600 text-white rounded-full shadow-lg hover:bg-green-700 active:bg-green-800 transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center z-50 ${
         shouldPulse ? 'animate-pulse' : ''
       }`}
       aria-label="Open chat"
+      aria-expanded={isOpen}
     >
       {/* Message Icon */}
       <svg

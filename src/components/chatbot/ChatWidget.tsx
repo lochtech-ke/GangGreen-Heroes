@@ -34,6 +34,8 @@ export function ChatWidget({
   const [isInitialized, setIsInitialized] = useState(false);
   const [quickActions, setQuickActions] = useState<QuickAction[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const widgetRef = useRef<HTMLDivElement>(null);
 
   // Initialize chat engine and start onboarding if needed
   useEffect(() => {
@@ -86,6 +88,61 @@ export function ChatWidget({
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  // Focus input when widget opens
+  useEffect(() => {
+    if (isOpen && inputRef.current) {
+      // Small delay to ensure DOM is ready
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 100);
+    }
+  }, [isOpen]);
+
+  // Handle Escape key to close widget
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen && !isOnboardingMode) {
+        onToggle();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [isOpen, isOnboardingMode, onToggle]);
+
+  // Focus trap - keep focus within widget when open
+  useEffect(() => {
+    if (!isOpen || !widgetRef.current) return;
+
+    const widget = widgetRef.current;
+    const focusableElements = widget.querySelectorAll(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    const firstElement = focusableElements[0] as HTMLElement;
+    const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
+
+    const handleTabKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab') return;
+
+      if (e.shiftKey) {
+        // Shift + Tab
+        if (document.activeElement === firstElement) {
+          e.preventDefault();
+          lastElement?.focus();
+        }
+      } else {
+        // Tab
+        if (document.activeElement === lastElement) {
+          e.preventDefault();
+          firstElement?.focus();
+        }
+      }
+    };
+
+    widget.addEventListener('keydown', handleTabKey as EventListener);
+    return () => widget.removeEventListener('keydown', handleTabKey as EventListener);
+  }, [isOpen, messages.length]);
 
   const handleSendMessage = async () => {
     if (!inputValue.trim() || !conversationId || isTyping) {
@@ -161,7 +218,7 @@ export function ChatWidget({
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
@@ -179,15 +236,19 @@ export function ChatWidget({
   }
 
   const positionClasses = position === 'bottom-right' 
-    ? 'bottom-20 right-4' 
-    : 'bottom-20 left-4';
+    ? 'md:bottom-20 md:right-4 bottom-0 right-0' 
+    : 'md:bottom-20 md:left-4 bottom-0 left-0';
 
   return (
     <div
-      className={`fixed ${positionClasses} w-96 h-[600px] bg-white rounded-lg shadow-2xl flex flex-col z-50 border border-gray-200`}
+      ref={widgetRef}
+      className={`fixed ${positionClasses} w-full h-full md:w-96 md:h-[600px] lg:w-[400px] lg:h-[600px] md:max-w-md bg-white md:rounded-lg shadow-2xl flex flex-col z-50 border-0 md:border md:border-gray-200`}
+      role="dialog"
+      aria-label={isOnboardingMode ? 'Profile setup dialog' : 'Chat assistant dialog'}
+      aria-modal="true"
     >
       {/* Header */}
-      <div className="bg-green-600 text-white p-4 rounded-t-lg flex items-center justify-between">
+      <div className="bg-green-600 text-white p-4 md:rounded-t-lg flex items-center justify-between min-h-[60px]">
         <div className="flex items-center space-x-2">
           <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
             <span className="text-green-600 text-lg">🤖</span>
@@ -204,10 +265,11 @@ export function ChatWidget({
         {!isOnboardingMode && (
           <button
             onClick={onToggle}
-            className="text-white hover:text-green-100 transition-colors"
-            aria-label="Close chat"
+            className="text-white hover:text-green-100 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+            aria-label="Close chat (Press Escape)"
+            title="Close chat"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -231,7 +293,12 @@ export function ChatWidget({
       )}
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div 
+        className="flex-1 overflow-y-auto p-4 space-y-4"
+        role="log"
+        aria-live="polite"
+        aria-label="Chat messages"
+      >
         {messages.length === 0 && !isOnboardingMode && (
           <div className="text-center text-gray-500 mt-8">
             <p className="text-sm">👋 Hi! How can I help you today?</p>
@@ -270,30 +337,34 @@ export function ChatWidget({
       </div>
 
       {/* Input */}
-      <div className="p-4 border-t border-gray-200">
+      <div className="p-4 border-t border-gray-200 safe-area-bottom">
         <div className="flex space-x-2">
           <input
+            ref={inputRef}
             type="text"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            onKeyPress={handleKeyPress}
+            onKeyDown={handleKeyDown}
             placeholder={isOnboardingMode ? 'Type your answer...' : 'Ask me anything...'}
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            className="flex-1 px-4 py-2 md:py-2 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-base"
             disabled={isTyping}
+            aria-label={isOnboardingMode ? 'Type your answer' : 'Ask a question'}
+            aria-describedby={isOnboardingMode ? 'skip-hint' : undefined}
           />
           <button
             onClick={handleSendMessage}
             disabled={!inputValue.trim() || isTyping}
-            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
-            aria-label="Send message"
+            className="bg-green-600 text-white px-4 py-2 md:py-2 py-3 min-w-[44px] min-h-[44px] rounded-lg hover:bg-green-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center"
+            aria-label="Send message (Press Enter)"
+            title="Send message"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
             </svg>
           </button>
         </div>
         {isOnboardingMode && (
-          <p className="text-xs text-gray-500 mt-2">
+          <p id="skip-hint" className="text-xs text-gray-500 mt-2">
             Type "skip" to skip optional fields
           </p>
         )}

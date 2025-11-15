@@ -11,6 +11,8 @@ export function Message({ message, isUser, timestamp }: MessageProps) {
   return (
     <div
       className={`flex ${isUser ? 'justify-end' : 'justify-start'} animate-fade-in`}
+      role="article"
+      aria-label={`${isUser ? 'Your' : 'Assistant'} message at ${timestamp.toLocaleTimeString()}`}
     >
       <div
         className={`max-w-[80%] rounded-lg p-3 ${
