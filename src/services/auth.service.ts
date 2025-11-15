@@ -103,20 +103,35 @@ class AuthService {
     const start = performance.now();
 
     try {
+      console.log('[AuthService] Starting login for:', credentials.email);
+      console.log('[AuthService] Calling supabase.auth.signInWithPassword...');
+      
       const { data, error } = await supabase.auth.signInWithPassword({
         email: credentials.email,
         password: credentials.password,
       });
 
+      console.log('[AuthService] signInWithPassword response received');
+      console.log('[AuthService] Response details:', { 
+        hasData: !!data, 
+        hasUser: !!data?.user,
+        hasError: !!error,
+        errorMessage: error?.message 
+      });
+
       if (error) {
+        console.error('[AuthService] Login error:', error);
         return { user: null, error };
       }
 
       if (!data.user) {
+        console.error('[AuthService] No user in response');
         return { user: null, error: new Error('Login failed') };
       }
 
+      console.log('[AuthService] Auth successful, fetching user data...');
       const user = await this.getCurrentUser();
+      console.log('[AuthService] User data retrieved:', !!user);
 
       const duration = performance.now() - start;
       console.log(`[AuthService] Login completed in ${duration.toFixed(2)}ms`);
@@ -128,8 +143,9 @@ class AuthService {
       return { user, error: null };
     } catch (error) {
       const duration = performance.now() - start;
-      console.error('[AuthService] Login failed:', {
+      console.error('[AuthService] Login exception caught:', {
         error: error instanceof Error ? error.message : 'Unknown error',
+        errorType: error?.constructor?.name,
         duration: `${duration.toFixed(2)}ms`,
       });
       return {
@@ -193,10 +209,15 @@ class AuthService {
           user_profiles (*)
         `)
         .eq('id', authUser.id)
-        .single();
+        .maybeSingle();
 
-      if (error || !data) {
+      if (error) {
         console.error('[AuthService] Failed to fetch user data:', error);
+        return null;
+      }
+
+      if (!data) {
+        console.error('[AuthService] No user data found for ID:', authUser.id);
         return null;
       }
 
@@ -229,6 +250,8 @@ class AuthService {
    * Handles the joined user_profiles data
    */
   private transformUserData(data: any): User {
+    console.log('[AuthService] Transforming user data:', JSON.stringify(data, null, 2));
+    
     // Extract profile data (Supabase returns joined data as array or object)
     let profile: UserProfile | undefined;
     
@@ -249,7 +272,7 @@ class AuthService {
       }
     }
 
-    return {
+    const user: User = {
       id: data.id,
       email: data.email,
       role: data.role,
@@ -257,6 +280,9 @@ class AuthService {
       created_at: data.created_at,
       profile,
     };
+
+    console.log('[AuthService] Transformed user:', JSON.stringify(user, null, 2));
+    return user;
   }
 
   /**

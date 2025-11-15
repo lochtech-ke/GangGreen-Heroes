@@ -81,8 +81,8 @@ The platform pilots conservation efforts in three key Kenyan forests:
 
 ## 🚧 Development Status
 
-**Current Phase**: Sprint 4 - Onboarding Chatbot (Infrastructure Setup)  
-**Progress**: 44% Complete (13.2 of 30 major tasks)  
+**Current Phase**: Sprint 4 - Onboarding Chatbot + Performance Optimization  
+**Progress**: 45% Complete (13.5 of 30 major tasks)  
 **Status**: ✅ Ahead of Schedule (5 days ahead)
 
 ### What's Complete
@@ -100,7 +100,7 @@ The platform pilots conservation efforts in three key Kenyan forests:
 - ✅ Row Level Security policies configured
 - ✅ Storage buckets setup (tree-images, documents, avatars, nft-badges)
 
-**Authentication System** ✅ 95% Complete (3.8 of 4 tasks)
+**Authentication System** ✅ 98% Complete (3.9 of 4 tasks)
 - ✅ Authentication service with role-based access control
 - ✅ Traditional email/password authentication with email confirmation support
 - ✅ Email verification flow with user-friendly confirmation screens
@@ -114,7 +114,12 @@ The platform pilots conservation efforts in three key Kenyan forests:
 - ✅ Simplified registration flow with database trigger
 - ✅ Graceful error handling (no client-side rollback)
 - ✅ Optional profile creation during registration
-- ✅ Enhanced debug logging for registration troubleshooting
+- ✅ Enhanced debug logging for registration and login troubleshooting
+- ✅ Detailed login flow logging with response validation
+- ✅ Improved error handling with `.maybeSingle()` for user data fetching
+- ✅ Performance optimization with user data caching (5-minute TTL)
+- ✅ Single JOIN query for user + profile data (reduced from 2 queries)
+- ✅ Performance monitoring with timing logs
 - 🚧 Authentication tests (60% complete - 25+ tests written)
 
 **Profile Management** ✅ 100% Complete (Task 4)
@@ -534,6 +539,7 @@ const hasAnyRole = authService.hasAnyRole(user, ['admin', 'organization']);
 - Profile completion is handled by the onboarding chatbot
 - No client-side rollback attempts (prevents auth/database inconsistencies)
 - Enhanced debug logging tracks the registration flow for troubleshooting
+- Improved error handling with `.maybeSingle()` prevents false errors when user data doesn't exist yet
 
 **Email Confirmation Handling**:
 - The RegisterForm automatically detects when email confirmation is required
