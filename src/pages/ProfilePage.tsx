@@ -14,7 +14,7 @@ export function ProfilePage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="flex items-center justify-center py-12">
         <div className="text-center">
           <p className="text-gray-600">Please log in to view your profile.</p>
         </div>
@@ -23,18 +23,16 @@ export function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4">
-        {isEditing ? (
-          <ProfileEditForm
-            user={user}
-            onSuccess={handleEditSuccess}
-            onCancel={() => setIsEditing(false)}
-          />
-        ) : (
-          <UserProfile user={user} onEdit={() => setIsEditing(true)} />
-        )}
-      </div>
-    </div>
+    <>
+      {isEditing ? (
+        <ProfileEditForm
+          user={user}
+          onSuccess={handleEditSuccess}
+          onCancel={() => setIsEditing(false)}
+        />
+      ) : (
+        <UserProfile user={user} onEdit={() => setIsEditing(true)} />
+      )}
+    </>
   );
 }

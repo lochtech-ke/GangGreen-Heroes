@@ -6,8 +6,15 @@ import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { ResetPasswordPage } from './pages/ResetPasswordPage';
 import { DashboardPage } from './pages/DashboardPage';
+import { ProfilePage } from './pages/ProfilePage';
+import { InitiativesPage } from './pages/InitiativesPage';
+import { TreesPage } from './pages/TreesPage';
+import { MarketplacePage } from './pages/MarketplacePage';
+import { GamificationPage } from './pages/GamificationPage';
+import { SettingsPage } from './pages/SettingsPage';
 import { ProtectedRoute } from './components/auth';
 import { ChatWidget } from './components/chatbot';
+import { Layout } from './components/layout';
 
 // Feature flag for chatbot (can be moved to environment variable)
 const CHATBOT_ENABLED = true;
@@ -74,7 +81,69 @@ function AppContent() {
           path="/dashboard"
           element={
             <ProtectedRoute>
-              <DashboardPage />
+              <Layout>
+                <DashboardPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/initiatives"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <InitiativesPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/trees"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <TreesPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/marketplace"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <MarketplacePage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/gamification"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <GamificationPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <ProfilePage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <SettingsPage />
+              </Layout>
             </ProtectedRoute>
           }
         />

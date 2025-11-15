@@ -1,15 +1,11 @@
 import { useAuth } from '../hooks/useAuth';
 
 export function DashboardPage() {
-  const { user, loading, logout } = useAuth();
-
-  const handleLogout = async () => {
-    await logout();
-  };
+  const { user, loading } = useAuth();
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="flex items-center justify-center py-12">
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
           <p className="mt-4 text-gray-600">Loading...</p>
@@ -19,25 +15,15 @@ export function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 p-4">
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-lg shadow-lg p-8">
-          <div className="flex justify-between items-start mb-6">
-            <div>
-              <h1 className="text-3xl font-bold text-green-700 mb-2">
-                Welcome to #GangGreen
-              </h1>
-              <p className="text-gray-600">
-                Catalyzing a Carbon-Negative Africa
-              </p>
-            </div>
-            <button
-              onClick={handleLogout}
-              className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-md transition-colors duration-200"
-            >
-              Logout
-            </button>
-          </div>
+    <div className="bg-white rounded-lg shadow-lg p-8">
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold text-green-700 mb-2">
+          Welcome to #GangGreen
+        </h1>
+        <p className="text-gray-600">
+          Catalyzing a Carbon-Negative Africa
+        </p>
+      </div>
 
           {user && (
             <div className="bg-green-50 rounded-lg p-6 mb-6">
@@ -106,12 +92,10 @@ export function DashboardPage() {
             </div>
           </div>
 
-          <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-md">
-            <p className="text-sm text-blue-800">
-              <strong>Authentication System Complete!</strong> You are now logged in and can access protected features.
-            </p>
-          </div>
-        </div>
+      <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-md">
+        <p className="text-sm text-blue-800">
+          <strong>Navigation System Active!</strong> Use the navigation menu above to explore different features.
+        </p>
       </div>
     </div>
   );
