@@ -1,10 +1,12 @@
 import { supabase } from './supabase';
+import { userCache } from './userCache';
 import type {
   User,
   RegisterData,
   LoginCredentials,
   AuthResponse,
   UserRole,
+  UserProfile,
 } from '../types/user.types';
 import type { Session, AuthChangeEvent } from '@supabase/supabase-js';
 
@@ -18,6 +20,8 @@ class AuthService {
    * Profile completion will be handled by the onboarding chatbot
    */
   async register(data: RegisterData): Promise<AuthResponse> {
+    const start = performance.now();
+
     try {
       console.log('[AuthService] Starting registration...', { email: data.email });
       
@@ -74,9 +78,17 @@ class AuthService {
       console.log('[AuthService] Fetching complete user data...');
       const user = await this.getCurrentUser();
       console.log('[AuthService] User data fetched:', user);
+
+      const duration = performance.now() - start;
+      console.log(`[AuthService] Registration completed in ${duration.toFixed(2)}ms`);
+
       return { user, error: null };
     } catch (error) {
-      console.error('[AuthService] Registration exception:', error);
+      const duration = performance.now() - start;
+      console.error('[AuthService] Registration exception:', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        duration: `${duration.toFixed(2)}ms`,
+      });
       return {
         user: null,
         error: error instanceof Error ? error : new Error('Registration failed'),
@@ -88,6 +100,8 @@ class AuthService {
    * Login with email and password
    */
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
+    const start = performance.now();
+
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email: credentials.email,
@@ -103,8 +117,21 @@ class AuthService {
       }
 
       const user = await this.getCurrentUser();
+
+      const duration = performance.now() - start;
+      console.log(`[AuthService] Login completed in ${duration.toFixed(2)}ms`);
+
+      if (duration > 1000) {
+        console.warn(`[AuthService] Slow login detected: ${duration.toFixed(2)}ms`);
+      }
+
       return { user, error: null };
     } catch (error) {
+      const duration = performance.now() - start;
+      console.error('[AuthService] Login failed:', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        duration: `${duration.toFixed(2)}ms`,
+      });
       return {
         user: null,
         error: error instanceof Error ? error : new Error('Login failed'),
@@ -118,6 +145,11 @@ class AuthService {
   async logout(): Promise<{ error: Error | null }> {
     try {
       const { error } = await supabase.auth.signOut();
+
+      // Clear cache on logout
+      userCache.clear();
+      console.log('[AuthService] User cache cleared on logout');
+
       return { error };
     } catch (error) {
       return {
@@ -128,53 +160,103 @@ class AuthService {
 
   /**
    * Get current authenticated user with profile data
+   * Optimized with single JOIN query and caching
    */
   async getCurrentUser(): Promise<User | null> {
+    const start = performance.now();
+
     try {
       const {
         data: { user: authUser },
       } = await supabase.auth.getUser();
-
-      console.log('[AuthService] getCurrentUser - authUser:', authUser?.id);
 
       if (!authUser) {
         console.log('[AuthService] No auth user found');
         return null;
       }
 
-      // Fetch user data from users table
-      const { data: userData, error: userError } = await supabase
+      // Check cache first
+      const cached = userCache.get(authUser.id);
+      if (cached) {
+        const duration = performance.now() - start;
+        console.log(`[AuthService] User served from cache (${duration.toFixed(2)}ms)`);
+        return cached;
+      }
+
+      console.log('[AuthService] Cache miss, fetching from database');
+
+      // Single query with JOIN to fetch user and profile data
+      const { data, error } = await supabase
         .from('users')
-        .select('*')
+        .select(`
+          *,
+          user_profiles (*)
+        `)
         .eq('id', authUser.id)
         .single();
 
-      console.log('[AuthService] User data from DB:', { userData, userError });
-
-      if (userError || !userData) {
-        console.error('[AuthService] Failed to fetch user data:', userError);
+      if (error || !data) {
+        console.error('[AuthService] Failed to fetch user data:', error);
         return null;
       }
 
-      // Fetch user profile
-      const { data: profileData } = await supabase
-        .from('user_profiles')
-        .select('*')
-        .eq('id', authUser.id)
-        .single();
+      // Transform the response to match User type
+      const user = this.transformUserData(data);
 
-      return {
-        id: userData.id,
-        email: userData.email,
-        role: userData.role,
-        forest_preference: userData.forest_preference,
-        created_at: userData.created_at,
-        profile: profileData || undefined,
-      };
+      // Cache the result
+      userCache.set(authUser.id, user);
+
+      const duration = performance.now() - start;
+      console.log(`[AuthService] getCurrentUser completed in ${duration.toFixed(2)}ms`);
+
+      if (duration > 1000) {
+        console.warn(`[AuthService] Slow query detected: ${duration.toFixed(2)}ms`);
+      }
+
+      return user;
     } catch (error) {
-      console.error('Error fetching current user:', error);
+      const duration = performance.now() - start;
+      console.error('[AuthService] Error fetching current user:', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        duration: `${duration.toFixed(2)}ms`,
+      });
       return null;
     }
+  }
+
+  /**
+   * Transform database response to User type
+   * Handles the joined user_profiles data
+   */
+  private transformUserData(data: any): User {
+    // Extract profile data (Supabase returns joined data as array or object)
+    let profile: UserProfile | undefined;
+    
+    if (data.user_profiles) {
+      // Handle both array and object responses
+      const profileData = Array.isArray(data.user_profiles) 
+        ? data.user_profiles[0] 
+        : data.user_profiles;
+      
+      if (profileData) {
+        profile = {
+          full_name: profileData.full_name,
+          phone: profileData.phone,
+          organization: profileData.organization,
+          location: profileData.location,
+          avatar_url: profileData.avatar_url,
+        };
+      }
+    }
+
+    return {
+      id: data.id,
+      email: data.email,
+      role: data.role,
+      forest_preference: data.forest_preference,
+      created_at: data.created_at,
+      profile,
+    };
   }
 
   /**
@@ -256,7 +338,13 @@ class AuthService {
    * Subscribe to auth state changes
    */
   onAuthStateChange(callback: (user: User | null) => void) {
-    return supabase.auth.onAuthStateChange(async (_event: AuthChangeEvent, session: Session | null) => {
+    return supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, session: Session | null) => {
+      // Clear cache on sign out or token refresh
+      if (event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
+        userCache.clear();
+        console.log(`[AuthService] Cache cleared on ${event}`);
+      }
+
       if (session?.user) {
         const user = await this.getCurrentUser();
         callback(user);

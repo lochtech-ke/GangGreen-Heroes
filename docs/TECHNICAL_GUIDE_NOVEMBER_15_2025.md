@@ -1,8 +1,8 @@
 # #GangGreen Platform - Technical Guide
 
 **Last Updated**: November 15, 2025  
-**Version**: 3.1  
-**Status**: Sprint 3 - Initiative Participation System Complete
+**Version**: 4.0  
+**Status**: Sprint 4 - Onboarding Chatbot & Auth Performance Optimization
 
 ---
 
@@ -10,26 +10,71 @@
 
 1. [Architecture Overview](#architecture-overview)
 2. [Technology Stack](#technology-stack)
-3. [Initiative Management System](#initiative-management-system)
-4. [Participation System](#participation-system)
-5. [Database Schema](#database-schema)
-6. [API Services](#api-services)
-7. [Component Architecture](#component-architecture)
-8. [Testing](#testing)
+3. [Authentication System](#authentication-system)
+4. [Authentication Performance Optimization](#authentication-performance-optimization)
+5. [User Profile Management](#user-profile-management)
+6. [Initiative Management System](#initiative-management-system)
+7. [Tree Registry and Monitoring](#tree-registry-and-monitoring)
+8. [Antugrow API Integration](#antugrow-api-integration)
+9. [Onboarding Chatbot](#onboarding-chatbot)
+10. [Database Schema](#database-schema)
+11. [API Services](#api-services)
+12. [Component Architecture](#component-architecture)
+13. [State Management](#state-management)
+14. [Security](#security)
+15. [Testing](#testing)
+16. [Deployment](#deployment)
 
 ---
 
 ## Architecture Overview
 
-The #GangGreen platform uses a modern React + TypeScript frontend with Supabase backend, featuring comprehensive initiative management with geospatial tracking and participant engagement.
+### High-Level Architecture
 
-**Key Layers**:
-- Client Layer: React 18 + TypeScript + Vite
-- Service Layer: TypeScript services with Supabase client
-- Backend: Supabase (PostgreSQL + PostGIS + Auth + Storage)
-- Geospatial: Leaflet.js for interactive maps
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     Client Layer (React)                     │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐     │
+│  │   Web App    │  │  Mobile Web  │  │   Admin      │     │
+│  │   (Vite)     │  │  (Responsive)│  │   Dashboard  │     │
+│  └──────────────┘  └──────────────┘  └──────────────┘     │
+└─────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────────────┐
+│                  Service Layer (TypeScript)                  │
+│  ┌──────────────────────────────────────────────────────┐  │
+│  │  Auth │ Profile │ Initiative │ Tree │ Antugrow      │  │
+│  │  Cache │ Chatbot │ Marketplace │ Web3 │ NFT         │  │
+│  └──────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────────────┐
+│                   Backend (Supabase)                         │
+│  ┌────────────────────┐  ┌────────────────────┐           │
+│  │  PostgreSQL DB     │  │  Auth Service      │           │
+│  │  - 20 tables       │  │  - JWT tokens      │           │
+│  │  - PostGIS         │  │  - Session mgmt    │           │
+│  │  - RLS policies    │  │                    │           │
+│  └────────────────────┘  └────────────────────┘           │
+│  ┌────────────────────┐                                    │
+│  │  Storage Buckets   │                                    │
+│  │  - Tree images     │                                    │
+│  │  - Avatars         │                                    │
+│  └────────────────────┘                                    │
+└─────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────────────┐
+│              External Integrations                           │
+│  ┌────────────────────┐  ┌────────────────────┐           │
+│  │  Antugrow API      │  │  Leaflet.js Maps   │           │
+│  │  - Tree analysis   │  │  - Geospatial viz  │           │
+│  └────────────────────┘  └────────────────────┘           │
+└─────────────────────────────────────────────────────────────┘
+```
 
----
 
 ## Technology Stack
 
@@ -37,361 +82,262 @@ The #GangGreen platform uses a modern React + TypeScript frontend with Supabase 
 - **Framework**: React 18.2.0 with TypeScript 5.2.2
 - **Build Tool**: Vite 5.0.8
 - **Styling**: Tailwind CSS 3.4.0
+- **Routing**: React Router DOM 6.21.0
 - **Maps**: Leaflet.js 1.9.4 + react-leaflet 4.2.1
+- **State Management**: React Context API
 - **Testing**: Vitest 4.0.8, Testing Library 16.3.0
 
 ### Backend
-- **BaaS**: Supabase (PostgreSQL, Auth, Storage)
-- **Database**: PostgreSQL 15 with PostGIS
-- **Authentication**: Supabase Auth with JWT
+- **BaaS**: Supabase (PostgreSQL, Auth, Storage, Real-time)
+- **Database**: PostgreSQL 15 with PostGIS extension
+- **Authentication**: Supabase Auth with JWT tokens
+- **Storage**: Supabase Storage (4 buckets)
+
+### External Integrations
+- **Antugrow API**: AI-powered tree monitoring and analysis
+- **OpenStreetMap**: Free map tiles for Leaflet.js
+
+### Development Tools
+- **Package Manager**: npm
+- **Linting**: ESLint 8.55.0
+- **Formatting**: Prettier 3.1.1
+- **Version Control**: Git
 
 ---
 
-## Initiative Management System
+## Authentication System
 
 ### Overview
 
-Complete system for creating and managing tree planting initiatives with geospatial tracking, participant management, and progress monitoring.
+The authentication system provides secure user registration, login, and session management with role-based access control. As of November 15, 2025, a major performance optimization is being implemented to reduce login time from 2-5 seconds to under 500ms.
 
-**Status**: ✅ Complete
+**Status**: ✅ Complete (Optimization in progress)
 
-### Core Components
+### Current Architecture (Before Optimization)
 
-1. **InitiativeCard** - Summary display
-2. **InitiativeList** - Browse with filters
-3. **InitiativeForm** - Create with map picker
-4. **InitiativeDetails** - Full details page
-5. **InitiativeMap** - Interactive map view
-6. **LocationPicker** - Location selection
-7. **ForestBoundaryMap** - Forest visualization
-8. **ForestSelector** - Forest choice UI
+```
+User Login
+   ↓
+supabase.auth.signInWithPassword()
+   ↓
+getCurrentUser()
+   ↓
+supabase.auth.getUser() [Query 1]
+   ↓
+SELECT from users WHERE id = ? [Query 2]
+   ↓
+SELECT from user_profiles WHERE id = ? [Query 3]
+   ↓
+Transform and return user object
+   ↓
+Total Time: 2-5 seconds
+```
+
+**Issues**:
+- 3 sequential database queries
+- Multiple RLS policy evaluations
+- No caching mechanism
+- Slow user experience
+
 
 ---
 
-## Participation System
+## Authentication Performance Optimization
 
 ### Overview
 
-Complete participation system enabling community members to join initiatives, track contributions, and celebrate milestones.
+**Status**: 🚧 In Progress (Specs Complete, Implementation Starting)  
+**Target**: Reduce login time from 2-5 seconds to < 500ms  
+**Approach**: Database query consolidation + intelligent caching
 
-**Status**: ✅ Complete (Task 5.4 - November 15, 2025)
+### Optimized Architecture (After Optimization)
 
-### Components
+```
+User Login
+   ↓
+supabase.auth.signInWithPassword()
+   ↓
+getCurrentUser()
+   ↓
+Check UserCache (if valid, return in <50ms) ✨
+   ↓
+Single JOIN query: users + user_profiles [Query 1] ✨
+   ↓
+Cache result (TTL: 5 minutes) ✨
+   ↓
+Transform and return user object
+   ↓
+Total Time: <500ms (uncached), <50ms (cached)
+```
 
-#### 1. JoinInitiativeButton
+**Improvements**:
+- ✅ 3 queries → 1 query (67% reduction)
+- ✅ In-memory cache with 5-minute TTL
+- ✅ Performance monitoring and logging
+- ✅ 10x faster login experience
 
-**Purpose**: Smart button for joining/leaving initiatives
+### User Cache Service
 
-**Features**:
-- Adapts to participation status
-- Confirmation dialog before leaving
-- Only shows for active initiatives
-- Loading states and error handling
+**Location**: `src/services/userCache.ts` (Coming Soon)
 
-**Props**:
+**Interface**:
 ```typescript
-interface JoinInitiativeButtonProps {
-  initiativeId: string;
-  userId: string;
-  isParticipant: boolean;
-  initiativeStatus: 'active' | 'completed' | 'paused';
-  onJoin?: () => void;
-  onLeave?: () => void;
-  className?: string;
+interface CachedUser {
+  user: User;
+  timestamp: number;
+  expiresAt: number;
+}
+
+class UserCache {
+  private cache: Map<string, CachedUser>;
+  private TTL = 5 * 60 * 1000; // 5 minutes
+  
+  get(userId: string): User | null;
+  set(userId: string, user: User): void;
+  invalidate(userId: string): void;
+  clear(): void;
+  getStats(): { hits: number; misses: number };
 }
 ```
 
-**Usage**:
+**Cache Strategy**:
+- Cache user data for 5 minutes after fetch
+- Invalidate on logout
+- Invalidate on profile updates
+- Clear all cache on auth state change
+- Track hit/miss statistics
+
+
+### Optimized Auth Service Methods
+
+**getCurrentUser() - Optimized** (Coming Soon):
 ```typescript
-<JoinInitiativeButton
-  initiativeId={initiativeId}
-  userId={user.id}
-  isParticipant={isParticipant}
-  initiativeStatus={initiative.status}
-  onJoin={() => refreshData()}
-  onLeave={() => refreshData()}
-/>
-```
-
-#### 2. ParticipantList
-
-**Purpose**: Display initiative participants with contributions
-
-**Features**:
-- Avatar placeholders
-- Join dates
-- Contribution counts
-- Configurable max display
-- Empty state handling
-
-**Props**:
-```typescript
-interface ParticipantListProps {
-  initiativeId: string;
-  showContributions?: boolean;
-  maxDisplay?: number;
+async getCurrentUser(): Promise<User | null> {
+  const start = performance.now();
+  
+  try {
+    // Get auth user (required for ID)
+    const { data: { user: authUser } } = await supabase.auth.getUser();
+    
+    if (!authUser) return null;
+    
+    // Check cache first ✨
+    const cached = this.userCache.get(authUser.id);
+    if (cached) {
+      console.log('[Auth] Served from cache');
+      return cached;
+    }
+    
+    // Single query with join ✨
+    const { data, error } = await supabase
+      .from('users')
+      .select(`
+        *,
+        user_profiles (*)
+      `)
+      .eq('id', authUser.id)
+      .single();
+    
+    if (error || !data) return null;
+    
+    // Transform and cache ✨
+    const user = this.transformUserData(data);
+    this.userCache.set(authUser.id, user);
+    
+    const duration = performance.now() - start;
+    console.log(`[Auth] getCurrentUser took ${duration}ms`);
+    
+    if (duration > 1000) {
+      console.warn(`[Auth] Slow query detected: ${duration}ms`);
+    }
+    
+    return user;
+  } catch (error) {
+    console.error('[Auth] Error fetching user:', error);
+    return null;
+  }
 }
 ```
 
-#### 3. ContributionTracker
-
-**Purpose**: Track and update tree contributions
-
-**Features**:
-- Display/edit modes
-- Large number display
-- Validation (no negatives)
-- Success feedback (auto-dismiss)
-- Error handling
-
-**Props**:
+**login() - Updated** (Coming Soon):
 ```typescript
-interface ContributionTrackerProps {
-  initiativeId: string;
-  userId: string;
-  currentContribution: number;
-  onUpdate?: (newContribution: number) => void;
+async login(credentials: LoginCredentials): Promise<AuthResponse> {
+  const start = performance.now();
+  
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: credentials.email,
+      password: credentials.password,
+    });
+
+    if (error) return { user: null, error };
+    if (!data.user) return { user: null, error: new Error('Login failed') };
+
+    const user = await this.getCurrentUser();
+    
+    const duration = performance.now() - start;
+    console.log(`[Auth] Login completed in ${duration}ms`);
+    
+    if (duration > 1000) {
+      console.warn(`[Auth] Slow login detected: ${duration}ms`);
+    }
+    
+    return { user, error: null };
+  } catch (error) {
+    return {
+      user: null,
+      error: error instanceof Error ? error : new Error('Login failed'),
+    };
+  }
 }
 ```
 
-#### 4. MilestoneNotifications
-
-**Purpose**: Celebrate milestone achievements
-
-**Features**:
-- Milestones at 25%, 50%, 75%, 90%, 100%
-- Animated alerts for new milestones
-- Color-coded progress cards
-- Emoji indicators
-- Auto-dismiss alerts (5 seconds)
-
-**Props**:
+**logout() - Updated** (Coming Soon):
 ```typescript
-interface MilestoneNotificationsProps {
-  initiative: Initiative;
-  progress: InitiativeProgress;
-  onMilestoneReached?: (milestone: Milestone) => void;
+async logout(): Promise<{ error: Error | null }> {
+  try {
+    const { error } = await supabase.auth.signOut();
+    
+    // Clear cache on logout ✨
+    this.userCache.clear();
+    
+    return { error };
+  } catch (error) {
+    return {
+      error: error instanceof Error ? error : new Error('Logout failed'),
+    };
+  }
 }
 ```
 
-**Milestone Icons**:
-- 25%: 🌱 "Quarter way there!"
-- 50%: 🌳 "Halfway to the goal!"
-- 75%: 🌲 "Three quarters complete!"
-- 90%: 🎯 "Almost there!"
-- 100%: 🎉 "Goal achieved!"
+### Performance Targets
 
-### Participation Flow
+- **Login time (uncached):** < 500ms (currently 2-5s)
+- **Login time (cached):** < 50ms
+- **Cache hit rate:** > 80% for active users
+- **Database queries per login:** 1 (down from 3)
+- **Memory overhead:** < 1MB for 1000 cached users
 
-**Joining**:
-```
-User clicks "Join" → Service call → Database insert → 
-Success callback → UI refresh → "Participating" badge
-```
+### Performance Monitoring
 
-**Updating Contribution**:
-```
-User clicks "Update" → Form displays → User enters value →
-Service call → Database update → Progress recalculates →
-Milestone check → Alert if new milestone
-```
-
-**Leaving**:
-```
-User clicks "Leave" → Confirmation dialog → User confirms →
-Service call → Database delete → Success callback → UI refresh
-```
-
----
-
-## Database Schema
-
-### initiative_participants
-
-```sql
-CREATE TABLE initiative_participants (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  initiative_id UUID NOT NULL REFERENCES initiatives(id) ON DELETE CASCADE,
-  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  trees_contributed INTEGER DEFAULT 0 CHECK (trees_contributed >= 0),
-  joined_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  UNIQUE(initiative_id, user_id)
-);
-
-CREATE INDEX idx_participants_initiative ON initiative_participants(initiative_id);
-CREATE INDEX idx_participants_user ON initiative_participants(user_id);
-```
-
-**Row Level Security**:
-```sql
--- Anyone can view participants
-CREATE POLICY "Anyone can view participants"
-  ON initiative_participants FOR SELECT USING (true);
-
--- Users can join as themselves
-CREATE POLICY "Users can join initiatives"
-  ON initiative_participants FOR INSERT
-  WITH CHECK (auth.uid() = user_id);
-
--- Users can update own contributions
-CREATE POLICY "Users can update own contributions"
-  ON initiative_participants FOR UPDATE
-  USING (auth.uid() = user_id);
-
--- Users can leave initiatives
-CREATE POLICY "Users can leave initiatives"
-  ON initiative_participants FOR DELETE
-  USING (auth.uid() = user_id);
-```
-
----
-
-## API Services
-
-### Initiative Service - Participation Methods
-
+**Console Logging**:
 ```typescript
-class InitiativeService {
-  // Join initiative
-  async joinInitiative(
-    initiativeId: string,
-    userId: string
-  ): Promise<ParticipantResponse>;
+// Timing logs
+[Auth] getCurrentUser took 245ms
+[Auth] Login completed in 312ms
 
-  // Leave initiative
-  async leaveInitiative(
-    initiativeId: string,
-    userId: string
-  ): Promise<{ error: Error | null }>;
+// Cache logs
+[Auth] Served from cache
+[Auth] Cache hit rate: 85%
 
-  // Get participants
-  async getParticipants(initiativeId: string): Promise<{
-    participants: InitiativeParticipant[];
-    error: Error | null;
-  }>;
-
-  // Update contribution
-  async updateParticipantContribution(
-    initiativeId: string,
-    userId: string,
-    treesContributed: number
-  ): Promise<ParticipantResponse>;
-
-  // Calculate progress (for milestones)
-  async calculateProgress(
-    initiativeId: string
-  ): Promise<InitiativeProgress | null>;
-}
+// Warning logs
+[Auth] Slow query detected: 1250ms
+[Auth] Slow login detected: 1450ms
 ```
 
----
+**Metrics Tracked**:
+- Query execution time
+- Total login duration
+- Cache hit/miss ratio
+- Slow operation warnings (>1s)
 
-## Component Architecture
-
-### Initiative Components (12 total)
-
-```
-src/components/initiatives/
-├── InitiativeCard.tsx           (150 lines)
-├── InitiativeList.tsx           (180 lines)
-├── InitiativeForm.tsx           (280 lines)
-├── InitiativeDetails.tsx        (320 lines)
-├── ForestSelector.tsx           (100 lines)
-├── InitiativeMap.tsx            (200 lines)
-├── LocationPicker.tsx           (180 lines)
-├── ForestBoundaryMap.tsx        (150 lines)
-├── ParticipantList.tsx          (150 lines) ✨ NEW
-├── ContributionTracker.tsx      (150 lines) ✨ NEW
-├── JoinInitiativeButton.tsx     (150 lines) ✨ NEW
-├── MilestoneNotifications.tsx   (200 lines) ✨ NEW
-├── index.ts
-└── README.md                    (500+ lines)
-```
-
-**Total**: ~2,510 lines of code
-
-### Integration Example
-
-```typescript
-function InitiativeDetails({ initiativeId, currentUserId }) {
-  return (
-    <div>
-      {/* Header with join button */}
-      <JoinInitiativeButton
-        initiativeId={initiativeId}
-        userId={currentUserId}
-        isParticipant={isParticipant}
-        initiativeStatus={initiative.status}
-      />
-
-      {/* Milestones */}
-      <MilestoneNotifications
-        initiative={initiative}
-        progress={progress}
-      />
-
-      {/* Contribution tracker (participants only) */}
-      {isParticipant && (
-        <ContributionTracker
-          initiativeId={initiativeId}
-          userId={currentUserId}
-          currentContribution={currentParticipant.trees_contributed}
-        />
-      )}
-
-      {/* Participants */}
-      <ParticipantList
-        initiativeId={initiativeId}
-        maxDisplay={10}
-      />
-    </div>
-  );
-}
-```
-
----
-
-## Testing
-
-### Current Coverage
-
-- Auth service: 90%
-- LoginForm: 85%
-- RegisterForm: 85%
-- Profile service: 80%
-
-### Pending (Task 5.5)
-
-- Initiative service tests
-- 12 initiative component tests
-- Participation feature tests
-- Map component tests
-- Integration tests
-
-**Target**: 80% overall coverage
-
----
-
-## Performance
-
-- Initial load: < 3 seconds
-- API response: < 500ms
-- Map rendering: < 1 second
-- Milestone animation: < 500ms
-
----
-
-## Future Enhancements
-
-1. **Initiative Tests** (Task 5.5) - Next
-2. Push notifications for milestones
-3. Email notifications
-4. Social media sharing
-5. Leaderboards
-6. Team challenges
-
----
-
-**Document Version**: 3.1  
-**Last Updated**: November 15, 2025  
-**Next Update**: Upon completion of Task 5.5
