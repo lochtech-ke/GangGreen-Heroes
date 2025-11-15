@@ -1,8 +1,8 @@
 # #GangGreen Platform - User Guide
 
-**Last Updated**: November 17, 2025  
+**Last Updated**: November 18, 2025  
 **Version**: 4.0  
-**Status**: Sprint 3 Complete - AI-Powered Tree Monitoring Operational
+**Status**: Onboarding Chatbot Coming Soon
 
 ---
 
@@ -12,30 +12,23 @@
 
 ---
 
-## 🎉 What's New (November 17, 2025)
+## 🎉 What's New (November 18, 2025)
 
-### AI-Powered Tree Monitoring - NOW LIVE!
+### AI-Powered Onboarding Chatbot (Coming This Week!)
 
-The complete tree registry and AI-powered monitoring system is now operational:
+We're launching an intelligent chatbot assistant to help you get started:
 
-**Available Now**:
-- ✅ Register trees you've planted
-- ✅ Upload tree monitoring photos
-- ✅ Track tree growth with AI analysis
-- ✅ Monitor tree health status
-- ✅ Receive AI-powered recommendations
-- ✅ Automatic sync with Antugrow API
-- ✅ Real-time health alerts
+**What's Ready**:
+- ✅ Smart FAQ system with 28 common questions
+- ✅ Conversational profile completion
+- ✅ Automatic support escalation
+- ✅ Context-aware responses
 
-### Initiative Management System - FULLY OPERATIONAL!
-
-**Available Now**:
-- ✅ Browse active tree planting initiatives
-- ✅ View initiatives on interactive maps
-- ✅ Join conservation projects
-- ✅ Track initiative progress
-- ✅ See forest boundaries and locations
-- ✅ Create initiatives with visual location selection (organizations)
+**Coming This Week**:
+- 🚧 Chat widget interface
+- 🚧 Post-registration onboarding flow
+- 🚧 24/7 platform assistance
+- 🚧 Instant answers to your questions
 
 ---
 
@@ -47,9 +40,9 @@ The complete tree registry and AI-powered monitoring system is now operational:
 4. [User Roles](#user-roles)
 5. [Your Dashboard](#your-dashboard)
 6. [Tree Planting Initiatives](#tree-planting-initiatives)
-7. [Tree Registry](#tree-registry)
-8. [AI-Powered Tree Monitoring](#ai-powered-tree-monitoring)
-9. [Using Interactive Maps](#using-interactive-maps)
+7. [Tree Registry and Monitoring](#tree-registry-and-monitoring)
+8. [AI-Powered Tree Analysis](#ai-powered-tree-analysis)
+9. [Onboarding Chatbot](#onboarding-chatbot)
 10. [Profile Management](#profile-management)
 11. [Support](#support)
 12. [FAQ](#faq)
@@ -67,7 +60,7 @@ The complete tree registry and AI-powered monitoring system is now operational:
 ### Quick Start Steps
 
 1. **Register** - Create your account with email and password (30 seconds)
-2. **Complete Profile** - Add your details and preferences (2 minutes)
+2. **Complete Profile** - Chat with our AI assistant to set up your profile (2 minutes)
 3. **Explore** - Start participating in conservation efforts
 
 ---
@@ -100,25 +93,33 @@ The complete tree registry and AI-powered monitoring system is now operational:
 
 **What Happens Next**:
 - Your account is created immediately
-- User record automatically created via database trigger
-- Email confirmation screen shown (if email verification is enabled)
-- You're logged in automatically (after email confirmation)
-- You'll be prompted to complete your profile
-
-**Email Confirmation**:
-- If Supabase email confirmation is enabled, you'll see a friendly confirmation screen
-- Clear instructions guide you to check your email
-- Spam folder reminder included
-- Click the confirmation link in your email to verify your account
-- After confirmation, you can log in and complete your profile
+- You're logged in automatically
+- **Our AI chatbot will guide you through profile completion** (Coming This Week!)
 
 ---
 
 ## Completing Your Profile
 
-### Profile Information
+### New: AI-Powered Onboarding (Coming This Week!)
 
-After registration, complete your profile with:
+After registration, our friendly AI chatbot will help you complete your profile through a conversational interface:
+
+**The chatbot will ask you about**:
+1. **Your Full Name** - Required for personalization
+2. **How You Want to Participate** - Choose your role
+3. **Forest Preference** - Which forest you'd like to focus on (optional)
+4. **Phone Number** - For important updates (optional)
+5. **Location** - Where you're based (optional)
+6. **Organization Name** - If you represent an organization (conditional)
+
+**Benefits of Chatbot Onboarding**:
+- ✅ Conversational and friendly
+- ✅ Skip optional fields easily
+- ✅ Get instant help if confused
+- ✅ Progress tracking
+- ✅ Validation with helpful error messages
+
+### Profile Information
 
 #### 1. Your Full Name
 - Required for personalization
@@ -130,18 +131,14 @@ Choose your role:
 - 🤝 **Community Member** - Active local conservation work
 - 🏢 **Organization** - Manage initiatives and projects
 
-#### 3. Organization Name (If Applicable)
-- Only required if you selected "Organization"
-- Your organization's official name
-
-#### 4. Forest Preference (Optional)
+#### 3. Forest Preference (Optional)
 Choose which forest to focus on:
 - 🌳 **Kakamega Forest** - Primary pilot site (238 km²)
 - 🌲 **Karura Forest** - Urban conservation area (10.5 km²)
 - 🌴 **Mau Forest** - Critical water tower ecosystem (400 km²)
 - ⏭️ **No preference** - Support all forests
 
-#### 5. Additional Information (Optional)
+#### 4. Additional Information (Optional)
 - Phone number
 - Location
 - Profile picture
@@ -155,11 +152,11 @@ Choose which forest to focus on:
 Perfect for anyone who wants to support conservation efforts through donations and participation.
 
 **What you can do**:
-- Browse and view tree planting initiatives
+- Browse and join tree planting initiatives
 - View initiatives on interactive maps
-- Join initiatives
-- Register trees (coming soon)
+- Register trees you've planted
 - Track your environmental impact
+- Get AI-powered tree health analysis
 - Purchase carbon credits (coming soon)
 
 **Best for**: Supporters, donors, environmental enthusiasts
@@ -172,10 +169,10 @@ Ideal for local community members actively participating in forest conservation.
 - Everything an Individual can do
 - Join tree planting initiatives
 - Track personal contributions
-- **Register trees you've planted** ✅
-- **Upload tree monitoring photos** ✅
-- **Track tree growth with AI** ✅
-- **Monitor tree health** ✅
+- Register trees you've planted
+- Upload tree monitoring photos
+- Access AI-powered growth tracking
+- Participate in community challenges (coming soon)
 
 **Best for**: Local residents, volunteers, active participants
 
@@ -185,10 +182,11 @@ For NGOs, companies, and groups managing conservation initiatives.
 
 **What you can do**:
 - Everything Community Members can do
-- **Create and manage initiatives** ✅
+- **Create and manage initiatives**
 - Select initiative locations on interactive maps
 - Track participant contributions
 - Monitor initiative progress
+- Access advanced analytics
 - Generate reports (coming soon)
 
 **Best for**: NGOs, companies, conservation groups, schools
@@ -224,6 +222,7 @@ After completing your profile, you'll land on your personalized dashboard.
    - Join an initiative ✅
    - Register a tree ✅
    - Upload tree photos ✅
+   - Get AI analysis ✅
    - Make a donation (coming soon)
 
 ---
@@ -340,9 +339,9 @@ Click on any initiative card or map marker to see full details:
    - **End Date**: When the initiative ends (optional)
 
 4. **Select Location on Map**
-   - Use preset buttons (Kakamega, Karura, Mau)
-   - Click anywhere on the map
-   - Enter coordinates manually
+   - Click one of the preset buttons (Kakamega, Karura, Mau)
+   - Or click anywhere on the map
+   - Or enter coordinates manually
 
 5. **Review and Submit**
    - Check all information is correct
@@ -351,56 +350,50 @@ Click on any initiative card or map marker to see full details:
 
 ---
 
-## Tree Registry
+## Tree Registry and Monitoring
 
 ### What is the Tree Registry?
 
-The tree registry is a comprehensive system for tracking individual trees you've planted, monitoring their growth, and managing their health.
+The tree registry allows you to register trees you've planted, upload monitoring photos, and track their growth over time with AI-powered analysis.
 
 **Status**: ✅ FULLY OPERATIONAL
 
 ### Registering a Tree
 
-**Prerequisites**:
-- You must be logged in
-- You must have "Community Member" or "Organization" role
-
 **Steps**:
 
 1. **Navigate to Tree Registry**
    - Go to your dashboard
-   - Click "Register Tree" button
+   - Click "Register a Tree" button
 
-2. **Enter Tree Information**
+2. **Fill in Tree Information**
    - **Species**: Select or enter tree species
    - **Planted Date**: When the tree was planted
    - **Location**: Click on map or enter coordinates
-   - **Initiative**: Link to an initiative (optional)
-   - **Notes**: Any additional information
+   - **Initiative** (optional): Link to an initiative
+   - **Notes** (optional): Any additional information
 
-3. **Upload Photos** (Optional)
-   - Click "Upload Photos"
-   - Select one or more images
-   - Add captions to describe each photo
-   - Photos help with AI analysis
+3. **Upload Initial Photo** (optional)
+   - Take a photo of the newly planted tree
+   - Add a caption
+   - Upload from your device
 
 4. **Submit Registration**
-   - Review all information
+   - Review information
    - Click "Register Tree"
    - Your tree is now in the registry!
 
 ### Viewing Your Trees
 
-1. Navigate to "My Trees" from the main menu
-2. See all trees you've registered in a grid layout
+1. Navigate to "My Trees" from the dashboard
+2. See all your registered trees in a grid layout
 3. Each card shows:
    - Tree species
    - Planted date
    - Health status (color-coded)
-   - Height and diameter (if recorded)
    - Location
-   - Initiative (if linked)
    - Latest photo
+   - Growth metrics (if available)
 
 ### Filtering Trees
 
@@ -410,7 +403,7 @@ Use the filter panel to find specific trees:
 - All Species
 - Indigenous species
 - Exotic species
-- Specific species names
+- Custom species
 
 **Health Status Filter**:
 - All Statuses
@@ -420,226 +413,225 @@ Use the filter panel to find specific trees:
 - Deceased (gray)
 
 **Initiative Filter**:
-- All Initiatives
-- Specific initiative names
-- Trees not linked to initiatives
+- All Trees
+- Linked to specific initiative
+- Not linked to any initiative
 
-**Search**:
-- Search by species or notes
-- Real-time filtering as you type
+### Uploading Monitoring Photos
 
-### Viewing Tree Details
+**Steps**:
 
-Click on any tree card to see full details:
+1. **Open Tree Details**
+   - Click on a tree card
+   - Go to the tree details page
 
-**Information Displayed**:
-- Species and planted date
-- Health status with color indicator
-- Current measurements (height, diameter)
-- Location on map
-- Initiative link (if applicable)
-- Notes and observations
-- Photo gallery
-- AI analysis results (if available)
-- Growth chart (if multiple measurements)
-- Health history
+2. **Upload New Photo**
+   - Click "Upload Photo" button
+   - Select photo from your device
+   - Add a caption (optional)
+   - Click "Upload"
 
-### Uploading Tree Photos
+3. **View Photo Gallery**
+   - See all photos in chronological order
+   - Click to view full size
+   - See upload dates and captions
 
-1. Go to tree details page
-2. Click "Upload Photos" button
-3. Select one or more images from your device
-4. Add captions to describe each photo
-5. Click "Upload"
-6. Photos are automatically analyzed by AI
-
-**Photo Requirements**:
-- Maximum size: 10MB per image
-- Formats: JPG, PNG, WebP
-- Recommended: Clear photos showing the whole tree
-
-### Updating Tree Information
-
-1. Go to tree details page
-2. Click "Edit Tree" button
-3. Update any information:
-   - Health status
-   - Height and diameter
-   - Notes
-4. Click "Save Changes"
+**Tips**:
+- Take photos from the same angle for consistency
+- Upload photos regularly (monthly recommended)
+- Include a reference object for scale
+- Take photos in good lighting
 
 ---
 
-## AI-Powered Tree Monitoring
+## AI-Powered Tree Analysis
 
-### What is AI-Powered Monitoring?
+### What is Antugrow?
 
-The platform integrates with Antugrow API to provide automated tree analysis, growth tracking, health monitoring, and AI-powered recommendations.
+Antugrow is an AI-powered tree monitoring system that analyzes your tree photos to provide growth tracking, health assessment, and care recommendations.
 
 **Status**: ✅ FULLY OPERATIONAL
 
 ### How It Works
 
-1. **Automatic Analysis**
-   - When you upload a tree photo, it's automatically sent to Antugrow API
-   - AI analyzes the image for health indicators
-   - Results are displayed within minutes
+1. **Automatic Registration**
+   - When you register a tree, it's automatically registered with Antugrow
+   - You receive an Antugrow Tree ID
 
-2. **Background Sync**
-   - The system automatically syncs with Antugrow API
-   - Updates are fetched every few hours
-   - You can manually trigger a sync anytime
+2. **Photo Analysis**
+   - When you upload a photo, it's sent to Antugrow for analysis
+   - AI analyzes tree health, growth, and condition
+   - Results are available within minutes
 
-3. **Real-Time Alerts**
-   - Receive notifications when analysis is complete
-   - Get alerts for health issues
-   - See recommendations for tree care
+3. **Background Sync**
+   - The system automatically syncs with Antugrow
+   - Updates growth data and health status
+   - Checks for new recommendations
 
 ### Viewing AI Analysis
 
 **On Tree Details Page**:
 
-1. Navigate to a tree's details page
-2. Scroll to "AI Analysis" section
-3. See the latest analysis results:
-   - Health score (0-100)
-   - Growth rate
-   - Detected issues
-   - Confidence level
-   - Analysis date
+1. **Health Status Card**
+   - Current health status (Healthy, Needs Attention, Critical)
+   - Color-coded indicator
+   - Last updated timestamp
 
-### Understanding Health Status
+2. **Growth Chart**
+   - Height over time
+   - Diameter over time
+   - Growth rate trends
+   - Interactive chart with zoom
 
-**Healthy** (Green):
-- Tree is thriving
-- No issues detected
-- Continue current care routine
+3. **AI Recommendations**
+   - Personalized care suggestions
+   - Watering schedule
+   - Fertilization recommendations
+   - Pest/disease warnings
+   - Pruning advice
 
-**Needs Attention** (Yellow):
-- Minor issues detected
-- May need water, nutrients, or pest control
-- Check AI recommendations
-
-**Critical** (Red):
-- Serious issues detected
-- Immediate action required
-- Follow AI recommendations urgently
-
-**Deceased** (Gray):
-- Tree has died
-- No further monitoring needed
-- Consider replanting
-
-### AI Recommendations
-
-The AI provides specific recommendations based on analysis:
-
-**Types of Recommendations**:
-- Watering schedule
-- Fertilizer application
-- Pest control measures
-- Pruning suggestions
-- Disease treatment
-- Environmental adjustments
-
-**How to Use Recommendations**:
-1. Go to tree details page
-2. Scroll to "AI Recommendations" section
-3. Read each recommendation carefully
-4. Follow the suggested actions
-5. Update tree status after implementing
-
-### Growth Tracking
-
-**Growth Chart**:
-- Visual chart showing height and diameter over time
-- Compare growth rate to expected values
-- Identify growth patterns and anomalies
-
-**Growth Data**:
-- Height measurements (cm)
-- Diameter measurements (cm)
-- Growth rate (cm/month)
-- Predicted future growth
+4. **Analysis History**
+   - All past analyses
+   - Comparison over time
+   - Download reports
 
 ### Sync Status
 
 **Sync Indicator**:
-- Green: Recently synced (< 1 hour ago)
-- Yellow: Sync needed (> 1 hour ago)
-- Red: Sync failed (needs attention)
-- Gray: Never synced
+- 🟢 **Synced**: Data is up to date
+- 🟡 **Syncing**: Currently updating
+- 🔴 **Error**: Sync failed (retry available)
+- ⏸️ **Pending**: Waiting for analysis
 
 **Manual Sync**:
-1. Go to tree details page
-2. Click "Sync Now" button
-3. Wait for sync to complete
-4. See updated analysis results
+- Click "Sync Now" button on tree details page
+- Forces immediate sync with Antugrow
+- Useful after uploading new photos
 
-### Auto-Sync
+### Analysis Notifications
 
-**What is Auto-Sync?**:
-- Automatic background synchronization with Antugrow API
-- Runs every few hours
-- Keeps all tree data up to date
-
-**Enabling/Disabling**:
-1. Go to Settings
-2. Find "Auto-Sync" option
-3. Toggle on/off
-4. Changes take effect immediately
+**You'll receive notifications when**:
+- New analysis is available
+- Health status changes
+- Growth milestone reached
+- Urgent care needed
+- Recommendations updated
 
 ---
 
-## Using Interactive Maps
+## Onboarding Chatbot
 
-### Initiative Map
+### What is the Onboarding Chatbot?
 
-**Purpose**: See all initiatives on an interactive map
+The onboarding chatbot is your AI-powered assistant that helps you complete your profile after registration and answers questions about the platform.
 
-**How to Use**:
-1. Navigate to the initiatives page
-2. Click "View on Map"
-3. Pan and zoom to explore
-4. Click markers to see initiative details
-5. Use the popup "View Details" button to navigate
+**Status**: 🚧 COMING THIS WEEK (Backend Complete, UI In Development)
 
-**Map Controls**:
-- **Zoom**: Use + and - buttons or scroll wheel
-- **Pan**: Click and drag to move around
-- **Markers**: Click to see popup with details
+### How It Works
 
-**Marker Colors**:
-- 🟢 Green: Active initiative
-- 🔵 Blue: Completed initiative
-- 🟡 Yellow: Paused initiative
-- 🔴 Red: Selected initiative (highlighted)
+**Post-Registration Onboarding**:
 
-### Forest Boundary Map
+1. **Automatic Launch**
+   - After you create your account, the chatbot opens automatically
+   - Friendly welcome message appears
+   - You're guided through profile completion
 
-**Purpose**: Visualize the three pilot forests
+2. **Conversational Flow**
+   - Chatbot asks questions one at a time
+   - You respond naturally in the chat
+   - Skip optional questions easily
+   - Get instant validation and help
 
-**How to Use**:
-1. Navigate to the forests page
-2. See colored polygons showing forest boundaries
-3. Click on a forest to see information
-4. View forest area and description
+3. **Progress Tracking**
+   - See how much of your profile is complete
+   - Progress bar shows percentage
+   - Know exactly what's left
 
-**Forest Colors**:
-- 🟢 Green: Kakamega Forest
-- 🔵 Blue: Karura Forest
-- 🟣 Purple: Mau Forest
+4. **Profile Saved**
+   - When complete, your profile is automatically saved
+   - You're redirected to your dashboard
+   - Ready to start using the platform!
 
-### Tree Location Map
+**General Platform Assistance**:
 
-**Purpose**: See where trees are planted
+1. **Always Available**
+   - Chat button in bottom-right corner
+   - Click to open anytime
+   - 24/7 availability
 
-**How to Use**:
-1. Navigate to tree registry
-2. Click "View on Map"
-3. See markers for each tree
-4. Click markers to see tree details
-5. Filter by species, health, or initiative
+2. **Ask Questions**
+   - Type your question naturally
+   - AI understands various phrasings
+   - Get instant answers from knowledge base
+
+3. **Smart Matching**
+   - AI finds best answer from 28 FAQ entries
+   - 70%+ confidence threshold
+   - Related questions suggested
+
+4. **Automatic Escalation**
+   - If AI can't help, you're escalated to human support
+   - Support ticket created automatically
+   - Conversation history included
+   - Response within 24 hours
+
+### What You Can Ask
+
+**Getting Started** (5 topics):
+- How to create an account
+- How to complete your profile
+- Understanding user roles
+- Navigating the platform
+- Getting started guide
+
+**Projects** (8 topics):
+- Finding tree planting initiatives
+- Joining initiatives
+- Creating initiatives (organizations)
+- Tracking progress
+- Contributing trees
+- Initiative requirements
+- Forest selection
+- Location selection
+
+**Education & Gamification** (3 topics):
+- Learning about conservation
+- Earning points and badges
+- Leaderboards and challenges
+
+**Community** (3 topics):
+- Connecting with others
+- Community forums
+- Local events
+
+**Verification & Tracking** (3 topics):
+- Tree registration
+- Photo uploads
+- AI analysis
+
+**Sponsorship** (3 topics):
+- Corporate partnerships
+- Donation options
+- Carbon credits
+
+**Support** (3 topics):
+- Getting help
+- Contact information
+- Technical issues
+
+### Tips for Using the Chatbot
+
+**Do**:
+- ✅ Ask questions naturally
+- ✅ Be specific about what you need
+- ✅ Use the suggested quick actions
+- ✅ Skip optional onboarding fields if you want
+
+**Don't**:
+- ❌ Use overly complex language
+- ❌ Ask multiple questions at once
+- ❌ Expect answers outside platform scope
+- ❌ Close the chatbot during onboarding (wait until complete)
 
 ---
 
@@ -683,14 +675,19 @@ The AI provides specific recommendations based on analysis:
 
 ### Getting Help
 
-**Help Center** (coming soon):
-- Comprehensive FAQ
-- Video tutorials
-- Step-by-step guides
+**AI Chatbot** (Coming This Week!):
+- 24/7 instant answers
+- 28 FAQ topics covered
+- Automatic escalation to human support
 
 **Email Support**:
 - support@ganggreen.org
 - Response within 24 hours
+
+**Help Center** (coming soon):
+- Comprehensive FAQ
+- Video tutorials
+- Step-by-step guides
 
 **Community Forum** (coming soon):
 - Connect with other users
@@ -704,13 +701,16 @@ The AI provides specific recommendations based on analysis:
 ### Account & Registration
 
 **Q: Why do I need to complete my profile?**  
-A: Your profile helps us personalize your experience and connect you with relevant conservation opportunities. Some features require a complete profile.
+A: Your profile helps us personalize your experience and connect you with relevant conservation opportunities. The AI chatbot makes this quick and easy!
 
 **Q: Can I change my role later?**  
 A: Yes! You can update your role in your profile settings at any time.
 
 **Q: Is my information secure?**  
 A: Yes! We use industry-standard encryption and security practices. Your data is stored securely and never shared without your permission.
+
+**Q: What if I skip optional fields during onboarding?**  
+A: No problem! You can always add this information later in your profile settings.
 
 ### Initiatives
 
@@ -726,44 +726,64 @@ A: You become a participant and your name appears in the participant list. You c
 **Q: Can I leave an initiative after joining?**  
 A: Yes, you can leave an initiative at any time. Your contributions will still be recorded.
 
+**Q: How is progress tracked?**  
+A: Progress is calculated based on trees planted vs. target trees. The system also tracks if an initiative is on track based on time elapsed and progress made.
+
 ### Tree Registry
 
 **Q: Do I need to register every tree I plant?**  
-A: It's recommended but not required. Registering trees helps track conservation impact and enables AI-powered monitoring.
+A: It's recommended but not required. Registering trees helps track your impact and enables AI-powered monitoring.
 
-**Q: Can I register trees planted by others?**  
-A: Only if you have permission. The tree registry is for tracking trees you've personally planted or are responsible for.
+**Q: Can I register trees planted before joining the platform?**  
+A: Yes! Just enter the original planting date when registering.
 
-**Q: How often should I upload tree photos?**  
-A: We recommend uploading photos every 1-3 months to track growth and health over time.
+**Q: How often should I upload monitoring photos?**  
+A: Monthly is recommended for best AI analysis results, but you can upload as often as you like.
 
-**Q: What if I don't know the tree species?**  
-A: You can enter "Unknown" or a general description. The AI analysis may help identify the species from photos.
+**Q: What if I can't find my tree species in the list?**  
+A: You can enter a custom species name. We're constantly expanding our species database.
 
-### AI Monitoring
+### AI Analysis
 
 **Q: How accurate is the AI analysis?**  
-A: Antugrow's AI has been trained on thousands of tree images and provides highly accurate results. However, it's always good to verify with local experts.
+A: Antugrow's AI is highly accurate, trained on millions of tree images. However, it's a tool to assist, not replace, human expertise.
 
-**Q: How long does AI analysis take?**  
-A: Usually within a few minutes of uploading a photo. You'll receive a notification when analysis is complete.
+**Q: How long does analysis take?**  
+A: Usually within minutes of uploading a photo. You'll receive a notification when results are ready.
 
-**Q: What if the AI detects a problem?**  
-A: Follow the AI recommendations and consult with local forestry experts if needed. Early detection helps save trees.
+**Q: What if the AI detects a problem with my tree?**  
+A: You'll receive recommendations for care. For serious issues, consider consulting a local arborist.
 
-**Q: Can I disable AI monitoring?**  
-A: Yes, you can disable auto-sync in settings. However, we recommend keeping it enabled for best results.
+**Q: Can I download analysis reports?**  
+A: Yes! You can download PDF reports from the tree details page.
 
-### Maps
+### Chatbot
 
-**Q: Why can't I see the map?**  
-A: Make sure you have a stable internet connection. The maps require loading map tiles from OpenStreetMap. If the problem persists, try refreshing the page.
+**Q: When will the chatbot be available?**  
+A: The chatbot is launching this week! The backend is complete, and we're finalizing the user interface.
 
-**Q: How accurate are the forest boundaries?**  
-A: The forest boundaries shown are approximate and simplified for visualization purposes. They provide a general idea of forest locations and sizes.
+**Q: What can the chatbot help me with?**  
+A: Profile completion, platform navigation, answering questions about features, and escalating to human support when needed.
 
-**Q: Can I use the map on mobile?**  
-A: Yes! The maps are mobile-friendly and support touch gestures for panning and zooming.
+**Q: Can the chatbot answer any question?**  
+A: The chatbot knows about the #GangGreen platform and has 28 FAQ topics. For questions outside this scope, it will escalate to human support.
+
+**Q: Is the chatbot available 24/7?**  
+A: Yes! The AI chatbot is always available. Human support is available Monday-Friday, 9 AM - 5 PM EAT.
+
+### Technical Issues
+
+**Q: I didn't receive a verification email**  
+A: Check your spam folder. If still not found, click "Resend verification email" on the login page.
+
+**Q: I forgot my password**  
+A: Click "Forgot Password" on the login page and follow the instructions to reset it.
+
+**Q: The map is not loading**  
+A: Check your internet connection. Try refreshing the page. If the problem persists, try clearing your browser cache.
+
+**Q: My tree photos aren't uploading**  
+A: Check file size (max 10MB) and format (JPG, PNG, WebP). Ensure stable internet connection.
 
 ---
 
@@ -771,11 +791,11 @@ A: Yes! The maps are mobile-friendly and support touch gestures for panning and 
 
 ### Upcoming Features
 
-**Initiative Participation** (Next Week!)
-- Enhanced join/leave functionality
-- Contribution tracking interface
-- Participant management dashboard
-- Milestone notifications
+**Onboarding Chatbot** (This Week!)
+- AI-powered profile completion
+- 24/7 platform assistance
+- Instant FAQ answers
+- Automatic support escalation
 
 **Carbon Marketplace** (December 2025)
 - Purchase verified carbon credits
@@ -805,9 +825,9 @@ A: Yes! The maps are mobile-friendly and support touch gestures for panning and 
 
 ### Tree Health Status Colors
 
-- 🟢 **Green (Healthy)**: Tree is thriving, no issues detected
-- 🟡 **Yellow (Needs Attention)**: Minor issues detected, action recommended
-- 🔴 **Red (Critical)**: Serious issues detected, immediate action required
+- 🟢 **Green (Healthy)**: Tree is thriving
+- 🟡 **Yellow (Needs Attention)**: Minor issues detected
+- 🔴 **Red (Critical)**: Urgent care needed
 - ⚫ **Gray (Deceased)**: Tree has died
 
 ### Forest Information
@@ -833,7 +853,7 @@ A: Yes! The maps are mobile-friendly and support touch gestures for panning and 
 ### User Roles
 
 - 🌱 **Individual**: Support through donations and participation
-- 🤝 **Community Member**: Active local conservation work + tree registry
+- 🤝 **Community Member**: Active local conservation work
 - 🏢 **Organization**: Manage initiatives and projects
 - 👑 **Admin**: Platform administration (staff only)
 
@@ -844,6 +864,8 @@ A: Yes! The maps are mobile-friendly and support touch gestures for panning and 
 **Email**: support@ganggreen.org  
 **Response Time**: Within 24 hours  
 **Hours**: Monday-Friday, 9 AM - 5 PM EAT
+
+**AI Chatbot**: 24/7 (Coming This Week!)
 
 **Social Media**:
 - Twitter: @GangGreenAfrica
@@ -858,5 +880,5 @@ A: Yes! The maps are mobile-friendly and support touch gestures for panning and 
 ---
 
 **Document Version**: 4.0  
-**Last Updated**: November 17, 2025  
-**Next Update**: Upon launch of Initiative Participation Features (Week of November 18, 2025)
+**Last Updated**: November 18, 2025  
+**Next Update**: Upon launch of Onboarding Chatbot UI (Week of November 19, 2025)

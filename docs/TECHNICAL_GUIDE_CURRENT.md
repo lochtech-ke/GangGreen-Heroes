@@ -1,8 +1,8 @@
 # #GangGreen Platform - Technical Guide
 
-**Last Updated**: November 17, 2025  
+**Last Updated**: November 18, 2025  
 **Version**: 4.0  
-**Status**: Sprint 3 Complete - AI-Powered Tree Monitoring Operational
+**Status**: Sprint 4 - Onboarding Chatbot Backend Complete
 
 ---
 
@@ -13,9 +13,9 @@
 3. [Authentication System](#authentication-system)
 4. [User Profile Management](#user-profile-management)
 5. [Initiative Management System](#initiative-management-system)
-6. [Tree Registry System](#tree-registry-system)
-7. [AI-Powered Monitoring](#ai-powered-monitoring)
-8. [Geospatial Features](#geospatial-features)
+6. [Tree Registry and Monitoring](#tree-registry-and-monitoring)
+7. [Antugrow API Integration](#antugrow-api-integration)
+8. [Onboarding Chatbot System](#onboarding-chatbot-system)
 9. [Database Schema](#database-schema)
 10. [API Services](#api-services)
 11. [Component Architecture](#component-architecture)
@@ -44,6 +44,7 @@
 │                  Service Layer (TypeScript)                  │
 │  ┌──────────────────────────────────────────────────────┐  │
 │  │  Auth │ Profile │ Initiative │ Tree │ Antugrow      │  │
+│  │  Chatbot (8 services) │ Marketplace │ Web3          │  │
 │  └──────────────────────────────────────────────────────┘  │
 └─────────────────────────────────────────────────────────────┘
                             │
@@ -52,23 +53,25 @@
 │                   Backend (Supabase)                         │
 │  ┌────────────────────┐  ┌────────────────────┐           │
 │  │  PostgreSQL DB     │  │  Auth Service      │           │
-│  │  - 20 tables       │  │  - JWT tokens      │           │
+│  │  - 22 tables       │  │  - JWT tokens      │           │
 │  │  - PostGIS         │  │  - Session mgmt    │           │
 │  │  - RLS policies    │  │                    │           │
 │  └────────────────────┘  └────────────────────┘           │
-│  ┌────────────────────┐                                    │
-│  │  Storage Buckets   │                                    │
-│  │  - Tree images     │                                    │
-│  │  - Avatars         │                                    │
-│  └────────────────────┘                                    │
+│  ┌────────────────────┐  ┌────────────────────┐           │
+│  │  Storage Buckets   │  │  Real-time         │           │
+│  │  - Tree images     │  │  - Subscriptions   │           │
+│  │  - Avatars         │  │  - Live updates    │           │
+│  └────────────────────┘  └────────────────────┘           │
 └─────────────────────────────────────────────────────────────┘
                             │
                             ▼
 ┌─────────────────────────────────────────────────────────────┐
-│              External Services (Antugrow API)                │
-│  ┌──────────────────────────────────────────────────────┐  │
-│  │  AI Analysis │ Growth Tracking │ Health Monitoring   │  │
-│  └──────────────────────────────────────────────────────┘  │
+│                  External Integrations                       │
+│  ┌────────────────────┐  ┌────────────────────┐           │
+│  │  Antugrow API      │  │  OpenStreetMap     │           │
+│  │  - Tree analysis   │  │  - Map tiles       │           │
+│  │  - Growth tracking │  │  - Geospatial      │           │
+│  └────────────────────┘  └────────────────────┘           │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -81,9 +84,9 @@ React Component (UI)
    ↓
 Service Layer (Business Logic)
    ↓
-Supabase Client (API) / Antugrow API
+Supabase Client (API) / External API
    ↓
-PostgreSQL Database (PostGIS) / AI Analysis
+PostgreSQL Database / External Service
    ↓
 Response
    ↓
@@ -102,7 +105,6 @@ UI Re-render (with Maps/Charts)
 - **Styling**: Tailwind CSS 3.4.0
 - **Routing**: React Router DOM 6.21.0
 - **Maps**: Leaflet.js 1.9.4 + react-leaflet 4.2.1
-- **Charts**: Recharts (for growth and health visualizations)
 - **State Management**: React Context API
 - **Testing**: Vitest 4.0.8, Testing Library 16.3.0
 
@@ -112,8 +114,9 @@ UI Re-render (with Maps/Charts)
 - **Authentication**: Supabase Auth with JWT tokens
 - **Storage**: Supabase Storage (4 buckets)
 
-### External Services
-- **Antugrow API**: AI-powered tree monitoring, growth tracking, health analysis
+### External Integrations
+- **Antugrow API**: AI-powered tree monitoring and analysis
+- **OpenStreetMap**: Free map tiles for Leaflet.js
 
 ### Development Tools
 - **Package Manager**: npm
@@ -129,40 +132,17 @@ UI Re-render (with Maps/Charts)
 
 The authentication system provides secure user registration, login, and session management with role-based access control.
 
-**Status**: ✅ Complete (95%)
+**Status**: ✅ Complete (95% - tests in progress)
 
 ### Key Features
 
-- Email/password authentication with automatic user record creation
-- Email confirmation flow with user-friendly screens
-- Web3 wallet authentication (MetaMask, WalletConnect)
+- Email/password authentication
 - Session persistence with JWT tokens
 - Role-based access control (admin, organization, community, individual)
-- Protected routes with automatic redirects
 - Password reset flow
 - Real-time auth state updates
-
-### Registration Flow
-
-```
-1. User enters email and password
-   ↓
-2. RegisterForm validates input
-   ↓
-3. authService.register() called
-   ↓
-4. Supabase creates auth user
-   ↓
-5. Database trigger creates user record automatically
-   ↓
-6. Email confirmation screen shown (if required)
-   ↓
-7. User confirms email via link
-   ↓
-8. User can log in
-   ↓
-9. Profile completion (optional during registration)
-```
+- Protected routes
+- Database trigger for automatic user record creation
 
 ### Auth Service
 
@@ -170,40 +150,23 @@ The authentication system provides secure user registration, login, and session 
 
 **Key Methods**:
 ```typescript
-class AuthService {
-  // Registration (user record created automatically via database trigger)
-  async register(data: { email: string; password: string }): Promise<{
-    user: User | null;
-    error: Error | null;
-  }>;
+// Registration (user record created automatically via database trigger)
+await authService.register({ email, password });
 
-  // Login
-  async login(credentials: LoginCredentials): Promise<{
-    user: User | null;
-    error: Error | null;
-  }>;
+// Login
+await authService.login({ email, password });
 
-  // Logout
-  async logout(): Promise<{ error: Error | null }>;
+// Logout
+await authService.logout();
 
-  // Get current user
-  async getCurrentUser(): Promise<User | null>;
+// Password reset
+await authService.requestPasswordReset(email);
+await authService.updatePassword(newPassword);
 
-  // Password reset
-  async requestPasswordReset(email: string): Promise<{ error: Error | null }>;
-  async updatePassword(newPassword: string): Promise<{ error: Error | null }>;
-
-  // Role checking
-  hasRole(user: User | null, role: UserRole): boolean;
-  hasAnyRole(user: User | null, roles: UserRole[]): boolean;
-  isAdmin(user: User | null): boolean;
-  isOrganization(user: User | null): boolean;
-
-  // Auth state subscription
-  onAuthStateChange(callback: (user: User | null) => void): {
-    data: { subscription: { unsubscribe: () => void } };
-  };
-}
+// Role checking
+authService.isAdmin(user);
+authService.isOrganization(user);
+authService.hasRole(user, 'community');
 ```
 
 ### useAuth Hook
@@ -218,19 +181,7 @@ class AuthService {
 - `register()` - Register method
 - `logout()` - Logout method
 - `hasRole()` - Role checking
-- `isAdmin()` - Admin check
-- `isOrganization()` - Organization check
 - `refreshUser()` - Manual refresh
-
-### Components
-
-1. **RegisterForm** - Simplified registration (email/password only)
-2. **LoginForm** - Login with validation
-3. **Web3Login** - Web3 wallet authentication
-4. **AuthOptions** - Authentication method selector
-5. **ProtectedRoute** - Route guard component
-6. **PasswordResetRequest** - Request password reset
-7. **PasswordResetConfirm** - Confirm password reset
 
 ---
 
@@ -248,31 +199,17 @@ User profiles store additional information beyond authentication credentials.
 
 **Key Methods**:
 ```typescript
-class ProfileService {
-  // Get user profile
-  async getProfile(userId: string): Promise<{
-    profile: UserProfile | null;
-    error: Error | null;
-  }>;
+// Get profile
+await profileService.getProfile(userId);
 
-  // Create profile
-  async createProfile(userId: string, data: ProfileData): Promise<{
-    profile: UserProfile | null;
-    error: Error | null;
-  }>;
+// Create profile
+await profileService.createProfile(userId, data);
 
-  // Update profile
-  async updateProfile(userId: string, data: Partial<ProfileData>): Promise<{
-    profile: UserProfile | null;
-    error: Error | null;
-  }>;
+// Update profile
+await profileService.updateProfile(userId, updates);
 
-  // Upload avatar
-  async uploadAvatar(userId: string, file: File): Promise<{
-    url: string | null;
-    error: Error | null;
-  }>;
-}
+// Upload avatar
+await profileService.uploadAvatar(userId, file);
 ```
 
 ### Profile Data Structure
@@ -297,7 +234,7 @@ interface ProfileData {
 
 The initiative management system enables organizations to create and manage tree planting initiatives with geospatial tracking, participant management, and progress monitoring.
 
-**Status**: ✅ Complete
+**Status**: ✅ Complete (Service Layer + UI Components + Geospatial Features)
 
 ### Type Definitions
 
@@ -332,24 +269,6 @@ interface Initiative {
   created_at: string;
   updated_at: string;
 }
-
-// Participant tracking
-interface InitiativeParticipant {
-  id: string;
-  initiative_id: string;
-  user_id: string;
-  trees_contributed: number;
-  joined_at: string;
-}
-
-// Progress tracking
-interface InitiativeProgress {
-  initiative_id: string;
-  progress_percentage: number;
-  trees_remaining: number;
-  days_remaining?: number;
-  is_on_track: boolean;
-}
 ```
 
 ### Initiative Service
@@ -359,60 +278,24 @@ interface InitiativeProgress {
 **Key Methods**:
 
 ```typescript
-class InitiativeService {
-  // Create a new initiative
-  async createInitiative(data: CreateInitiativeData): Promise<InitiativeResponse>;
+// Create initiative
+await initiativeService.createInitiative(data);
 
-  // Get initiative by ID
-  async getInitiative(initiativeId: string): Promise<InitiativeResponse>;
+// Get initiatives with filters
+await initiativeService.getInitiatives({ forest, status, search });
 
-  // Get all initiatives with optional filtering
-  async getInitiatives(filters?: InitiativeFilters): Promise<InitiativesResponse>;
+// Join initiative
+await initiativeService.joinInitiative(initiativeId, userId);
 
-  // Update initiative
-  async updateInitiative(
-    initiativeId: string,
-    updates: UpdateInitiativeData
-  ): Promise<InitiativeResponse>;
-
-  // Delete initiative
-  async deleteInitiative(initiativeId: string): Promise<{ error: Error | null }>;
-
-  // Add participant to initiative
-  async joinInitiative(
-    initiativeId: string,
-    userId: string
-  ): Promise<ParticipantResponse>;
-
-  // Remove participant from initiative
-  async leaveInitiative(
-    initiativeId: string,
-    userId: string
-  ): Promise<{ error: Error | null }>;
-
-  // Get participants for an initiative
-  async getParticipants(initiativeId: string): Promise<{
-    participants: InitiativeParticipant[];
-    error: Error | null;
-  }>;
-
-  // Update participant contribution
-  async updateParticipantContribution(
-    initiativeId: string,
-    userId: string,
-    treesContributed: number
-  ): Promise<ParticipantResponse>;
-
-  // Calculate initiative progress
-  async calculateProgress(initiativeId: string): Promise<InitiativeProgress | null>;
-}
+// Calculate progress
+await initiativeService.calculateProgress(initiativeId);
 ```
 
 ### Initiative Components
 
 **Location**: `src/components/initiatives/`
 
-**Components** (11 total):
+**Components** (8 total):
 1. **InitiativeCard** - Summary card display
 2. **InitiativeList** - Grid with filtering
 3. **InitiativeForm** - Creation form with map picker
@@ -421,20 +304,16 @@ class InitiativeService {
 6. **InitiativeMap** - Interactive map display
 7. **LocationPicker** - Location selection tool
 8. **ForestBoundaryMap** - Forest boundary visualization
-9. **ParticipantList** - Participant display
-10. **ContributionTracker** - Contribution tracking
-11. **JoinInitiativeButton** - Join/leave button
-12. **MilestoneNotifications** - Milestone celebrations
 
 ---
 
-## Tree Registry System
+## Tree Registry and Monitoring
 
 ### Overview
 
-The tree registry system enables community members to register trees, upload images, track health status, and monitor growth.
+The tree registry system enables users to register trees, upload monitoring photos, track growth, and receive AI-powered health analysis.
 
-**Status**: ✅ Complete
+**Status**: ✅ Complete (Service Layer + UI Components + Tests)
 
 ### Type Definitions
 
@@ -452,12 +331,12 @@ interface Tree {
   species: string;
   planted_date: string;
   location: GeoPoint;
+  initiative_id?: string;
+  planted_by: string;
   health_status: TreeHealthStatus;
   height_cm?: number;
   diameter_cm?: number;
   notes?: string;
-  initiative_id?: string;
-  planted_by: string;
   created_at: string;
   updated_at: string;
 }
@@ -470,17 +349,6 @@ interface TreeImage {
   caption?: string;
   uploaded_at: string;
 }
-
-// Tree statistics
-interface TreeStatistics {
-  total_trees: number;
-  healthy_trees: number;
-  trees_needing_attention: number;
-  critical_trees: number;
-  deceased_trees: number;
-  average_height_cm: number;
-  average_diameter_cm: number;
-}
 ```
 
 ### Tree Service
@@ -490,41 +358,20 @@ interface TreeStatistics {
 **Key Methods**:
 
 ```typescript
-class TreeService {
-  // Create a new tree
-  async createTree(data: CreateTreeData): Promise<TreeResponse>;
+// Register tree
+await treeService.registerTree(data);
 
-  // Get tree by ID
-  async getTree(treeId: string): Promise<TreeResponse>;
+// Get trees with filters
+await treeService.getTrees({ species, health_status, initiative_id });
 
-  // Get all trees with optional filtering
-  async getTrees(filters?: TreeFilters): Promise<TreesResponse>;
+// Upload image
+await treeService.uploadTreeImage(treeId, file, caption);
 
-  // Update tree
-  async updateTree(
-    treeId: string,
-    updates: UpdateTreeData
-  ): Promise<TreeResponse>;
+// Update health status
+await treeService.updateHealthStatus(treeId, status);
 
-  // Delete tree
-  async deleteTree(treeId: string): Promise<{ error: Error | null }>;
-
-  // Upload tree image
-  async uploadTreeImage(
-    treeId: string,
-    file: File,
-    caption?: string
-  ): Promise<TreeImageResponse>;
-
-  // Get tree images
-  async getTreeImages(treeId: string): Promise<TreeImagesResponse>;
-
-  // Delete tree image
-  async deleteTreeImage(imageId: string): Promise<{ error: Error | null }>;
-
-  // Get tree statistics
-  async getTreeStatistics(filters?: TreeFilters): Promise<TreeStatistics | null>;
-}
+// Get statistics
+await treeService.getTreeStatistics(userId);
 ```
 
 ### Tree Components
@@ -536,20 +383,20 @@ class TreeService {
 2. **TreeRegistry** - Grid with filtering
 3. **TreeDetails** - Full details page
 4. **SpeciesSelector** - Species selection
-5. **TreeImageUpload** - Image upload
-6. **ImageGallery** - Image gallery with lightbox
-7. **TreeHealthStatus** - Health status display
+5. **TreeImageUpload** - Image upload interface
+6. **ImageGallery** - Photo gallery
+7. **TreeHealthStatus** - Health indicator
 8. **TreeGrowthChart** - Growth visualization
 
 ---
 
-## AI-Powered Monitoring
+## Antugrow API Integration
 
 ### Overview
 
-The AI-powered monitoring system integrates with Antugrow API to provide automated tree analysis, growth tracking, health monitoring, and AI-powered recommendations.
+The Antugrow API integration provides AI-powered tree monitoring, growth tracking, and health analysis.
 
-**Status**: ✅ Complete
+**Status**: ✅ Complete (Service Layer + Background Sync + UI Components + Tests)
 
 ### Antugrow Service
 
@@ -558,53 +405,47 @@ The AI-powered monitoring system integrates with Antugrow API to provide automat
 **Key Methods**:
 
 ```typescript
-class AntugrowService {
-  // Register tree with Antugrow
-  async registerTree(treeData: AntugrowTreeRegistration): Promise<AntugrowTreeResponse>;
+// Register tree with Antugrow
+await antugrowService.registerTree(treeData);
 
-  // Analyze tree image
-  async analyzeTreeImage(
-    treeId: string,
-    imageUrl: string
-  ): Promise<AntugrowAnalysisResponse>;
+// Analyze tree image
+await antugrowService.analyzeTreeImage(treeId, imageUrl);
 
-  // Get tree growth data
-  async getTreeGrowthData(treeId: string): Promise<AntugrowGrowthDataResponse>;
+// Get growth data
+await antugrowService.getGrowthData(antugrowTreeId);
 
-  // Get tree health status
-  async getTreeHealthStatus(treeId: string): Promise<AntugrowHealthResponse>;
+// Get health analysis
+await antugrowService.getHealthAnalysis(antugrowTreeId);
 
-  // Get AI recommendations
-  async getRecommendations(treeId: string): Promise<AntugrowRecommendationsResponse>;
-
-  // Process webhook
-  async processWebhook(payload: AntugrowWebhookPayload): Promise<void>;
-}
+// Get recommendations
+await antugrowService.getRecommendations(antugrowTreeId);
 ```
 
-### Antugrow Sync Service
+### Background Sync Service
 
 **Location**: `src/services/antugrow-sync.service.ts`
+
+**Features**:
+- Automatic synchronization of tree data
+- Periodic health checks
+- Growth data updates
+- Error handling and retry logic
+- Configurable sync intervals
 
 **Key Methods**:
 
 ```typescript
-class AntugrowSyncService {
-  // Sync single tree
-  async syncTree(treeId: string): Promise<SyncResult>;
+// Start auto-sync
+antugrowSyncService.startAutoSync(intervalMinutes);
 
-  // Sync all trees
-  async syncAllTrees(): Promise<SyncSummary>;
+// Stop auto-sync
+antugrowSyncService.stopAutoSync();
 
-  // Get sync status
-  async getSyncStatus(treeId: string): Promise<SyncStatus | null>;
+// Manual sync
+await antugrowSyncService.syncTree(treeId);
 
-  // Enable/disable auto-sync
-  setAutoSync(enabled: boolean): void;
-
-  // Get auto-sync status
-  isAutoSyncEnabled(): boolean;
-}
+// Sync all trees
+await antugrowSyncService.syncAllTrees();
 ```
 
 ### Monitoring Components
@@ -613,106 +454,269 @@ class AntugrowSyncService {
 
 **Components** (5 total):
 1. **AntugrowAnalysisDisplay** - AI analysis results
-2. **AnalysisNotification** - Analysis alerts
+2. **AnalysisNotification** - New analysis alerts
 3. **SyncStatusIndicator** - Sync status display
-4. **TreeHealthStatus** - Health monitoring
-5. **TreeGrowthChart** - Growth tracking
+4. **TreeHealthStatus** - Health visualization
+5. **TreeGrowthChart** - Growth trends
 
 ---
 
-## Geospatial Features
+## Onboarding Chatbot System
 
 ### Overview
 
-The platform includes comprehensive geospatial features for visualizing and managing tree planting initiatives and tree locations across Kenya's pilot forests.
+The onboarding chatbot provides AI-powered conversational assistance for post-registration profile completion and general platform support.
 
-**Status**: ✅ Complete
+**Status**: ✅ Backend Complete (8 services), UI Pending
 
-### Technology Stack
+### Architecture
 
-**Mapping Library**: Leaflet.js 1.9.4
-- Open-source JavaScript library
-- Mobile-friendly and lightweight (39 KB gzipped)
-- Extensive plugin ecosystem
-- No API key required with OpenStreetMap
+```
+ChatEngine (Main Orchestrator)
+├── OnboardingFlowManager
+│   ├── Session management
+│   ├── Step progression
+│   ├── Validation
+│   └── Profile saving
+├── KnowledgeBaseManager
+│   ├── JSON loading
+│   ├── Caching
+│   └── Search
+├── SemanticMatcher
+│   ├── TF-IDF vectorization
+│   ├── Cosine similarity
+│   └── Fuzzy matching
+├── ContextManager
+│   ├── History tracking
+│   ├── Session state
+│   └── Persistence
+├── QueryProcessor
+│   ├── Normalization
+│   ├── Intent extraction
+│   └── Entity extraction
+├── ResponseGenerator
+│   ├── Formatting
+│   ├── Personalization
+│   └── Follow-ups
+├── EscalationHandler
+│   ├── Threshold checking
+│   ├── Ticket creation
+│   └── Analytics
+└── AnalyticsTracker
+    ├── Event logging
+    └── Supabase integration
+```
 
-**React Integration**: react-leaflet 4.2.1
-- Official React components for Leaflet
-- Declarative API with hooks
-- Full TypeScript support
+### Type Definitions
 
-**Map Tiles**: OpenStreetMap
-- Free and open-source
-- No API key required
-- Global coverage
-- Community-maintained
+**Location**: `src/types/chatbot.types.ts`
 
-### Coordinate System
+**Core Types**:
 
-**Format**: WGS84 (EPSG:4326)
-- Standard GPS coordinate system
-- Latitude: -90 to 90 (North/South)
-- Longitude: -180 to 180 (East/West)
-
-**GeoJSON Point Format**:
 ```typescript
-interface GeoPoint {
-  type: 'Point';
-  coordinates: [number, number]; // [longitude, latitude]
+// Message
+interface Message {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: Date;
+  metadata?: Record<string, any>;
+}
+
+// Conversation context
+interface ConversationContext {
+  conversationId: string;
+  messages: Message[];
+  lastActivity: Date;
+  mode: 'general' | 'onboarding';
+  onboardingSessionId?: string;
+  onboardingProgress?: number;
+}
+
+// Knowledge base entry
+interface KnowledgeBaseEntry {
+  id: string;
+  question: string;
+  answer: string;
+  category: string;
+  keywords: string[];
+  relatedQuestions?: string[];
+}
+
+// Onboarding session
+interface OnboardingSession {
+  sessionId: string;
+  userId: string;
+  userEmail: string;
+  currentStep: OnboardingStep;
+  collectedData: Partial<ProfileData>;
+  startedAt: Date;
+  completedAt?: Date;
 }
 ```
 
-### Forest Coordinates
+### Chat Engine Service
 
-**Kakamega Forest**:
-- Center: 0.2827°N, 34.8522°E
-- Area: 238 km²
-- Bounds: 0.2°N to 0.35°N, 34.8°E to 34.9°E
+**Location**: `src/services/chatbot/chatEngine.service.ts`
 
-**Karura Forest**:
-- Center: -1.2411°N, 36.8344°E
-- Area: 10.5 km²
-- Bounds: -1.25°N to -1.23°N, 36.82°E to 36.85°E
+**Key Methods**:
 
-**Mau Forest**:
-- Center: -0.5°N, 35.5833°E
-- Area: 400 km²
-- Bounds: -0.7°N to -0.3°N, 35.4°E to 35.8°E
+```typescript
+// Initialize conversation
+const conversationId = await chatEngine.initializeConversation('general');
 
-### Map Components
+// Start onboarding
+const response = await chatEngine.startOnboarding(userId, userEmail);
 
-#### 1. InitiativeMap
+// Process general query
+const response = await chatEngine.processQuery(conversationId, query);
 
-**Purpose**: Display multiple initiatives on an interactive map
+// Process onboarding response
+const response = await chatEngine.processOnboardingResponse(
+  conversationId,
+  userResponse
+);
 
-**Features**:
-- Color-coded markers by status (green=active, blue=completed, yellow=paused)
-- Custom SVG markers with dynamic colors
-- Clickable markers with detailed popups
-- Configurable center, zoom, and height
-- Selected initiative highlighting
+// Get conversation history
+const history = await chatEngine.getConversationHistory(conversationId);
+```
 
-#### 2. LocationPicker
+### Onboarding Flow Manager
 
-**Purpose**: Interactive location selection for creating initiatives
+**Location**: `src/services/chatbot/onboardingFlowManager.ts`
 
 **Features**:
-- Click-to-place marker
-- Preset location buttons (Kakamega, Karura, Mau)
-- Manual coordinate input fields
-- Real-time marker updates
-- Disabled state support
+- Post-registration profile completion
+- Step-by-step conversational flow
+- Field validation
+- Skip logic for optional fields
+- Profile saving to Supabase
+- Progress tracking
 
-#### 3. ForestBoundaryMap
+**Onboarding Steps**:
+1. Welcome message
+2. Full name (required)
+3. Role selection (required)
+4. Forest preference (required)
+5. Phone number (optional)
+6. Location (optional)
+7. Organization name (conditional)
+8. Completion confirmation
 
-**Purpose**: Visualize forest boundaries as polygons
+### Knowledge Base Manager
+
+**Location**: `src/services/chatbot/knowledgeBaseManager.ts`
 
 **Features**:
-- Color-coded forest polygons
-- Semi-transparent fill for visibility
-- Popups with forest information
-- Single or all forest display
-- Configurable height
+- JSON loading and caching
+- Hot-reload functionality
+- Structure validation
+- Category-based search
+- Statistics tracking
+
+**Knowledge Base** (28 entries):
+- Getting started: 5 entries
+- Projects: 8 entries
+- Education & gamification: 3 entries
+- Community: 3 entries
+- Verification & tracking: 3 entries
+- Sponsorship: 3 entries
+- Support: 3 entries
+
+### Semantic Matcher
+
+**Location**: `src/services/chatbot/semanticMatcher.ts`
+
+**Features**:
+- TF-IDF vectorization
+- Cosine similarity calculation
+- Fuzzy string matching
+- Confidence scoring (0-100%)
+- Top-N match ranking
+- Typo tolerance
+
+**Matching Algorithm**:
+```typescript
+1. Normalize query (lowercase, remove punctuation)
+2. Calculate TF-IDF vectors for query and all KB entries
+3. Compute cosine similarity scores
+4. Apply fuzzy matching for short queries
+5. Rank by confidence score
+6. Return best match if confidence >= 70%
+```
+
+### Context Manager
+
+**Location**: `src/services/chatbot/contextManager.ts`
+
+**Features**:
+- Conversation history (last 5 messages)
+- Session state management
+- localStorage persistence
+- 20-minute timeout
+- Onboarding mode tracking
+
+### Query Processor
+
+**Location**: `src/services/chatbot/queryProcessor.ts`
+
+**Features**:
+- Query normalization
+- Intent extraction (8 types)
+- Entity extraction
+- Greeting/farewell detection
+- Skip request detection
+
+**Intent Types**:
+- getting-started
+- find-projects
+- join-project
+- education
+- community
+- verification
+- sponsorship
+- support
+
+### Response Generator
+
+**Location**: `src/services/chatbot/responseGenerator.ts`
+
+**Features**:
+- Response formatting and personalization
+- Context-aware customization
+- Follow-up action generation
+- Greeting/farewell responses
+- Category-specific quick actions
+
+### Escalation Handler
+
+**Location**: `src/services/chatbot/escalationHandler.ts`
+
+**Features**:
+- 70% confidence threshold
+- Attempt tracking (max 2 attempts)
+- Support ticket creation
+- Priority determination
+- Escalation analytics
+
+**Escalation Triggers**:
+- Low confidence match (<70%)
+- Multiple failed attempts (>2)
+- Explicit support request
+- Complex query detection
+
+### Analytics Tracker
+
+**Location**: `src/services/chatbot/analyticsTracker.ts`
+
+**Tracked Events**:
+- query_sent
+- response_generated
+- escalation_triggered
+- onboarding_started
+- onboarding_step_completed
+- onboarding_completed
+- support_ticket_created
 
 ---
 
@@ -771,6 +775,21 @@ CREATE INDEX idx_initiatives_organization ON initiatives(organization_id);
 CREATE INDEX idx_initiatives_location ON initiatives USING GIST(location);
 ```
 
+#### initiative_participants
+```sql
+CREATE TABLE initiative_participants (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  initiative_id UUID NOT NULL REFERENCES initiatives(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  trees_contributed INTEGER DEFAULT 0 CHECK (trees_contributed >= 0),
+  joined_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(initiative_id, user_id)
+);
+
+CREATE INDEX idx_participants_initiative ON initiative_participants(initiative_id);
+CREATE INDEX idx_participants_user ON initiative_participants(user_id);
+```
+
 #### trees
 ```sql
 CREATE TABLE trees (
@@ -778,21 +797,20 @@ CREATE TABLE trees (
   species TEXT NOT NULL,
   planted_date DATE NOT NULL,
   location GEOMETRY(Point, 4326) NOT NULL,
+  initiative_id UUID REFERENCES initiatives(id),
+  planted_by UUID NOT NULL REFERENCES users(id),
   health_status TEXT DEFAULT 'healthy' CHECK (health_status IN ('healthy', 'needs_attention', 'critical', 'deceased')),
   height_cm DECIMAL(10, 2),
   diameter_cm DECIMAL(10, 2),
   notes TEXT,
-  initiative_id UUID REFERENCES initiatives(id),
-  planted_by UUID NOT NULL REFERENCES users(id),
   antugrow_tree_id TEXT UNIQUE,
-  last_analysis_date TIMESTAMP WITH TIME ZONE,
+  last_synced_at TIMESTAMP WITH TIME ZONE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Indexes
 CREATE INDEX idx_trees_species ON trees(species);
-CREATE INDEX idx_trees_health ON trees(health_status);
+CREATE INDEX idx_trees_health_status ON trees(health_status);
 CREATE INDEX idx_trees_initiative ON trees(initiative_id);
 CREATE INDEX idx_trees_planted_by ON trees(planted_by);
 CREATE INDEX idx_trees_location ON trees USING GIST(location);
@@ -811,12 +829,96 @@ CREATE TABLE tree_images (
 CREATE INDEX idx_tree_images_tree ON tree_images(tree_id);
 ```
 
+#### support_tickets
+```sql
+CREATE TABLE support_tickets (
+  ticket_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  conversation_id UUID NOT NULL,
+  user_id UUID REFERENCES users(id),
+  message_history JSONB NOT NULL,
+  priority TEXT DEFAULT 'medium' CHECK (priority IN ('low', 'medium', 'high')),
+  category TEXT,
+  status TEXT DEFAULT 'open' CHECK (status IN ('open', 'in_progress', 'resolved', 'closed')),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE INDEX idx_support_tickets_user ON support_tickets(user_id);
+CREATE INDEX idx_support_tickets_status ON support_tickets(status);
+CREATE INDEX idx_support_tickets_priority ON support_tickets(priority);
+```
+
+#### chatbot_analytics
+```sql
+CREATE TABLE chatbot_analytics (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  event_type TEXT NOT NULL,
+  conversation_id UUID NOT NULL,
+  user_id UUID REFERENCES users(id),
+  timestamp TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  metadata JSONB
+);
+
+CREATE INDEX idx_chatbot_analytics_event_type ON chatbot_analytics(event_type);
+CREATE INDEX idx_chatbot_analytics_user ON chatbot_analytics(user_id);
+CREATE INDEX idx_chatbot_analytics_timestamp ON chatbot_analytics(timestamp);
+```
+
 ### Row Level Security
 
-All tables have RLS enabled:
-- Users can only access their own data
-- Public data (initiatives, trees) readable by all
-- Write operations restricted by role
+**initiatives policies**:
+```sql
+-- Anyone can view active initiatives
+CREATE POLICY "Anyone can view active initiatives"
+  ON initiatives FOR SELECT
+  USING (status = 'active' OR auth.uid() = organization_id);
+
+-- Organizations can create initiatives
+CREATE POLICY "Organizations can create initiatives"
+  ON initiatives FOR INSERT
+  WITH CHECK (auth.uid() = organization_id);
+
+-- Organizations can update their own initiatives
+CREATE POLICY "Organizations can update own initiatives"
+  ON initiatives FOR UPDATE
+  USING (auth.uid() = organization_id);
+```
+
+**trees policies**:
+```sql
+-- Anyone can view trees
+CREATE POLICY "Anyone can view trees"
+  ON trees FOR SELECT
+  USING (true);
+
+-- Users can register trees
+CREATE POLICY "Users can register trees"
+  ON trees FOR INSERT
+  WITH CHECK (auth.uid() = planted_by);
+
+-- Users can update their own trees
+CREATE POLICY "Users can update own trees"
+  ON trees FOR UPDATE
+  USING (auth.uid() = planted_by);
+```
+
+**support_tickets policies**:
+```sql
+-- Users can view their own tickets
+CREATE POLICY "Users can view own tickets"
+  ON support_tickets FOR SELECT
+  USING (auth.uid() = user_id);
+
+-- Admins can view all tickets
+CREATE POLICY "Admins can view all tickets"
+  ON support_tickets FOR SELECT
+  USING (
+    EXISTS (
+      SELECT 1 FROM user_profiles
+      WHERE id = auth.uid() AND role = 'admin'
+    )
+  );
+```
 
 ### Storage Buckets
 
@@ -868,9 +970,17 @@ export const serviceName = new ServiceName();
 1. **authService** - Authentication operations
 2. **profileService** - User profile management
 3. **initiativeService** - Initiative management
-4. **treeService** - Tree registry operations
-5. **antugrowService** - AI-powered monitoring
-6. **antugrowSyncService** - Background sync
+4. **treeService** - Tree registry and monitoring
+5. **antugrowService** - Antugrow API integration
+6. **antugrowSyncService** - Background synchronization
+7. **chatEngine** - Chatbot orchestration
+8. **onboardingFlowManager** - Onboarding flow
+9. **knowledgeBaseManager** - FAQ management
+10. **semanticMatcher** - Query matching
+11. **contextManager** - Conversation context
+12. **queryProcessor** - Query processing
+13. **responseGenerator** - Response generation
+14. **escalationHandler** - Support escalation
 
 ---
 
@@ -881,15 +991,32 @@ export const serviceName = new ServiceName();
 ```
 src/
 ├── components/
-│   ├── auth/              # Authentication components (8)
-│   ├── profile/           # Profile management (2)
-│   ├── initiatives/       # Initiative components (11)
-│   └── trees/             # Tree components (8)
-├── services/              # Business logic (6 services)
-├── contexts/              # React Context providers
-├── hooks/                 # Custom React hooks
-├── types/                 # TypeScript type definitions
-└── utils/                 # Utility functions
+│   ├── auth/              # Authentication components
+│   ├── profile/           # Profile management
+│   ├── initiatives/       # Initiative components (8)
+│   ├── trees/             # Tree components (8)
+│   ├── chatbot/           # Chatbot components (pending)
+│   └── common/            # Shared components
+├── services/
+│   ├── supabase.ts
+│   ├── auth.service.ts
+│   ├── profile.service.ts
+│   ├── initiative.service.ts
+│   ├── tree.service.ts
+│   ├── antugrow.service.ts
+│   ├── antugrow-sync.service.ts
+│   └── chatbot/           # Chatbot services (8)
+├── contexts/
+│   └── AuthContext.tsx
+├── hooks/
+│   └── useAuth.ts
+├── types/
+│   ├── user.types.ts
+│   ├── initiative.types.ts
+│   ├── tree.types.ts
+│   └── chatbot.types.ts
+└── data/
+    └── chatbot-knowledge-base.json
 ```
 
 ---
@@ -954,16 +1081,20 @@ All tables have RLS enabled:
 
 ### Test Coverage
 
-**Current**: ~70% (target: 80%)
+**Current**: ~60% (target: 80%)
 
 **Tested**:
-- ✅ Auth service (90% coverage, 15+ tests)
-- ✅ LoginForm (85% coverage, 7 tests)
-- ✅ RegisterForm (85% coverage, 8 tests)
-- ✅ Tree service (85% coverage, 20+ tests)
-- ✅ Antugrow service (90% coverage, 45+ tests)
+- ✅ Auth service (90% coverage)
+- ✅ LoginForm (85% coverage)
+- ✅ RegisterForm (85% coverage)
+- ✅ Profile service (80% coverage)
+- ✅ Tree service (85% coverage)
+- ✅ Antugrow service (80% coverage)
 
-**Total**: 65+ tests, 100% pass rate
+**Pending**:
+- ⏳ Chatbot services
+- ⏳ Initiative tests
+- ⏳ Integration tests
 
 ### Running Tests
 
@@ -1000,7 +1131,11 @@ VITE_SUPABASE_URL=https://wobpryllvdjaapzjbsxx.supabase.co
 VITE_SUPABASE_ANON_KEY=sb_publishable_A5qSpuvL1M7QhqkB2bkqUQ_QmE9dpra
 VITE_ANTUGROW_API_URL=https://api.antugrow.com
 VITE_ANTUGROW_API_KEY=<secret>
-VITE_MAPBOX_TOKEN=<secret>
+```
+
+**Optional**:
+```
+VITE_MAPBOX_TOKEN=<secret>  # For Mapbox tiles (optional)
 ```
 
 ### Hosting
@@ -1020,6 +1155,7 @@ VITE_MAPBOX_TOKEN=<secret>
 - Initial load: < 3 seconds
 - API response: < 500ms
 - Map rendering: < 1 second
+- Chatbot query: < 500ms
 - Test execution: < 5 seconds
 
 ### Optimization
@@ -1028,6 +1164,7 @@ VITE_MAPBOX_TOKEN=<secret>
 2. **Image Optimization**: WebP format, lazy loading
 3. **Map Optimization**: Marker clustering (future)
 4. **Bundle Size**: Tree shaking, minification
+5. **Caching**: Knowledge base in-memory caching
 
 ---
 
@@ -1035,14 +1172,13 @@ VITE_MAPBOX_TOKEN=<secret>
 
 ### Planned Features
 
-1. **Initiative Participation** (Task 5.4)
-2. **Initiative Tests** (Task 5.5)
-3. **Carbon Marketplace** (Tasks 8-9)
-4. **Web3 Integration** (Tasks 21-24)
-5. **Gamification** (Tasks 25-27)
+1. **Chatbot UI** (Task 6) - In Progress
+2. **Carbon Marketplace** (December 2025)
+3. **Web3 Integration** (January 2026)
+4. **Gamification** (February 2026)
 
 ---
 
 **Document Version**: 4.0  
-**Last Updated**: November 17, 2025  
-**Next Update**: Upon completion of Task 5.4 (Initiative Participation Features)
+**Last Updated**: November 18, 2025  
+**Next Update**: Upon completion of Task 6 (Chatbot UI Components)

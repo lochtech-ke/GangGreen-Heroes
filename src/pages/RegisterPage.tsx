@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { RegisterForm } from '../components/auth';
+import { ChatWidget } from '../components/chatbot';
 
 export function RegisterPage() {
   const navigate = useNavigate();
@@ -41,23 +42,17 @@ export function RegisterPage() {
       <div className="w-full max-w-md">
         <RegisterForm onSuccess={handleRegisterSuccess} />
         
-        {/* Chatbot will be integrated here in Task 8.1 */}
-        {onboardingState.isActive && (
-          <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-md">
-            <p className="text-sm text-blue-700">
-              🤖 Onboarding chatbot will appear here to help you complete your profile.
-            </p>
-            <p className="text-xs text-blue-600 mt-2">
-              User ID: {onboardingState.userId}
-            </p>
-            <button
-              onClick={handleOnboardingComplete}
-              className="mt-2 text-sm text-blue-600 hover:text-blue-700 underline"
-            >
-              Skip for now (temporary - for testing)
-            </button>
-          </div>
-        )}
+        {/* Chatbot Widget for Onboarding */}
+        <ChatWidget
+          isOpen={onboardingState.isActive}
+          onToggle={() => {}} // Disabled during onboarding
+          autoStartOnboarding={onboardingState.isActive}
+          userId={onboardingState.userId || undefined}
+          userEmail={onboardingState.userEmail || undefined}
+          onOnboardingComplete={handleOnboardingComplete}
+          position="bottom-right"
+          hasCompletedProfile={false} // New users haven't completed profile yet
+        />
 
         {!onboardingState.isActive && (
           <div className="mt-4 text-center">

@@ -29,11 +29,17 @@ The platform pilots conservation efforts in three key Kenyan forests:
 - **Interactive Maps** - Leaflet.js integration with initiative markers and forest boundaries
 - **Location Picker** - Visual map-based location selection for creating initiatives
 - **Geospatial Features** - PostGIS integration with coordinate conversion and spatial queries
+- **Tree Registry** - Complete tree registration, monitoring, and species tracking system
+- **AI-Powered Tree Monitoring** - Antugrow API integration for growth tracking and health analysis
+- **Background Sync** - Automatic synchronization of tree data with AI analysis results
 
 ### In Development 🚧
-- **Authentication Testing** - Comprehensive test suite (60% complete)
-- **Initiative Participation** - Enhanced join/leave functionality and contribution tracking
-- **Initiative Testing** - Unit and integration tests for initiative features
+- **Onboarding Chatbot** - AI-powered conversational assistant for post-registration profile completion and general support
+  - Conversational onboarding flow to collect user profile information
+  - 28-entry knowledge base for answering common questions
+  - Semantic matching for natural language understanding
+  - Context-aware responses and escalation to human support
+  - Integration with registration flow for seamless user experience
 
 ### Planned 📋
 - **Carbon Credit Marketplace** - Verified carbon credits trading with transparent verification
@@ -75,8 +81,8 @@ The platform pilots conservation efforts in three key Kenyan forests:
 
 ## 🚧 Development Status
 
-**Current Phase**: Sprint 3 Complete - AI-Powered Tree Monitoring Operational  
-**Progress**: 43% Complete (13 of 30 major tasks)  
+**Current Phase**: Sprint 4 - Onboarding Chatbot (Infrastructure Setup)  
+**Progress**: 44% Complete (13.2 of 30 major tasks)  
 **Status**: ✅ Ahead of Schedule (5 days ahead)
 
 ### What's Complete
@@ -151,6 +157,16 @@ The platform pilots conservation efforts in three key Kenyan forests:
 - ✅ Tree monitoring UI components (5 components: AnalysisDisplay, Notification, SyncIndicator, HealthStatus, GrowthChart)
 - ✅ Comprehensive integration tests (45+ tests)
 
+**Onboarding Chatbot** 🚧 5% Complete (Task 8)
+- ✅ Project structure created (components, services, types directories)
+- ✅ TypeScript type definitions file initialized
+- ✅ Knowledge base JSON with 28 FAQ entries
+- 🚧 Semantic matching and query processing (Next)
+- 📋 Context management and conversation flow
+- 📋 Response generation and escalation handling
+- 📋 Chat widget UI components
+- 📋 Integration with registration flow
+
 **Testing Infrastructure** 🚧 60% Complete
 - ✅ Vitest configuration with React support
 - ✅ Testing Library integration (React, jest-dom, user-event)
@@ -178,8 +194,13 @@ The platform pilots conservation efforts in three key Kenyan forests:
 
 ### Coming Soon
 
-- 📋 Task 5.4: Initiative participation features (Next - Week of Nov 18)
-- 📋 Task 5.5: Initiative tests (Week of Nov 22)
+- 🚧 Task 8: Onboarding Chatbot (In Progress - Week of Nov 18)
+  - ✅ Project structure and type definitions
+  - 🚧 Knowledge base and semantic matching
+  - 📋 Context management and query processing
+  - 📋 Response generation and escalation
+  - 📋 Chat engine orchestration
+  - 📋 UI components and integration
 - 📋 Complete authentication testing (Task 3.4)
 - 📋 Carbon marketplace (December 2025)
 - 📋 Web3 features (January 2026)
@@ -247,7 +268,11 @@ The authentication pages include:
 3. Email confirmation screen shown (if email verification is enabled)
 4. User clicks confirmation link in email to verify account
 5. Optional: Provide additional profile details during registration
-6. Onboarding chatbot guides profile completion
+6. **Onboarding chatbot guides profile completion** (Coming Soon - In Development)
+   - Conversational interface collects profile information
+   - Asks for name, role, forest preference, and optional details
+   - Validates inputs and provides helpful guidance
+   - Saves completed profile to database
 7. User can edit profile anytime from the profile page
 
 **Email Confirmation**:
@@ -337,17 +362,26 @@ ganggreen-platform/
 │   │   │   ├── RegisterForm.test.tsx
 │   │   │   ├── index.ts                # Component exports
 │   │   │   └── README.md               # Component documentation
-│   │   └── profile/           # Profile management components
-│   │       ├── ProfileEditForm.tsx     # Profile completion/editing
-│   │       ├── UserProfile.tsx         # Profile display
-│   │       └── README.md               # Profile documentation
+│   │   ├── profile/           # Profile management components
+│   │   │   ├── ProfileEditForm.tsx     # Profile completion/editing
+│   │   │   ├── UserProfile.tsx         # Profile display
+│   │   │   └── README.md               # Profile documentation
+│   │   ├── initiatives/       # Initiative management components (8 components)
+│   │   ├── trees/             # Tree registry and monitoring components (8 components)
+│   │   └── chatbot/           # Onboarding chatbot components (in development)
+│   ├── data/            # Static data and knowledge bases
+│   │   └── chatbot-knowledge-base.json # FAQ entries for chatbot
 │   ├── services/        # Business logic and API clients
-│   │   ├── supabase.ts           # Supabase client configuration
-│   │   ├── auth.service.ts       # Authentication service
-│   │   ├── profile.service.ts    # Profile management service
-│   │   ├── initiative.service.ts # Initiative management service
-│   │   ├── auth.service.test.ts  # Service unit tests
-│   │   └── README.md             # Service documentation
+│   │   ├── supabase.ts              # Supabase client configuration
+│   │   ├── auth.service.ts          # Authentication service
+│   │   ├── profile.service.ts       # Profile management service
+│   │   ├── initiative.service.ts    # Initiative management service
+│   │   ├── tree.service.ts          # Tree registry service
+│   │   ├── antugrow.service.ts      # Antugrow API integration
+│   │   ├── antugrow-sync.service.ts # Background sync service
+│   │   ├── chatbot/                 # Chatbot services (in development)
+│   │   ├── *.service.test.ts        # Service unit tests
+│   │   └── README.md                # Service documentation
 │   ├── contexts/        # React Context providers
 │   │   ├── AuthContext.tsx       # Global auth state provider
 │   │   └── README.md             # Context documentation
@@ -366,7 +400,9 @@ ganggreen-platform/
 │   │   └── README.md             # Testing guide (300+ lines)
 │   ├── types/           # TypeScript type definitions
 │   │   ├── user.types.ts         # User, auth, and profile types
-│   │   └── initiative.types.ts   # Initiative and participant types
+│   │   ├── initiative.types.ts   # Initiative and participant types
+│   │   ├── tree.types.ts         # Tree registry and monitoring types
+│   │   └── chatbot.types.ts      # Chatbot conversation and onboarding types
 │   ├── utils/           # Utility functions
 │   │   ├── constants.ts          # Application constants
 │   │   └── helpers.ts            # Helper functions
