@@ -37,6 +37,10 @@ interface WebhookEvent {
       quantity_tons?: number;
       buyer_id?: string;
       transaction_id?: string;
+      purchase_id?: string;
+      badge_type?: string;
+      tier?: string;
+      user_id?: string;
     };
     customer: {
       id: number;
@@ -62,6 +66,111 @@ function verifySignature(body: string, signature: string): boolean {
 }
 
 /**
+ * Handle badge purchase payment
+ */
+async function handleBadgePurchasePayment(
+  supabase: any,
+  event: WebhookEvent
+): Promise<void> {
+  const { reference, id, paid_at } = event.data;
+
+  console.log(`Processing badge purchase for reference: ${reference}`);
+
+  // Find badge purchase by Paystack reference
+  const { data: purchase, error: fetchError } = await supabase
+    .from('badge_purchases')
+    .select('*')
+    .eq('paystack_reference', reference)
+    .single();
+
+  if (fetchError || !purchase) {
+    console.error('Badge purchase not found:', fetchError);
+    throw new Error(`Badge purchase not found for reference: ${reference}`);
+  }
+
+  // Check if already processed
+  if (purchase.gg_coins_credited) {
+    console.log(`Badge purchase ${purchase.id} already processed`);
+    return;
+  }
+
+  // Update purchase status
+  const { error: updateError } = await supabase
+    .from('badge_purchases')
+    .update({
+      payment_status: 'success',
+      completed_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      metadata: {
+        ...purchase.metadata,
+        paystack_transaction_id: id.toString(),
+        paystack_paid_at: paid_at,
+      },
+    })
+    .eq('id', purchase.id);
+
+  if (updateError) {
+    console.error('Failed to update badge purchase:', updateError);
+    throw updateError;
+  }
+
+  // Credit GG Coins using database function
+  const { data: creditResult, error: creditError } = await supabase.rpc('credit_gg_coins', {
+    p_user_id: purchase.user_id,
+    p_amount: purchase.gg_coins_awarded,
+    p_transaction_type: 'purchase_reward',
+    p_reference_type: 'badge_purchase',
+    p_reference_id: purchase.id,
+    p_description: `Earned ${purchase.gg_coins_awarded} GG Coin for purchasing ${purchase.badge_type} ${purchase.tier} badge`,
+    p_metadata: {
+      badge_type: purchase.badge_type,
+      tier: purchase.tier,
+      amount_kes: purchase.amount_kes,
+      paystack_reference: reference,
+    },
+  });
+
+  if (creditError || !creditResult?.success) {
+    console.error('Failed to credit GG Coins:', creditError || creditResult?.error);
+    // Don't throw - we'll retry later
+    return;
+  }
+
+  // Mark coins as credited
+  const { error: markError } = await supabase
+    .from('badge_purchases')
+    .update({ gg_coins_credited: true })
+    .eq('id', purchase.id);
+
+  if (markError) {
+    console.error('Failed to mark coins as credited:', markError);
+  }
+
+  // Create notification
+  const { error: notifError } = await supabase.from('notifications').insert({
+    user_id: purchase.user_id,
+    type: 'badge_purchase',
+    title: 'Badge Purchase Successful! 🎉',
+    message: `You earned ${purchase.gg_coins_awarded} GG Coin for purchasing a ${purchase.tier} tier badge.`,
+    metadata: {
+      purchase_id: purchase.id,
+      badge_type: purchase.badge_type,
+      tier: purchase.tier,
+      gg_coins_earned: purchase.gg_coins_awarded,
+      paystack_reference: reference,
+    },
+    read: false,
+    created_at: new Date().toISOString(),
+  });
+
+  if (notifError) {
+    console.error('Failed to create notification:', notifError);
+  }
+
+  console.log(`Badge purchase ${purchase.id} processed successfully. Credited ${purchase.gg_coins_awarded} GG Coins.`);
+}
+
+/**
  * Handle successful payment webhook
  */
 async function handleSuccessfulPayment(
@@ -72,7 +181,13 @@ async function handleSuccessfulPayment(
 
   console.log(`Processing charge.success for reference: ${reference}`);
 
-  // Find transaction by Paystack reference
+  // Check if this is a badge purchase (reference starts with 'GG-')
+  if (reference.startsWith('GG-')) {
+    await handleBadgePurchasePayment(supabase, event);
+    return;
+  }
+
+  // Find transaction by Paystack reference (carbon credit transaction)
   const { data: transaction, error: fetchError } = await supabase
     .from('transactions')
     .select('*')
@@ -105,6 +220,45 @@ async function handleSuccessfulPayment(
 }
 
 /**
+ * Handle failed badge purchase payment
+ */
+async function handleFailedBadgePurchase(
+  supabase: any,
+  event: WebhookEvent
+): Promise<void> {
+  const { reference } = event.data;
+
+  console.log(`Processing failed badge purchase for reference: ${reference}`);
+
+  // Find badge purchase by Paystack reference
+  const { data: purchase, error: fetchError } = await supabase
+    .from('badge_purchases')
+    .select('*')
+    .eq('paystack_reference', reference)
+    .single();
+
+  if (fetchError || !purchase) {
+    console.error('Badge purchase not found:', fetchError);
+    return;
+  }
+
+  // Update purchase status to failed
+  const { error: updateError } = await supabase
+    .from('badge_purchases')
+    .update({
+      payment_status: 'failed',
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', purchase.id);
+
+  if (updateError) {
+    console.error('Failed to update badge purchase:', updateError);
+  }
+
+  console.log(`Badge purchase ${purchase.id} marked as failed`);
+}
+
+/**
  * Handle failed payment webhook
  */
 async function handleFailedPayment(
@@ -115,7 +269,13 @@ async function handleFailedPayment(
 
   console.log(`Processing charge.failed for reference: ${reference}`);
 
-  // Find transaction by Paystack reference
+  // Check if this is a badge purchase (reference starts with 'GG-')
+  if (reference.startsWith('GG-')) {
+    await handleFailedBadgePurchase(supabase, event);
+    return;
+  }
+
+  // Find transaction by Paystack reference (carbon credit transaction)
   const { data: transaction, error: fetchError } = await supabase
     .from('transactions')
     .select('*')

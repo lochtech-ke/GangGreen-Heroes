@@ -1,5 +1,9 @@
+import { useState, useEffect } from 'react';
 import type { User } from '../../types/user.types';
+import type { GGCoinTransaction } from '../../types/ggCoin.types';
 import { profileService } from '../../services/profile.service';
+import { ggCoinService } from '../../services/ggCoin.service';
+import { GGCoinBalance } from '../gamification/GGCoinBalance';
 
 interface UserProfileProps {
   user: User;
@@ -11,6 +15,25 @@ export function UserProfile({ user, onEdit }: UserProfileProps) {
   const completeness = profile
     ? profileService.getProfileCompleteness(profile)
     : 0;
+
+  const [transactions, setTransactions] = useState<GGCoinTransaction[]>([]);
+  const [loadingTransactions, setLoadingTransactions] = useState(true);
+  const [showAllTransactions, setShowAllTransactions] = useState(false);
+
+  useEffect(() => {
+    const loadTransactions = async () => {
+      try {
+        const history = await ggCoinService.getTransactionHistory(user.id, 10);
+        setTransactions(history);
+      } catch (error) {
+        console.error('Error loading GG Coin transactions:', error);
+      } finally {
+        setLoadingTransactions(false);
+      }
+    };
+
+    loadTransactions();
+  }, [user.id]);
 
   const getRoleDisplay = (role: string) => {
     const roleMap: Record<string, string> = {
@@ -150,6 +173,100 @@ export function UserProfile({ user, onEdit }: UserProfileProps) {
                 day: 'numeric',
               })}
             </span>
+          </div>
+        </div>
+
+        {/* GG Coins Section */}
+        <div className="border-t pt-4">
+          <h4 className="text-sm font-semibold text-gray-700 mb-3">
+            GG Coins
+          </h4>
+          
+          {/* Balance Display */}
+          <div className="mb-4 p-4 bg-gradient-to-br from-yellow-50 to-orange-50 rounded-lg border border-yellow-200">
+            <GGCoinBalance 
+              userId={user.id} 
+              showTooltip={false}
+              className="justify-center"
+            />
+            <p className="text-xs text-gray-600 text-center mt-2">
+              Earn GG Coins by purchasing badges and participating in #GangGreen activities
+            </p>
+          </div>
+
+          {/* Transaction History */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <h5 className="text-xs font-semibold text-gray-700">Recent Transactions</h5>
+              {transactions.length > 5 && (
+                <button
+                  onClick={() => setShowAllTransactions(!showAllTransactions)}
+                  className="text-xs text-green-600 hover:text-green-700 font-medium"
+                >
+                  {showAllTransactions ? 'Show Less' : 'Show All'}
+                </button>
+              )}
+            </div>
+
+            {loadingTransactions ? (
+              <div className="space-y-2">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="animate-pulse flex justify-between p-2 bg-gray-50 rounded">
+                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                    <div className="h-4 bg-gray-200 rounded w-16"></div>
+                  </div>
+                ))}
+              </div>
+            ) : transactions.length === 0 ? (
+              <div className="text-center py-6 bg-gray-50 rounded-lg">
+                <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-2">
+                  <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <p className="text-xs text-gray-500 mb-2">No transactions yet</p>
+                <a 
+                  href="/badges" 
+                  className="text-xs text-green-600 hover:text-green-700 font-medium"
+                >
+                  Purchase a badge to earn your first GG Coins →
+                </a>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {(showAllTransactions ? transactions : transactions.slice(0, 5)).map((tx) => (
+                  <div 
+                    key={tx.id} 
+                    className="flex justify-between items-center p-2 bg-gray-50 hover:bg-gray-100 rounded transition-colors"
+                  >
+                    <div className="flex-1">
+                      <p className="text-xs text-gray-900 font-medium">
+                        {tx.description || tx.transaction_type}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {new Date(tx.created_at).toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                          year: 'numeric',
+                        })}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <span 
+                        className={`text-sm font-bold ${
+                          tx.amount > 0 ? 'text-green-600' : 'text-red-600'
+                        }`}
+                      >
+                        {tx.amount > 0 ? '+' : ''}{tx.amount}
+                      </span>
+                      <div className="w-4 h-4 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center">
+                        <span className="text-white text-[8px] font-bold">GG</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
