@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuthContext } from './contexts/AuthContext';
+import { JourneyProvider } from './contexts/JourneyContext';
 import { HomePage } from './pages/HomePage';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
@@ -12,9 +13,20 @@ import { TreesPage } from './pages/TreesPage';
 import { MarketplacePage } from './pages/MarketplacePage';
 import { GamificationPage } from './pages/GamificationPage';
 import { SettingsPage } from './pages/SettingsPage';
+import { SocialFeedPage } from './pages/SocialFeedPage';
+import { JourneyDashboardPage } from './pages/JourneyDashboardPage';
+import {
+  TermsOfServicePage,
+  PrivacyPolicyPage,
+  CookiePolicyPage,
+  TaxReceiptPolicyPage,
+  AcceptableUsePolicyPage,
+} from './pages/legal';
 import { ProtectedRoute } from './components/auth';
 import { ChatWidget } from './components/chatbot';
 import { Layout } from './components/layout';
+import { SupabaseTest } from './components/auth/SupabaseTest';
+import { PixiPreloader } from './components/common';
 
 // Feature flag for chatbot (can be moved to environment variable)
 const CHATBOT_ENABLED = true;
@@ -77,12 +89,76 @@ function AppContent() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/test-supabase" element={<SupabaseTest />} />
+        
+        {/* Social Feed */}
+        <Route
+          path="/social-feed"
+          element={
+            <Layout>
+              <SocialFeedPage />
+            </Layout>
+          }
+        />
+        
+        {/* Legal Pages */}
+        <Route
+          path="/legal/terms"
+          element={
+            <Layout>
+              <TermsOfServicePage />
+            </Layout>
+          }
+        />
+        <Route
+          path="/legal/privacy"
+          element={
+            <Layout>
+              <PrivacyPolicyPage />
+            </Layout>
+          }
+        />
+        <Route
+          path="/legal/cookies"
+          element={
+            <Layout>
+              <CookiePolicyPage />
+            </Layout>
+          }
+        />
+        <Route
+          path="/legal/tax-receipts"
+          element={
+            <Layout>
+              <TaxReceiptPolicyPage />
+            </Layout>
+          }
+        />
+        <Route
+          path="/legal/acceptable-use"
+          element={
+            <Layout>
+              <AcceptableUsePolicyPage />
+            </Layout>
+          }
+        />
+        
         <Route
           path="/dashboard"
           element={
             <ProtectedRoute>
               <Layout>
                 <DashboardPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/journey"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <JourneyDashboardPage />
               </Layout>
             </ProtectedRoute>
           }
@@ -154,13 +230,34 @@ function AppContent() {
 }
 
 function App() {
+  const [showPreloader, setShowPreloader] = useState(true);
+
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <AppContent />
-      </AuthProvider>
-    </BrowserRouter>
+    <>
+      {showPreloader && (
+        <PixiPreloader
+          minDisplayDuration={3000}
+          fadeOutDuration={500}
+          autoHide={true}
+          allowSkip={false}
+          onComplete={() => setShowPreloader(false)}
+        />
+      )}
+      <BrowserRouter>
+        <AuthProvider>
+          <JourneyProviderWrapper>
+            <AppContent />
+          </JourneyProviderWrapper>
+        </AuthProvider>
+      </BrowserRouter>
+    </>
   );
+}
+
+// Wrapper to provide user ID to JourneyProvider
+function JourneyProviderWrapper({ children }: { children: React.ReactNode }) {
+  const { user } = useAuthContext();
+  return <JourneyProvider userId={user?.id || null}>{children}</JourneyProvider>;
 }
 
 export default App;

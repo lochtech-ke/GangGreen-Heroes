@@ -9,6 +9,11 @@ export const baseNavigationItems: NavItemConfig[] = [
     icon: 'home',
   },
   {
+    to: '/journey',
+    label: 'My Journey',
+    icon: 'map',
+  },
+  {
     to: '/initiatives',
     label: 'Initiatives',
     icon: 'tree',
@@ -22,6 +27,11 @@ export const baseNavigationItems: NavItemConfig[] = [
     to: '/marketplace',
     label: 'Marketplace',
     icon: 'shopping-cart',
+  },
+  {
+    to: '/social-feed',
+    label: 'Social Feed',
+    icon: 'hash',
   },
   {
     to: '/gamification',

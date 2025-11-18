@@ -3,30 +3,45 @@
 ## Overview
 This implementation plan breaks down the Individual User Journey feature into discrete, manageable coding tasks. Each task builds incrementally on previous work, ensuring a cohesive implementation that integrates with existing platform features.
 
-- [ ] 1. Set up journey data models and database schema
-- [ ] 1.1 Create journey progress tracking tables
+- [x] 1. Set up journey data models and database schema
+
+
+- [x] 1.1 Create journey progress tracking tables
+
+
   - Create `user_journey_progress` table with stage tracking, milestones, and metrics
   - Add indexes for user_id and current_stage lookups
   - Create migration file with proper constraints and defaults
   - _Requirements: 1.1, 2.1, 3.1_
 
-- [ ] 1.2 Create micro-challenges tables
+
+- [x] 1.2 Create micro-challenges tables
+
   - Create `micro_challenges` table with difficulty levels, points, and requirements
   - Create `user_challenge_progress` table for tracking user participation
   - Add indexes for efficient challenge queries
   - _Requirements: 6.1, 6.2, 6.3_
 
-- [ ] 1.3 Create climate nuggets tables
+
+
+- [x] 1.3 Create climate nuggets tables
+
   - Create `climate_nuggets` table with content, categories, and related causes
   - Create `user_climate_nuggets` table for read/saved status tracking
   - Add indexes for category and user lookups
+
   - _Requirements: 5.1, 5.2, 5.4_
+
+
 
 - [ ] 1.4 Create referrals and petitions tables
   - Create `user_referrals` table with referral codes and status tracking
   - Create `petitions` and `petition_signatures` tables
   - Add unique constraints and indexes
+
+
   - _Requirements: 12.1, 12.2, 13.1, 13.3_
+
 
 - [ ] 1.5 Create certificates table
   - Create `user_certificates` table with type, metadata, and URLs
@@ -34,22 +49,30 @@ This implementation plan breaks down the Individual User Journey feature into di
   - _Requirements: 14.1, 14.2, 14.5_
 
 
-- [ ] 2. Implement journey service and core logic
-- [ ] 2.1 Create journey service with stage management
+- [x] 2. Implement journey service and core logic
+
+
+- [x] 2.1 Create journey service with stage management
+
+
   - Implement `journey.service.ts` with stage transition logic
   - Add methods for tracking user progress and milestones
   - Implement journey initialization for new users
   - Add validation for stage prerequisites
   - _Requirements: 1.1, 2.3, 3.5_
 
-- [ ] 2.2 Implement journey progress tracking
+
+- [x] 2.2 Implement journey progress tracking
+
   - Add methods to update stage progress percentages
   - Implement milestone completion tracking
   - Add cause joining and tracking functionality
   - Create methods to calculate next recommended actions
   - _Requirements: 3.4, 10.1, 10.6_
 
-- [ ] 2.3 Create journey context provider
+- [x] 2.3 Create journey context provider
+
+
   - Implement `JourneyProvider` React context
   - Add hooks for accessing journey state (`useJourney`)
   - Implement real-time journey updates using Supabase subscriptions
@@ -119,7 +142,10 @@ This implementation plan breaks down the Individual User Journey feature into di
 
 
 - [ ] 5. Build micro-challenge system
-- [ ] 5.1 Create micro-challenge service
+- [x] 5.1 Create micro-challenge service
+
+
+
   - Implement `microChallenge.service.ts` with CRUD operations
   - Add methods to fetch challenges by difficulty and category
   - Implement challenge participation tracking
@@ -236,7 +262,9 @@ This implementation plan breaks down the Individual User Journey feature into di
 
 
 - [ ] 9. Build referral system
-- [ ] 9.1 Create referral service
+- [x] 9.1 Create referral service
+
+
   - Implement `referral.service.ts` with referral code generation
   - Add methods to track referral registrations
   - Implement referral activation logic
@@ -263,8 +291,11 @@ This implementation plan breaks down the Individual User Journey feature into di
   - _Requirements: 12.3, 12.6_
 
 
-- [ ] 10. Implement petition system
-- [ ] 10.1 Create petition service
+- [-] 10. Implement petition system
+
+- [x] 10.1 Create petition service
+
+
   - Implement `petition.service.ts` with CRUD operations
   - Add methods for petition creation and validation
   - Implement signature tracking and duplicate prevention
@@ -383,8 +414,13 @@ This implementation plan breaks down the Individual User Journey feature into di
   - _Requirements: 15.1, 15.2, 15.3_
 
 
-- [ ] 14. Create journey dashboard and navigation
-- [ ] 14.1 Build journey dashboard page
+- [x] 14. Create journey dashboard and navigation
+
+
+- [x] 14.1 Build journey dashboard page
+
+
+
   - Create `JourneyDashboard` page component
   - Display current stage and progress
   - Show next recommended actions
@@ -392,19 +428,23 @@ This implementation plan breaks down the Individual User Journey feature into di
   - Display recent achievements
   - _Requirements: 2.3, 10.1_
 
-- [ ] 14.2 Integrate journey into main navigation
+- [x] 14.2 Integrate journey into main navigation
+
+
   - Add journey menu items to navigation
   - Update dashboard to show journey overview
   - Add journey stage indicator to header
   - _Requirements: 2.3_
 
-- [ ] 14.3 Create journey onboarding trigger
+
+- [x] 14.3 Create journey onboarding trigger
   - Automatically start onboarding for new users
   - Add option to restart onboarding
   - Track onboarding completion
   - _Requirements: 2.1, 2.3_
 
-- [ ] 14.4 Build journey analytics tracking
+- [x] 14.4 Build journey analytics tracking
+
   - Track stage progression events
   - Monitor milestone completion rates
   - Track action completion by type

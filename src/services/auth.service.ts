@@ -1,5 +1,8 @@
 import { supabase } from './supabase';
 import { userCache } from './userCache';
+import { withRetry, DEFAULT_RETRY_CONFIG } from '../utils/retry';
+import { checkSupabaseHealth } from '../utils/supabaseHealth';
+import { categorizeAuthError } from '../types/authError.types';
 import type {
   User,
   RegisterData,
@@ -18,38 +21,66 @@ class AuthService {
   /**
    * Register a new user with email and password
    * Profile completion will be handled by the onboarding chatbot
+   * Enhanced with retry logic, health checks, and error categorization
    */
   async register(data: RegisterData): Promise<AuthResponse> {
     const start = performance.now();
 
     try {
-      console.log('[AuthService] Starting registration...', { email: data.email });
-      
-      // Step 1: Create auth user
-      // Note: User record in 'users' table is automatically created by database trigger
-      const { data: authData, error: authError } = await supabase.auth.signUp({
+      console.log('[AuthService] Starting registration...', {
         email: data.email,
-        password: data.password,
-        options: {
-          data: {
-            role: data.role || 'individual',
-            forest_preference: data.forest_preference,
-          },
-        },
       });
+
+      // Check service health first
+      const isHealthy = await checkSupabaseHealth();
+      if (!isHealthy) {
+        console.warn('[AuthService] Service health check failed');
+        return {
+          user: null,
+          error: new Error(
+            'Service temporarily unavailable. Please try again in a few moments.'
+          ),
+        };
+      }
+
+      // Step 1: Create auth user with retry logic
+      // Note: User record in 'users' table is automatically created by database trigger
+      const { data: authData, error: authError } = await withRetry(
+        () =>
+          supabase.auth.signUp({
+            email: data.email,
+            password: data.password,
+            options: {
+              data: {
+                role: data.role || 'individual',
+                forest_preference: data.forest_preference,
+              },
+            },
+          }),
+        DEFAULT_RETRY_CONFIG,
+        'signUp'
+      );
 
       console.log('[AuthService] SignUp response:', { authData, authError });
 
       if (authError) {
-        console.error('[AuthService] SignUp error:', authError);
-        return { user: null, error: authError };
+        const enhancedError = categorizeAuthError(authError);
+        console.error('[AuthService] SignUp error:', {
+          type: enhancedError.type,
+          message: enhancedError.message,
+          retryable: enhancedError.retryable,
+        });
+        return {
+          user: null,
+          error: new Error(enhancedError.userMessage),
+        };
       }
 
       if (!authData.user) {
         console.error('[AuthService] No user in auth data');
         return {
           user: null,
-          error: new Error('User registration failed'),
+          error: new Error('User registration failed. Please try again.'),
         };
       }
 
@@ -59,18 +90,23 @@ class AuthService {
       // Profile will be created when user completes the onboarding flow
       // Only create profile if additional data is provided (for backward compatibility)
       if (data.full_name || data.phone || data.organization || data.location) {
-        const { error: profileError } = await supabase.from('user_profiles').insert({
-          id: authData.user.id,
-          full_name: data.full_name,
-          phone: data.phone,
-          organization: data.organization,
-          location: data.location,
-        });
+        const { error: profileError } = await supabase
+          .from('user_profiles')
+          .insert({
+            id: authData.user.id,
+            full_name: data.full_name,
+            phone: data.phone,
+            organization: data.organization,
+            location: data.location,
+          });
 
         if (profileError) {
           // Don't fail registration if profile creation fails
           // User can complete profile through onboarding chatbot
-          console.warn('Profile creation failed, will be handled by onboarding:', profileError);
+          console.warn(
+            'Profile creation failed, will be handled by onboarding:',
+            profileError
+          );
         }
       }
 
@@ -80,53 +116,84 @@ class AuthService {
       console.log('[AuthService] User data fetched:', user);
 
       const duration = performance.now() - start;
-      console.log(`[AuthService] Registration completed in ${duration.toFixed(2)}ms`);
+      console.log(
+        `[AuthService] Registration completed in ${duration.toFixed(2)}ms`
+      );
+
+      if (duration > 1000) {
+        console.warn(
+          `[AuthService] Slow registration detected: ${duration.toFixed(2)}ms`
+        );
+      }
 
       return { user, error: null };
     } catch (error) {
       const duration = performance.now() - start;
+      const enhancedError = categorizeAuthError(error);
       console.error('[AuthService] Registration exception:', {
-        error: error instanceof Error ? error.message : 'Unknown error',
+        type: enhancedError.type,
+        message: enhancedError.message,
         duration: `${duration.toFixed(2)}ms`,
       });
       return {
         user: null,
-        error: error instanceof Error ? error : new Error('Registration failed'),
+        error: new Error(enhancedError.userMessage),
       };
     }
   }
 
   /**
    * Login with email and password
+   * Enhanced with retry logic, health checks, and error categorization
    */
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     const start = performance.now();
 
     try {
       console.log('[AuthService] Starting login for:', credentials.email);
-      console.log('[AuthService] Calling supabase.auth.signInWithPassword...');
-      
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: credentials.email,
-        password: credentials.password,
-      });
 
-      console.log('[AuthService] signInWithPassword response received');
-      console.log('[AuthService] Response details:', { 
-        hasData: !!data, 
-        hasUser: !!data?.user,
-        hasError: !!error,
-        errorMessage: error?.message 
-      });
+      // Check service health first
+      const isHealthy = await checkSupabaseHealth();
+      if (!isHealthy) {
+        console.warn('[AuthService] Service health check failed');
+        return {
+          user: null,
+          error: new Error(
+            'Service temporarily unavailable. Please try again in a few moments.'
+          ),
+        };
+      }
+
+      // Attempt login with retry logic
+      const { data, error } = await withRetry(
+        () =>
+          supabase.auth.signInWithPassword({
+            email: credentials.email,
+            password: credentials.password,
+          }),
+        DEFAULT_RETRY_CONFIG,
+        'signInWithPassword'
+      );
 
       if (error) {
-        console.error('[AuthService] Login error:', error);
-        return { user: null, error };
+        const enhancedError = categorizeAuthError(error);
+        console.error('[AuthService] Login error:', {
+          type: enhancedError.type,
+          message: enhancedError.message,
+          retryable: enhancedError.retryable,
+        });
+        return {
+          user: null,
+          error: new Error(enhancedError.userMessage),
+        };
       }
 
       if (!data.user) {
         console.error('[AuthService] No user in response');
-        return { user: null, error: new Error('Login failed') };
+        return {
+          user: null,
+          error: new Error('Login failed. Please try again.'),
+        };
       }
 
       console.log('[AuthService] Auth successful, fetching user data...');
@@ -137,20 +204,23 @@ class AuthService {
       console.log(`[AuthService] Login completed in ${duration.toFixed(2)}ms`);
 
       if (duration > 1000) {
-        console.warn(`[AuthService] Slow login detected: ${duration.toFixed(2)}ms`);
+        console.warn(
+          `[AuthService] Slow login detected: ${duration.toFixed(2)}ms`
+        );
       }
 
       return { user, error: null };
     } catch (error) {
       const duration = performance.now() - start;
-      console.error('[AuthService] Login exception caught:', {
-        error: error instanceof Error ? error.message : 'Unknown error',
-        errorType: error?.constructor?.name,
+      const enhancedError = categorizeAuthError(error);
+      console.error('[AuthService] Login exception:', {
+        type: enhancedError.type,
+        message: enhancedError.message,
         duration: `${duration.toFixed(2)}ms`,
       });
       return {
         user: null,
-        error: error instanceof Error ? error : new Error('Login failed'),
+        error: new Error(enhancedError.userMessage),
       };
     }
   }
@@ -176,7 +246,7 @@ class AuthService {
 
   /**
    * Get current authenticated user with profile data
-   * Optimized with single JOIN query and caching
+   * Optimized with single JOIN query, caching, and retry logic
    */
   async getCurrentUser(): Promise<User | null> {
     const start = performance.now();
@@ -195,21 +265,38 @@ class AuthService {
       const cached = userCache.get(authUser.id);
       if (cached) {
         const duration = performance.now() - start;
-        console.log(`[AuthService] User served from cache (${duration.toFixed(2)}ms)`);
+        console.log(
+          `[AuthService] User served from cache (${duration.toFixed(2)}ms)`
+        );
         return cached;
       }
 
       console.log('[AuthService] Cache miss, fetching from database');
 
-      // Single query with JOIN to fetch user and profile data
-      const { data, error } = await supabase
-        .from('users')
-        .select(`
-          *,
-          user_profiles (*)
-        `)
-        .eq('id', authUser.id)
-        .maybeSingle();
+      // Single query with JOIN to fetch user and profile data, with retry logic
+      const result = await withRetry(
+        async () => {
+          const response = await supabase
+            .from('users')
+            .select(`
+              *,
+              user_profiles (*)
+            `)
+            .eq('id', authUser.id)
+            .maybeSingle();
+          
+          // Throw error if query failed to trigger retry
+          if (response.error) {
+            throw response.error;
+          }
+          
+          return response;
+        },
+        DEFAULT_RETRY_CONFIG,
+        'getCurrentUser'
+      );
+
+      const { data, error } = result;
 
       if (error) {
         console.error('[AuthService] Failed to fetch user data:', error);
@@ -228,10 +315,14 @@ class AuthService {
       userCache.set(authUser.id, user);
 
       const duration = performance.now() - start;
-      console.log(`[AuthService] getCurrentUser completed in ${duration.toFixed(2)}ms`);
+      console.log(
+        `[AuthService] getCurrentUser completed in ${duration.toFixed(2)}ms`
+      );
 
       if (duration > 1000) {
-        console.warn(`[AuthService] Slow query detected: ${duration.toFixed(2)}ms`);
+        console.warn(
+          `[AuthService] Slow query detected: ${duration.toFixed(2)}ms`
+        );
       }
 
       return user;

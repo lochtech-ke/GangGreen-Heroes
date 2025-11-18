@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
 import { Navigation } from '../navigation';
+import { Footer } from './Footer';
 
 interface LayoutProps {
   children: ReactNode;
@@ -7,16 +8,19 @@ interface LayoutProps {
 
 export function Layout({ children }: LayoutProps) {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Navigation */}
       <Navigation />
 
       {/* Main Content - Add top padding to account for fixed navigation */}
-      <main className="pt-16">
+      <main className="pt-16 flex-grow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {children}
         </div>
       </main>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 }

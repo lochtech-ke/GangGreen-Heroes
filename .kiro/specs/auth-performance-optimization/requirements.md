@@ -11,6 +11,9 @@ The authentication system currently experiences significant delays during login 
 - **User Profile**: The row in the `user_profiles` table containing user personal information
 - **RLS**: Row Level Security policies that control data access at the database level
 - **getCurrentUser Method**: The service method that fetches complete user data after authentication
+- **Exponential Backoff**: A retry strategy where wait time increases exponentially between retry attempts
+- **Transient Failure**: A temporary error that may succeed if retried (network timeout, service temporarily unavailable)
+- **Permanent Failure**: An error that will not succeed on retry (invalid credentials, user not found)
 
 ## Requirements
 
@@ -49,3 +52,27 @@ The authentication system currently experiences significant delays during login 
 3. THE Auth System SHALL include timing information in console logs for debugging
 4. WHEN errors occur during authentication, THE Auth System SHALL log the error context without exposing sensitive data
 5. THE Auth System SHALL provide clear console output distinguishing between auth, database, and network delays
+
+### Requirement 4
+
+**User Story:** As a user, I want clear feedback when the service is unavailable, so that I understand what is happening
+
+#### Acceptance Criteria
+
+1. WHEN the Auth System cannot connect to the backend service, THE Auth System SHALL display a user-friendly error message indicating service unavailability
+2. WHEN authentication times out, THE Auth System SHALL distinguish between network timeouts and invalid credentials
+3. THE Auth System SHALL retry failed connection attempts with exponential backoff up to 3 times
+4. WHEN all retry attempts fail, THE Auth System SHALL provide actionable guidance to the user
+5. THE Auth System SHALL check backend service health before attempting authentication operations
+
+### Requirement 5
+
+**User Story:** As a developer, I want the authentication system to handle network failures gracefully, so that temporary issues don't break the user experience
+
+#### Acceptance Criteria
+
+1. THE Auth System SHALL implement retry logic with exponential backoff for transient network failures
+2. WHEN a connection timeout occurs, THE Auth System SHALL retry the request with increasing delays between attempts
+3. THE Auth System SHALL limit retry attempts to a maximum of 3 attempts
+4. WHEN retrying, THE Auth System SHALL log each attempt with timing information
+5. THE Auth System SHALL differentiate between retryable errors and permanent failures

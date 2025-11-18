@@ -15,3 +15,8 @@ export { ggCoinService } from './ggCoin.service';
 export { badgePurchaseService } from './badgePurchase.service';
 export { badgeAnalyticsService } from './badgeAnalytics.service';
 export { paystackService } from './paystack.service';
+export { socialFeedService, socialFeedAnalyticsService } from './socialFeed.service';
+export { journeyService } from './journey.service';
+export { microChallengeService } from './microChallenge.service';
+export { referralService } from './referral.service';
+export { petitionService } from './petition.service';

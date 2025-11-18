@@ -309,11 +309,225 @@ console.error('[Auth] Operation failed:', {
 - **Database queries per login:** 1 (down from 3)
 - **Memory overhead:** < 1MB for 1000 cached users
 
+## Connection Resilience
+
+### Retry Logic with Exponential Backoff
+
+**Implementation:**
+```typescript
+interface RetryConfig {
+  maxAttempts: number;
+  initialDelay: number;
+  maxDelay: number;
+  backoffMultiplier: number;
+}
+
+async function withRetry<T>(
+  operation: () => Promise<T>,
+  config: RetryConfig,
+  operationName: string
+): Promise<T> {
+  let lastError: Error;
+  
+  for (let attempt = 1; attempt <= config.maxAttempts; attempt++) {
+    try {
+      const result = await operation();
+      if (attempt > 1) {
+        console.log(`[Auth] ${operationName} succeeded on attempt ${attempt}`);
+      }
+      return result;
+    } catch (error) {
+      lastError = error as Error;
+      
+      if (attempt < config.maxAttempts && isRetryableError(error)) {
+        const delay = Math.min(
+          config.initialDelay * Math.pow(config.backoffMultiplier, attempt - 1),
+          config.maxDelay
+        );
+        console.warn(`[Auth] ${operationName} failed (attempt ${attempt}/${config.maxAttempts}), retrying in ${delay}ms...`);
+        await sleep(delay);
+      } else {
+        break;
+      }
+    }
+  }
+  
+  throw lastError;
+}
+
+function isRetryableError(error: any): boolean {
+  // Network errors, timeouts, and 5xx errors are retryable
+  const retryableMessages = ['timeout', 'network', 'ECONNREFUSED', 'ETIMEDOUT'];
+  const errorMessage = error?.message?.toLowerCase() || '';
+  return retryableMessages.some(msg => errorMessage.includes(msg));
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+```
+
+### Health Check
+
+**Implementation:**
+```typescript
+async function checkSupabaseHealth(): Promise<boolean> {
+  try {
+    const { error } = await Promise.race([
+      supabase.from('users').select('count').limit(1),
+      new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Health check timeout')), 3000)
+      )
+    ]) as any;
+    
+    return !error;
+  } catch (error) {
+    console.error('[Auth] Health check failed:', error);
+    return false;
+  }
+}
+```
+
+### Enhanced Error Messages
+
+**User-Facing Error Types:**
+```typescript
+enum AuthErrorType {
+  INVALID_CREDENTIALS = 'invalid_credentials',
+  SERVICE_UNAVAILABLE = 'service_unavailable',
+  NETWORK_ERROR = 'network_error',
+  TIMEOUT = 'timeout',
+  UNKNOWN = 'unknown'
+}
+
+interface EnhancedAuthError {
+  type: AuthErrorType;
+  message: string;
+  userMessage: string;
+  retryable: boolean;
+}
+
+function categorizeAuthError(error: any): EnhancedAuthError {
+  const errorMessage = error?.message?.toLowerCase() || '';
+  
+  if (errorMessage.includes('invalid') || errorMessage.includes('credentials')) {
+    return {
+      type: AuthErrorType.INVALID_CREDENTIALS,
+      message: error.message,
+      userMessage: 'Invalid email or password. Please try again.',
+      retryable: false
+    };
+  }
+  
+  if (errorMessage.includes('timeout')) {
+    return {
+      type: AuthErrorType.TIMEOUT,
+      message: error.message,
+      userMessage: 'Connection timed out. Please check your internet connection and try again.',
+      retryable: true
+    };
+  }
+  
+  if (errorMessage.includes('network') || errorMessage.includes('fetch')) {
+    return {
+      type: AuthErrorType.NETWORK_ERROR,
+      message: error.message,
+      userMessage: 'Network error. Please check your internet connection.',
+      retryable: true
+    };
+  }
+  
+  return {
+    type: AuthErrorType.SERVICE_UNAVAILABLE,
+    message: error.message,
+    userMessage: 'Service temporarily unavailable. Please try again in a few moments.',
+    retryable: true
+  };
+}
+```
+
+### Updated Login Method with Resilience
+
+```typescript
+async login(credentials: LoginCredentials): Promise<AuthResponse> {
+  const start = performance.now();
+
+  try {
+    console.log('[AuthService] Starting login for:', credentials.email);
+    
+    // Check service health first
+    const isHealthy = await checkSupabaseHealth();
+    if (!isHealthy) {
+      console.warn('[AuthService] Service health check failed');
+      return {
+        user: null,
+        error: new Error('Service temporarily unavailable. Please try again in a few moments.')
+      };
+    }
+    
+    // Attempt login with retry logic
+    const { data, error } = await withRetry(
+      () => supabase.auth.signInWithPassword({
+        email: credentials.email,
+        password: credentials.password,
+      }),
+      {
+        maxAttempts: 3,
+        initialDelay: 1000,
+        maxDelay: 5000,
+        backoffMultiplier: 2
+      },
+      'signInWithPassword'
+    );
+
+    if (error) {
+      const enhancedError = categorizeAuthError(error);
+      console.error('[AuthService] Login error:', enhancedError);
+      return { 
+        user: null, 
+        error: new Error(enhancedError.userMessage)
+      };
+    }
+
+    if (!data.user) {
+      return { 
+        user: null, 
+        error: new Error('Login failed. Please try again.')
+      };
+    }
+
+    const user = await this.getCurrentUser();
+
+    const duration = performance.now() - start;
+    console.log(`[AuthService] Login completed in ${duration.toFixed(2)}ms`);
+
+    if (duration > 1000) {
+      console.warn(`[AuthService] Slow login detected: ${duration.toFixed(2)}ms`);
+    }
+
+    return { user, error: null };
+  } catch (error) {
+    const duration = performance.now() - start;
+    const enhancedError = categorizeAuthError(error);
+    console.error('[AuthService] Login exception:', {
+      type: enhancedError.type,
+      message: enhancedError.message,
+      duration: `${duration.toFixed(2)}ms`,
+    });
+    return {
+      user: null,
+      error: new Error(enhancedError.userMessage),
+    };
+  }
+}
+```
+
 ## Migration Strategy
 
-1. **Phase 1:** Add cache implementation (non-breaking)
-2. **Phase 2:** Optimize getCurrentUser() with join query
-3. **Phase 3:** Add performance monitoring
-4. **Phase 4:** Monitor and tune cache TTL
+1. **Phase 1:** Add cache implementation (non-breaking) ✅
+2. **Phase 2:** Optimize getCurrentUser() with join query ✅
+3. **Phase 3:** Add performance monitoring ✅
+4. **Phase 4:** Add connection resilience (retry logic, health checks)
+5. **Phase 5:** Monitor and tune cache TTL
 
 No database migrations required - only code changes.
