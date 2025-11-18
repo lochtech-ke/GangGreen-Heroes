@@ -6,7 +6,7 @@ interface CreditCardProps {
   showInitiative?: boolean;
 }
 
-export function CreditCard({ credit, onClick, showInitiative = true }: CreditCardProps) {
+export function CreditCard({ credit, onClick, showInitiative: _showInitiative = true }: CreditCardProps) {
   const getVerificationColor = (status: string) => {
     const colors = {
       verified: 'bg-green-100 text-green-700 border-green-200',

@@ -1,7 +1,5 @@
 import { supabase } from './supabase';
 import type {
-  CarbonCredit,
-  Transaction,
   CreateCreditData,
   UpdateCreditData,
   CreateTransactionData,
