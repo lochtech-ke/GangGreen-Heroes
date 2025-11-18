@@ -266,21 +266,30 @@
   - _Completed: November 17, 2025_
 
 - [ ] 8. Carbon Credit Marketplace
-- [ ] 8.1 Create carbon credit service
+- [x] 8.1 Create carbon credit service
+
+
+
   - Implement credit CRUD operations
   - Add credit availability calculations
   - Create pricing and currency conversion
   - Implement verification status management
   - _Requirements: 3.1, 3.2, 3.4, 3.5_
 
-- [ ] 8.2 Build marketplace UI
+- [x] 8.2 Build marketplace UI
+
+
+
   - Create CarbonCreditList component
   - Build CreditCard display component
   - Implement credit filtering and sorting
   - Add verification badge display
   - _Requirements: 3.1, 3.4_
 
-- [ ] 8.3 Implement purchase flow
+- [x] 8.3 Implement purchase flow
+
+
+
   - Create multi-step PurchaseFlow component
   - Add quantity selector with validation
   - Implement payment integration (placeholder)

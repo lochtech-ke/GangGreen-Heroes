@@ -367,6 +367,209 @@ if (error) {
 }
 ```
 
+## Carbon Credit Service (`carbonCredit.service.ts`)
+
+The carbon credit service handles carbon credit marketplace operations, transactions, pricing, and currency conversion.
+
+### Features
+
+- Create, read, update, and delete carbon credits
+- Filter credits by initiative, verification status, currency, and price range
+- Manage credit verification status
+- Create and track transactions (purchases)
+- Update transaction status (pending, completed, failed, refunded)
+- Calculate credit availability
+- Convert prices between USD and KES
+- Automatic quantity management on purchase/refund
+
+### Usage Examples
+
+#### Create a carbon credit listing
+
+```typescript
+import { carbonCreditService } from '@/services';
+
+const { credit, error } = await carbonCreditService.createCredit({
+  initiative_id: 'initiative-uuid',
+  quantity_tons: 100,
+  price_per_ton: 25.50,
+  currency: 'USD',
+  verification_certificate_url: 'https://example.com/cert.pdf',
+});
+
+if (error) {
+  console.error('Failed to create credit:', error);
+} else {
+  console.log('Credit created:', credit);
+}
+```
+
+#### Get all credits with filters
+
+```typescript
+// Get verified credits only
+const { credits, error } = await carbonCreditService.getVerifiedCredits();
+
+// Get credits with custom filters
+const { credits, error } = await carbonCreditService.getCredits({
+  verification_status: 'verified',
+  currency: 'USD',
+  min_price: 20,
+  max_price: 50,
+  available_only: true,
+});
+
+// Get credits for specific initiative
+const { credits, error } = await carbonCreditService.getCredits({
+  initiative_id: 'initiative-uuid',
+});
+```
+
+#### Get single credit
+
+```typescript
+const { credit, error } = await carbonCreditService.getCredit(creditId);
+if (error) {
+  console.error('Failed to fetch credit:', error);
+} else {
+  console.log('Credit:', credit);
+}
+```
+
+#### Update credit
+
+```typescript
+const { credit, error } = await carbonCreditService.updateCredit(creditId, {
+  price_per_ton: 30.00,
+  available_quantity: 75,
+});
+
+if (error) {
+  console.error('Failed to update credit:', error);
+} else {
+  console.log('Credit updated:', credit);
+}
+```
+
+#### Update verification status (admin only)
+
+```typescript
+const { credit, error } = await carbonCreditService.updateVerificationStatus(
+  creditId,
+  'verified',
+  'https://example.com/verification-cert.pdf'
+);
+
+if (error) {
+  console.error('Failed to verify credit:', error);
+} else {
+  console.log('Credit verified:', credit);
+}
+```
+
+#### Check credit availability
+
+```typescript
+const availableQuantity = await carbonCreditService.calculateAvailability(creditId);
+console.log(`Available: ${availableQuantity} tons`);
+```
+
+#### Create a transaction (purchase credits)
+
+```typescript
+const { transaction, error } = await carbonCreditService.createTransaction({
+  buyer_id: 'user-uuid',
+  credit_id: 'credit-uuid',
+  quantity_tons: 10,
+  payment_method: 'credit_card',
+});
+
+if (error) {
+  console.error('Failed to create transaction:', error);
+} else {
+  console.log('Transaction created:', transaction);
+  console.log('Total amount:', transaction.total_amount);
+}
+```
+
+#### Get transaction
+
+```typescript
+const { transaction, error } = await carbonCreditService.getTransaction(transactionId);
+if (error) {
+  console.error('Failed to fetch transaction:', error);
+} else {
+  console.log('Transaction:', transaction);
+}
+```
+
+#### Get user's transaction history
+
+```typescript
+const { transactions, error } = await carbonCreditService.getUserTransactions(userId);
+if (error) {
+  console.error('Failed to fetch transactions:', error);
+} else {
+  console.log('User transactions:', transactions);
+}
+```
+
+#### Get transactions with filters
+
+```typescript
+// Get completed transactions
+const { transactions, error } = await carbonCreditService.getTransactions({
+  payment_status: 'completed',
+});
+
+// Get transactions for specific credit
+const { transactions, error } = await carbonCreditService.getTransactions({
+  credit_id: 'credit-uuid',
+});
+
+// Get transactions within date range
+const { transactions, error } = await carbonCreditService.getTransactions({
+  start_date: '2025-01-01',
+  end_date: '2025-12-31',
+});
+```
+
+#### Update transaction status
+
+```typescript
+// Mark as completed
+const { transaction, error } = await carbonCreditService.updateTransactionStatus(
+  transactionId,
+  'completed',
+  'https://example.com/receipt.pdf'
+);
+
+// Mark as failed (automatically restores credit quantity)
+const { transaction, error } = await carbonCreditService.updateTransactionStatus(
+  transactionId,
+  'failed'
+);
+
+// Process refund (automatically restores credit quantity)
+const { transaction, error } = await carbonCreditService.updateTransactionStatus(
+  transactionId,
+  'refunded'
+);
+```
+
+#### Convert prices between currencies
+
+```typescript
+// Convert USD to KES
+const conversion = carbonCreditService.convertPrice(100, 'USD', 'KES');
+console.log(`${conversion.amount} ${conversion.from_currency} = ${conversion.converted_amount} ${conversion.to_currency}`);
+console.log(`Exchange rate: ${conversion.exchange_rate}`);
+
+// Convert KES to USD
+const conversion = carbonCreditService.convertPrice(15000, 'KES', 'USD');
+console.log(`${conversion.amount} ${conversion.from_currency} = ${conversion.converted_amount} ${conversion.to_currency}`);
+```
+
 ## Supabase Client (`supabase.ts`)
 
 The base Supabase client configuration used by all services.

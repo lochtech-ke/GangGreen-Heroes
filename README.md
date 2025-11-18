@@ -41,8 +41,17 @@ The platform pilots conservation efforts in three key Kenyan forests:
   - Context-aware responses and escalation to human support
   - Integration with registration flow for seamless user experience
 
+- **Paystack Payment Integration** - ✅ Implementation Complete, Ready for Deployment
+  - Secure payment processing for carbon credit purchases
+  - Multiple payment methods (cards, bank transfer, M-Pesa)
+  - Real-time payment verification and webhook handling
+  - USD to KES currency conversion
+  - Test mode for development with visual indicators
+  - Comprehensive error handling and logging
+  - See [Paystack Integration Guide](docs/PAYSTACK_INTEGRATION.md) for details
+
 ### Planned 📋
-- **Carbon Credit Marketplace** - Verified carbon credits trading with transparent verification
+- **Carbon Credit Marketplace** - Verified carbon credits trading with transparent verification (Payment system ready)
 - **Impact Dashboard** - Real-time metrics on trees planted, carbon sequestered, and area covered
 - **Crypto Donations** - Accept ETH, MATIC, and USDC donations
 - **NFT Badge Rewards** - Blockchain-based achievement recognition
@@ -206,8 +215,16 @@ The platform pilots conservation efforts in three key Kenyan forests:
   - 📋 Response generation and escalation
   - 📋 Chat engine orchestration
   - 📋 UI components and integration
+- ✅ Paystack Payment Integration (Complete - Nov 18, 2025)
+  - ✅ Frontend payment flow integration
+  - ✅ Payment verification Edge Function
+  - ✅ Webhook handler Edge Function
+  - ✅ Currency conversion (USD to KES)
+  - ✅ Test mode configuration
+  - ✅ Comprehensive documentation
+  - 📋 Deployment to production (pending)
 - 📋 Complete authentication testing (Task 3.4)
-- 📋 Carbon marketplace (December 2025)
+- 📋 Carbon marketplace UI (December 2025)
 - 📋 Web3 features (January 2026)
 - 📋 Gamification system (February 2026)
 
@@ -295,12 +312,25 @@ The authentication pages include:
 Create a `.env` file in the root directory:
 
 ```env
+# Supabase Configuration
 VITE_SUPABASE_URL=https://wobpryllvdjaapzjbsxx.supabase.co
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+
+# Antugrow API Configuration
 VITE_ANTUGROW_API_URL=https://api.antugrow.com
 VITE_ANTUGROW_API_KEY=your_antugrow_api_key
+
+# Mapbox Configuration
 VITE_MAPBOX_TOKEN=your_mapbox_token
+
+# Paystack Payment Configuration
+VITE_PAYSTACK_PUBLIC_KEY=pk_live_916e900767097bdee3bd604568c16670a329249b
+VITE_PAYSTACK_CALLBACK_URL=https://gg.lochtech.africa
+VITE_USD_TO_KES_RATE=150.0
+VITE_PAYSTACK_MODE=test  # Use 'live' for production
 ```
+
+**Note:** For Paystack secret key and other backend secrets, see [Paystack Deployment Guide](docs/PAYSTACK_DEPLOYMENT_CHECKLIST.md).
 
 ### Database Setup
 
@@ -816,12 +846,19 @@ See [Testing Guide](src/test/README.md) for comprehensive testing documentation,
 
 Comprehensive documentation is available in the `docs/` directory:
 
+### General Documentation
 - **[Project Status Report](docs/PROJECT_STATUS.md)** - 📊 Current progress, metrics, and next steps
 - **[Quick Reference](docs/QUICK_REFERENCE.md)** - ⚡ Essential commands, code snippets, and quick tips
 - **[Technical Guide](docs/TECHNICAL_GUIDE.md)** - 🔧 Architecture, API docs, database schema (updated with current status)
 - **[User Guide](docs/USER_GUIDE.md)** - 📖 Complete user manual (updated with development timeline)
 - **[GitHub Project Updates](docs/GITHUB_PROJECT_UPDATES.md)** - 📋 Project board setup and task management (updated with Task 1 completion)
 - **[Documentation Summary](docs/DOCUMENTATION_SUMMARY.md)** - 📝 Overview of all documentation
+
+### Payment Integration Documentation
+- **[Paystack Integration Guide](docs/PAYSTACK_INTEGRATION.md)** - 💳 Complete Paystack payment integration documentation
+- **[Paystack Deployment Checklist](docs/PAYSTACK_DEPLOYMENT_CHECKLIST.md)** - ✅ Step-by-step deployment guide
+- **[Paystack Integration Complete](docs/PAYSTACK_INTEGRATION_COMPLETE.md)** - 📋 Implementation summary and status
+- **[Edge Functions Guide](supabase/functions/README.md)** - 🔧 Supabase Edge Functions deployment
 
 **New to the project?** 
 - Developers: Start with [Quick Reference](docs/QUICK_REFERENCE.md) and [Project Status](docs/PROJECT_STATUS.md)
