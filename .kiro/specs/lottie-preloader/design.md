@@ -78,18 +78,17 @@ interface PreloaderState {
      - Roots (lines extending downward)
      - Sun/rain particles (animated sprites)
 
-3. **Scene 3 (4-5.5s)**: Message Display
+3. **Scene 3 (4-5.5s)**: Message Display with Geolocation-Based Flag
    - Duration: 1500ms
    - Text: "Chill Kiasi..." (Swahili/Sheng for "Relax a bit...")
-   - Background: Parallax layers with Kenyan flag colors
-     - Black layer (#000000) - moving slowest
-     - Red layer (#BB0000) - medium speed
-     - Green layer (#006600) - faster
-     - White accents (#FFFFFF)
+   - Background: Parallax layers with user's country flag colors (detected via geolocation)
+     - Default (Kenya): Black (#000000), Red (#BB0000), Green (#006600), White (#FFFFFF)
+     - Colors dynamically loaded based on detected country
+     - Fallback to Kenyan colors if geolocation fails or is denied
    - Blur effect: Pixi.js BlurFilter on background layers
    - Hashtags: "#GangGreen" and "#GreenBeltMovement" below main text
    - Font: Bold, modern sans-serif for main text; lighter weight for hashtags
-   - Animation: Fade in text, parallax scroll background
+   - Animation: Fade in text, parallax scroll background with smooth color transitions
 
 **Animation Properties**:
 - Total duration: 5500ms
@@ -109,7 +108,7 @@ interface SceneConfig {
   duration: number;
   startTime: number;
   endTime: number;
-  setup: (container: Container) => void;
+  setup: (container: Container, flagColors?: FlagColors) => void;
   animate: (container: Container, progress: number) => void;
   cleanup: (container: Container) => void;
 }
@@ -119,6 +118,19 @@ interface AnimationTimeline {
   currentScene: number;
   startTime: number;
   totalDuration: number;
+}
+
+interface FlagColors {
+  primary: number;
+  secondary: number;
+  tertiary: number;
+  accent: number;
+}
+
+interface GeolocationData {
+  country: string;
+  countryCode: string;
+  flagColors: FlagColors;
 }
 ```
 
@@ -222,22 +234,45 @@ Test cases:
 
 ## Implementation Notes
 
+### Geolocation and Flag Colors
+
+The preloader will detect the user's country and display their flag colors:
+
+**Geolocation Strategy**:
+1. Use browser Geolocation API to get coordinates
+2. Call a geolocation service (e.g., ipapi.co or ip-api.com) to convert coordinates to country
+3. Map country code to flag colors using a predefined color palette
+4. Cache the result in localStorage to avoid repeated API calls
+5. Fallback to Kenyan colors if detection fails
+
+**Flag Color Mapping** (sample countries):
+```typescript
+const FLAG_COLORS: Record<string, FlagColors> = {
+  KE: { primary: 0x000000, secondary: 0xBB0000, tertiary: 0x006600, accent: 0xFFFFFF }, // Kenya
+  NG: { primary: 0x008751, secondary: 0xFFFFFF, tertiary: 0x008751, accent: 0xFFFFFF }, // Nigeria
+  ZA: { primary: 0x007A4D, secondary: 0xFFB612, tertiary: 0xDE3831, accent: 0x002395 }, // South Africa
+  GH: { primary: 0xCE1126, secondary: 0xFCD116, tertiary: 0x006B3F, accent: 0x000000 }, // Ghana
+  ET: { primary: 0x078930, secondary: 0xFCDD09, tertiary: 0xDA121A, accent: 0x0F47AF }, // Ethiopia
+  // Add more countries as needed
+};
+```
+
 ### Pixi.js Animation Creation
 
 The animations will be created programmatically using Pixi.js primitives and sprites:
 - **Graphics API** for shapes (circles, rectangles, lines)
 - **Sprites** for character and tree elements
 - **Text** for message display
-- **Filters** for blur effects
+- **Filters** for blur, glow, and shadow effects
+- **Particle systems** for enhanced visual effects
 
-**Design Assets Needed**:
-- Simple geometric shapes for character (can be drawn with Pixi.Graphics)
-- Tree sprites (can be created programmatically or use simple SVG)
-- Kenyan flag color palette: 
-  - Black: #000000 (0x000000)
-  - Red: #BB0000 (0xBB0000)
-  - Green: #006600 (0x006600)
-  - White: #FFFFFF (0xFFFFFF)
+**Visual Enhancement Techniques**:
+- Smooth easing functions (easeInOutCubic, easeOutElastic)
+- Particle effects for soil, leaves, and ambient elements
+- Gradient fills for depth and lighting
+- Drop shadows on text and key elements
+- Glow effects on interactive elements
+- Color transitions between scenes
 
 ### React Integration
 
@@ -304,6 +339,8 @@ Use Tailwind CSS with custom animations:
 }
 ```
 
+**Note**: Geolocation detection will use browser APIs and a free geolocation service (no additional npm packages required)
+
 ### Existing Dependencies (No Changes)
 
 - React 18+
@@ -323,9 +360,13 @@ src/
 │           ├── Scene1.ts                # Scene 1: Child planting
 │           ├── Scene2.ts                # Scene 2: Tree growth
 │           ├── Scene3.ts                # Scene 3: Message display
-│           └── AnimationTimeline.ts     # Timeline controller
+│           ├── AnimationTimeline.ts     # Timeline controller
+│           ├── flagColors.ts            # Flag color mappings
+│           └── easingFunctions.ts       # Animation easing utilities
 ├── hooks/
 │   └── useAppReady.ts                   # Hook to track app loading state
+├── services/
+│   └── geolocation.service.ts           # Geolocation detection service
 └── types/
     └── preloader.types.ts               # TypeScript interfaces
 ```

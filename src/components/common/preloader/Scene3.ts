@@ -1,16 +1,17 @@
 /**
- * Scene 3: Message Display with Kenyan Flag Colors
+ * Scene 3: Waving Kenyan Flag with Color-Cycling Loading Text
  * Duration: 1500ms (4-5.5s)
  * 
- * This scene displays "Chill Kiasi..." message with parallax background
- * using Kenyan flag colors, reinforcing cultural authenticity.
+ * This scene displays a waving Kenyan flag with "Loading..." text
+ * that cycles through the flag colors (black, red, green, white).
  */
 
 import { Container, Graphics, Text } from 'pixi.js';
 import type { SceneConfig } from '../../../types';
+import { easeInOutCubic } from './easingFunctions';
 
 // Kenyan flag colors
-const COLORS = {
+const KENYAN_COLORS = {
   black: 0x000000,
   red: 0xBB0000,
   green: 0x006600,
@@ -21,11 +22,9 @@ const COLORS = {
  * Creates Scene 3 configuration
  */
 export function createScene3(): SceneConfig {
-  let flagBox: Graphics;
-  let whiteAccents: Graphics[] = [];
-  let mainText: Text;
-  let hashtag1: Text;
-  let hashtag2: Text;
+  let background: Graphics;
+  let flagStripes: Graphics[] = [];
+  let loadingText: Text;
 
   return {
     duration: 1500,
@@ -38,241 +37,143 @@ export function createScene3(): SceneConfig {
       const centerX = width / 2;
       const centerY = height / 2;
 
-      // Create Kenyan flag bounding box (hand-drawn style)
-      const boxWidth = Math.min(width, height) * 0.6;
-      const boxHeight = boxWidth * 0.4; // Maintain flag proportions
-      const boxX = centerX - boxWidth / 2;
-      const boxY = centerY - boxHeight / 2 - Math.min(width, height) * 0.15;
+      // Create simple gradient background
+      background = new Graphics();
+      background.rect(0, 0, width, height);
+      background.fill({ color: 0xF5F5F5, alpha: 1 });
+      container.addChild(background);
 
-      // Flag container with hand-drawn border
-      flagBox = new Graphics();
+      // Create waving Kenyan flag
+      const flagWidth = Math.min(width, height) * 0.5;
+      const flagHeight = flagWidth * 0.67; // Standard flag ratio
+      const flagY = centerY - flagHeight / 2 - Math.min(width, height) * 0.1;
       
-      // Black stripe (top)
-      flagBox.rect(boxX, boxY, boxWidth, boxHeight / 4);
-      flagBox.fill(COLORS.black);
-      
-      // Red stripe (middle)
-      flagBox.rect(boxX, boxY + boxHeight / 4, boxWidth, boxHeight / 4);
-      flagBox.fill(COLORS.red);
-      
-      // White stripe (center - thinner)
-      flagBox.rect(boxX, boxY + boxHeight * 0.4, boxWidth, boxHeight * 0.2);
-      flagBox.fill(COLORS.white);
-      
-      // Green stripe (bottom)
-      flagBox.rect(boxX, boxY + boxHeight * 0.6, boxWidth, boxHeight / 4);
-      flagBox.fill(COLORS.green);
-      
-      // Hand-drawn border effect (sketchy lines)
-      flagBox.moveTo(boxX, boxY);
-      // Top edge with wobble
-      for (let i = 0; i <= 20; i++) {
-        const x = boxX + (boxWidth / 20) * i;
-        const y = boxY + (Math.sin(i * 0.5) * 2);
-        flagBox.lineTo(x, y);
-      }
-      // Right edge
-      for (let i = 0; i <= 20; i++) {
-        const x = boxX + boxWidth + (Math.cos(i * 0.5) * 2);
-        const y = boxY + (boxHeight / 20) * i;
-        flagBox.lineTo(x, y);
-      }
-      // Bottom edge
-      for (let i = 20; i >= 0; i--) {
-        const x = boxX + (boxWidth / 20) * i;
-        const y = boxY + boxHeight + (Math.sin(i * 0.5) * 2);
-        flagBox.lineTo(x, y);
-      }
-      // Left edge
-      for (let i = 20; i >= 0; i--) {
-        const x = boxX + (Math.cos(i * 0.5) * 2);
-        const y = boxY + (boxHeight / 20) * i;
-        flagBox.lineTo(x, y);
-      }
-      flagBox.stroke({ width: 4, color: COLORS.white, alpha: 0.8 });
-      
-      flagBox.alpha = 0;
-      container.addChild(flagBox);
-
-      // Scattered hand-drawn accents around the flag
-      const accentSize = Math.min(width, height) * 0.02;
-      for (let i = 0; i < 8; i++) {
-        const accent = new Graphics();
-        // Hand-drawn circle (irregular)
-        const segments = 12;
-        const baseRadius = accentSize + Math.random() * accentSize;
-        accent.moveTo(baseRadius, 0);
-        for (let j = 0; j <= segments; j++) {
-          const angle = (j / segments) * Math.PI * 2;
-          const radiusVariation = baseRadius + (Math.random() - 0.5) * accentSize * 0.3;
-          const x = Math.cos(angle) * radiusVariation;
-          const y = Math.sin(angle) * radiusVariation;
-          accent.lineTo(x, y);
-        }
-        accent.fill({ color: 0x10B981, alpha: 0.3 });
-        accent.stroke({ width: 2, color: 0x10B981, alpha: 0.5 });
-        
-        // Position around the flag box
-        const anglePos = (i / 8) * Math.PI * 2;
-        const distance = boxWidth * 0.7;
-        accent.x = centerX + Math.cos(anglePos) * distance;
-        accent.y = boxY + boxHeight / 2 + Math.sin(anglePos) * distance * 0.5;
-        accent.alpha = 0;
-        whiteAccents.push(accent);
-        container.addChild(accent);
+      for (let i = 0; i < 4; i++) {
+        const stripe = new Graphics();
+        stripe.alpha = 0;
+        flagStripes.push(stripe);
+        container.addChild(stripe);
       }
 
-      // Create main text (responsive font size)
-      const mainFontSize = Math.min(width, height) * 0.08;
-      mainText = new Text({
-        text: 'Chill Kiasi...',
+      // Create loading text that will cycle through colors
+      const textFontSize = Math.min(width, height) * 0.06;
+      loadingText = new Text({
+        text: 'Loading...',
         style: {
-          fontFamily: 'Arial, sans-serif',
-          fontSize: mainFontSize,
+          fontFamily: 'Arial, Helvetica, sans-serif',
+          fontSize: textFontSize,
           fontWeight: 'bold',
-          fill: COLORS.white,
+          fill: KENYAN_COLORS.black,
           align: 'center',
           dropShadow: {
-            color: COLORS.black,
+            color: 0xFFFFFF,
             blur: 4,
             angle: Math.PI / 4,
-            distance: 4,
-          },
-        },
-      });
-      mainText.anchor.set(0.5);
-      mainText.x = centerX;
-      mainText.y = centerY - mainFontSize * 0.5;
-      mainText.alpha = 0;
-      container.addChild(mainText);
-
-      // Create hashtag 1 (responsive)
-      const hashtagFontSize = Math.min(width, height) * 0.04;
-      const hashtagSpacing = Math.min(width, height) * 0.12;
-      hashtag1 = new Text({
-        text: '#GangGreen',
-        style: {
-          fontFamily: 'Arial, sans-serif',
-          fontSize: hashtagFontSize,
-          fontWeight: '400',
-          fill: 0x10B981, // Bright green
-          align: 'center',
-          dropShadow: {
-            color: COLORS.black,
-            blur: 2,
-            angle: Math.PI / 4,
             distance: 2,
+            alpha: 0.8,
           },
         },
       });
-      hashtag1.anchor.set(0.5);
-      hashtag1.x = centerX - hashtagSpacing;
-      hashtag1.y = centerY + mainFontSize;
-      hashtag1.alpha = 0;
-      container.addChild(hashtag1);
-
-      // Create hashtag 2 (responsive)
-      hashtag2 = new Text({
-        text: '#GreenBeltMovement',
-        style: {
-          fontFamily: 'Arial, sans-serif',
-          fontSize: hashtagFontSize,
-          fontWeight: '400',
-          fill: 0x10B981, // Bright green
-          align: 'center',
-          dropShadow: {
-            color: COLORS.black,
-            blur: 2,
-            angle: Math.PI / 4,
-            distance: 2,
-          },
-        },
-      });
-      hashtag2.anchor.set(0.5);
-      hashtag2.x = centerX + hashtagSpacing;
-      hashtag2.y = centerY + mainFontSize;
-      hashtag2.alpha = 0;
-      container.addChild(hashtag2);
+      loadingText.anchor.set(0.5);
+      loadingText.x = centerX;
+      loadingText.y = flagY + flagHeight + textFontSize * 1.5;
+      loadingText.alpha = 0;
+      container.addChild(loadingText);
     },
 
     animate: (container: Container, progress: number) => {
-
-      // Animation phases:
-      // 0-0.3: Fade in background layers
-      // 0.3-0.6: Parallax scroll background
-      // 0.4-0.7: Fade in main text
-      // 0.6-0.9: Fade in hashtags
-      // 0.9-1.0: Hold
-
-      // Fade in flag box
-      if (progress < 0.3) {
-        const fadeProgress = progress / 0.3;
-        flagBox.alpha = fadeProgress;
-        // Slight scale animation for depth
-        flagBox.scale.set(0.9 + fadeProgress * 0.1);
-      }
-
-      // Fade in hand-drawn accents with stagger
-      if (progress > 0.2) {
-        whiteAccents.forEach((accent, i) => {
-          const accentStart = 0.2 + (i / whiteAccents.length) * 0.3;
-          if (progress > accentStart) {
-            const accentProgress = Math.min(1, (progress - accentStart) * 3);
-            accent.alpha = accentProgress * 0.4;
-            // Gentle floating animation
-            accent.y += Math.sin(progress * Math.PI * 2 + i) * 0.3;
-            accent.rotation = Math.sin(progress * Math.PI + i) * 0.1;
-          }
-        });
-      }
-
-      // Fade in main text
-      if (progress > 0.4 && progress < 0.7) {
-        const textProgress = (progress - 0.4) / 0.3;
-        mainText.alpha = textProgress;
-        mainText.scale.set(0.8 + textProgress * 0.2);
-      } else if (progress >= 0.7) {
-        mainText.alpha = 1;
-        mainText.scale.set(1);
-      }
-
-      // Fade in hashtags (responsive)
+      const width = container.width || window.innerWidth;
       const height = container.height || window.innerHeight;
+      const centerX = width / 2;
       const centerY = height / 2;
-      const mainFontSize = Math.min(container.width || window.innerWidth, height) * 0.08;
-      
-      if (progress > 0.6 && progress < 0.9) {
-        const hashtagProgress = (progress - 0.6) / 0.3;
-        hashtag1.alpha = hashtagProgress;
-        hashtag2.alpha = hashtagProgress;
-        
-        // Slight stagger
-        hashtag1.y = centerY + mainFontSize - (1 - hashtagProgress) * 20;
-        hashtag2.y = centerY + mainFontSize - (1 - hashtagProgress) * 15;
-      } else if (progress >= 0.9) {
-        hashtag1.alpha = 1;
-        hashtag2.alpha = 1;
-      }
 
-      // Gentle pulsing effect on text
-      if (progress > 0.7) {
-        const pulseProgress = (progress - 0.7) / 0.3;
-        const pulse = 1 + Math.sin(pulseProgress * Math.PI * 4) * 0.05;
-        mainText.scale.set(pulse);
+      const flagWidth = Math.min(width, height) * 0.5;
+      const flagHeight = flagWidth * 0.67;
+      const flagX = centerX - flagWidth / 2;
+      const flagY = centerY - flagHeight / 2 - Math.min(width, height) * 0.1;
+      const stripeHeight = flagHeight / 4;
+
+      // Fade in flag stripes
+      const fadeInProgress = Math.min(1, progress / 0.3);
+      const stripeColors = [KENYAN_COLORS.black, KENYAN_COLORS.red, KENYAN_COLORS.white, KENYAN_COLORS.green];
+      
+      flagStripes.forEach((stripe, i) => {
+        stripe.clear();
+        stripe.alpha = easeInOutCubic(fadeInProgress);
+        
+        // Create waving effect using sine wave
+        const waveSpeed = 2;
+        const waveAmplitude = 15;
+        const segments = 40;
+        const segmentWidth = flagWidth / segments;
+        
+        for (let seg = 0; seg < segments; seg++) {
+          const x = flagX + seg * segmentWidth;
+          const y = flagY + i * stripeHeight;
+          
+          // Calculate wave offset for this segment
+          const waveOffset = Math.sin((progress * Math.PI * waveSpeed) + (seg / segments) * Math.PI * 2) * waveAmplitude;
+          
+          // Draw segment of stripe
+          stripe.rect(x, y + waveOffset, segmentWidth + 1, stripeHeight);
+          stripe.fill({ color: stripeColors[i], alpha: 1 });
+        }
+      });
+
+      // Fade in and animate loading text
+      if (progress > 0.2) {
+        const textProgress = (progress - 0.2) / 0.2;
+        loadingText.alpha = Math.min(1, textProgress);
+        
+        // Pulse the text
+        const pulseSpeed = 2.5;
+        const pulseAmount = 0.1;
+        const pulse = 1 + Math.sin(progress * Math.PI * pulseSpeed) * pulseAmount;
+        loadingText.scale.set(pulse);
+        
+        // Cycle through flag colors (black, red, green, white)
+        const colorCycleSpeed = 1.5; // Complete cycle every 1.5 seconds
+        const colorIndex = Math.floor((progress * colorCycleSpeed * 4) % 4);
+        const colors = [KENYAN_COLORS.black, KENYAN_COLORS.red, KENYAN_COLORS.green, KENYAN_COLORS.white];
+        
+        // Smooth color transition
+        const colorProgress = (progress * colorCycleSpeed * 4) % 1;
+        const currentColor = colors[colorIndex];
+        const nextColor = colors[(colorIndex + 1) % 4];
+        
+        // Interpolate between colors
+        const r1 = (currentColor >> 16) & 0xFF;
+        const g1 = (currentColor >> 8) & 0xFF;
+        const b1 = currentColor & 0xFF;
+        
+        const r2 = (nextColor >> 16) & 0xFF;
+        const g2 = (nextColor >> 8) & 0xFF;
+        const b2 = nextColor & 0xFF;
+        
+        const r = Math.round(r1 + (r2 - r1) * colorProgress);
+        const g = Math.round(g1 + (g2 - g1) * colorProgress);
+        const b = Math.round(b1 + (b2 - b1) * colorProgress);
+        
+        const interpolatedColor = (r << 16) | (g << 8) | b;
+        loadingText.style.fill = interpolatedColor;
+        
+        // Adjust drop shadow color for contrast
+        if (interpolatedColor === KENYAN_COLORS.white) {
+          loadingText.style.dropShadow.color = 0x000000;
+        } else {
+          loadingText.style.dropShadow.color = 0xFFFFFF;
+        }
       }
     },
 
     cleanup: (container: Container) => {
       // Remove all elements
-      if (flagBox) container.removeChild(flagBox);
-      if (mainText) container.removeChild(mainText);
-      if (hashtag1) container.removeChild(hashtag1);
-      if (hashtag2) container.removeChild(hashtag2);
-      
-      whiteAccents.forEach((accent) => container.removeChild(accent));
+      if (background) container.removeChild(background);
+      flagStripes.forEach((stripe) => container.removeChild(stripe));
+      if (loadingText) container.removeChild(loadingText);
       
       // Clear references
-      whiteAccents = [];
+      flagStripes = [];
     },
   };
 }

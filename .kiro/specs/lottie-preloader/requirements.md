@@ -53,15 +53,17 @@ This specification defines a Pixi.js-powered animated preloader for the #GangGre
 
 ### Requirement 4
 
-**User Story:** As a platform user, I want to see the "Chill Kiasi..." message with Kenyan flag colors, so that I feel the cultural authenticity and local connection of the platform
+**User Story:** As a platform user, I want to see the "Chill Kiasi..." message with my country's flag colors based on my location, so that I feel the cultural authenticity and local connection of the platform
 
 #### Acceptance Criteria
 
 1. WHEN Scene 2 completes, THE Preloader SHALL transition to Scene 3 displaying the text "Chill Kiasi..."
-2. THE Preloader SHALL render the background using Kenyan flag colors in black, red, green, and white
-3. THE Preloader SHALL apply a parallax blur effect to the background colors
-4. THE Preloader SHALL display the hashtags "#GangGreen" and "#GreenBeltMovement" below the main message
-5. THE Preloader SHALL maintain Scene 3 for at least 1.5 seconds before fade-out
+2. THE Preloader SHALL detect the user's country using geolocation API
+3. THE Preloader SHALL render the background using the detected country's flag colors with Kenyan flag as default
+4. THE Preloader SHALL apply a parallax blur effect to the background colors
+5. THE Preloader SHALL display the hashtags "#GangGreen" and "#GreenBeltMovement" below the main message
+6. THE Preloader SHALL maintain Scene 3 for at least 1.5 seconds before fade-out
+7. WHEN geolocation fails or is denied, THE Preloader SHALL use Kenyan flag colors as fallback
 
 ### Requirement 5
 
@@ -86,3 +88,17 @@ This specification defines a Pixi.js-powered animated preloader for the #GangGre
 3. THE Preloader SHALL accept an auto-hide configuration parameter to control automatic dismissal
 4. THE Preloader SHALL provide a callback function that executes when the animation completes
 5. THE Preloader SHALL allow the animation to be skipped after the minimum display duration elapses
+
+### Requirement 7
+
+**User Story:** As a platform user, I want to see smooth, visually appealing animations with enhanced effects, so that the loading experience feels premium and engaging
+
+#### Acceptance Criteria
+
+1. THE Preloader SHALL render all animations at 60 frames per second without frame drops
+2. THE Preloader SHALL apply smooth easing functions to all transitions and movements
+3. THE Preloader SHALL include particle effects for enhanced visual appeal in Scene 1 and Scene 2
+4. THE Preloader SHALL use gradient backgrounds and lighting effects to create depth
+5. THE Preloader SHALL ensure all text is crisp and readable with proper anti-aliasing
+6. THE Preloader SHALL apply smooth color transitions between scenes
+7. THE Preloader SHALL include subtle shadow effects on key elements for visual depth

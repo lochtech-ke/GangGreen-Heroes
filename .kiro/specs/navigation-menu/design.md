@@ -2,29 +2,59 @@
 
 ## Overview
 
-This design document outlines the implementation of a comprehensive navigation system for the #GangGreen platform. The navigation will provide authenticated users with easy access to all platform features through a responsive, accessible, and role-aware menu system.
+This design document outlines the redesign of the navigation system for the #GangGreen platform to accommodate the significant feature growth. The updated navigation will organize features into logical groups, provide quick access to common actions, display user rewards and notifications, and offer an improved mobile experience with bottom navigation. The system will remain responsive, accessible, and role-aware while handling the expanded feature set without overwhelming users.
 
 ## Architecture
 
 ### Component Hierarchy
 
 ```
-Layout (new)
-├── Navigation (new)
+Layout (existing)
+├── DesktopNavigation (updated)
 │   ├── Logo
-│   ├── NavLinks
-│   │   ├── NavItem (Dashboard)
-│   │   ├── NavItem (Initiatives)
-│   │   ├── NavItem (Tree Registry)
-│   │   ├── NavItem (Marketplace)
-│   │   └── NavItem (Gamification)
-│   ├── UserMenu (new)
-│   │   ├── UserButton
-│   │   └── UserDropdown
-│   │       ├── ProfileLink
-│   │       ├── SettingsLink
-│   │       └── LogoutButton
-│   └── MobileMenuButton
+│   ├── NavGroups
+│   │   ├── NavDropdown (Community)
+│   │   │   ├── Social Feed
+│   │   │   ├── Forums (future)
+│   │   │   └── Events (future)
+│   │   ├── NavDropdown (Conservation)
+│   │   │   ├── Initiatives
+│   │   │   ├── Tree Registry
+│   │   │   ├── My Journey
+│   │   │   └── Create Initiative (org only)
+│   │   └── NavDropdown (Marketplace)
+│   │       ├── Carbon Credits
+│   │       ├── NFT Badges
+│   │       └── Donate
+│   ├── QuickActions (new)
+│   │   └── ActionDropdown
+│   ├── SearchButton (new)
+│   ├── NotificationCenter (new)
+│   │   ├── NotificationBell
+│   │   └── NotificationDropdown
+│   ├── GGCoinDisplay (new)
+│   └── UserMenu (updated)
+│       ├── UserButton (with avatar + level)
+│       └── UserDropdown
+│           ├── Profile
+│           ├── My Journey
+│           ├── NFT Badges
+│           ├── Settings
+│           └── Logout
+├── MobileNavigation (updated)
+│   ├── TopBar
+│   │   ├── MenuButton
+│   │   ├── Logo
+│   │   ├── NotificationBell
+│   │   └── UserAvatar
+│   ├── SideDrawer (hamburger menu)
+│   │   └── Full navigation tree
+│   └── BottomNavBar (new)
+│       ├── Home
+│       ├── Community
+│       ├── Conservation
+│       ├── Marketplace
+│       └── Profile
 └── Page Content
 ```
 
@@ -32,16 +62,46 @@ Layout (new)
 
 The navigation will integrate with React Router and support the following routes:
 
-- `/dashboard` - Main dashboard (existing)
-- `/initiatives` - Initiative list and management (to be created)
-- `/initiatives/create` - Create new initiative (organization role)
+**Core Pages:**
+- `/` - Home page (public)
+- `/dashboard` - Main dashboard (authenticated)
+
+**Community Section:**
+- `/social-feed` - Social media feed (existing)
+- `/forums` - Community forums (future)
+- `/events` - Community events (future)
+
+**Conservation Section:**
+- `/initiatives` - Initiative list (existing)
+- `/initiatives/create` - Create initiative (org role)
 - `/initiatives/:id` - Initiative details
-- `/trees` - Tree registry (to be created)
+- `/trees` - Tree registry (existing)
 - `/trees/:id` - Tree details
-- `/marketplace` - Carbon credit marketplace (to be created)
-- `/gamification` - Gamification dashboard (to be created)
-- `/profile` - User profile (existing page)
-- `/settings` - User settings (to be created)
+- `/journey` - Individual user journey (existing)
+
+**Marketplace Section:**
+- `/marketplace` - Carbon credit marketplace (existing)
+- `/nft-badges` - NFT badge marketplace (existing)
+- `/donate` - Donation page (future)
+
+**Gamification:**
+- `/gamification` - Gamification dashboard (existing)
+- `/leaderboard` - Global leaderboard (future)
+
+**User Pages:**
+- `/profile` - User profile (existing)
+- `/settings` - User settings (existing)
+
+**Admin Pages:**
+- `/admin/moderation` - Content moderation (admin only)
+- `/admin/analytics` - Platform analytics (admin only)
+
+**Legal Pages:**
+- `/legal/terms` - Terms of Service (existing)
+- `/legal/privacy` - Privacy Policy (existing)
+- `/legal/cookies` - Cookie Policy (existing)
+- `/legal/tax-receipts` - Tax Receipt Policy (existing)
+- `/legal/acceptable-use` - Acceptable Use Policy (existing)
 
 ## Components and Interfaces
 
@@ -151,6 +211,139 @@ export function MobileMenu({ isOpen, onClose, navItems, user, onLogout }: Mobile
 - Full-screen on mobile
 - Touch-friendly targets
 
+### 6. NavDropdown Component
+
+Dropdown menu for grouped navigation items (mega menu style).
+
+```typescript
+interface NavDropdownProps {
+  group: NavGroupConfig;
+  isOpen: boolean;
+  onToggle: () => void;
+}
+
+export function NavDropdown({ group, isOpen, onToggle }: NavDropdownProps): JSX.Element
+```
+
+**Features:**
+- Hover to open (desktop)
+- Click to open (mobile)
+- Grid layout for items
+- Item descriptions
+- Icons for each item
+- Smooth animations
+
+### 7. QuickActions Component
+
+Quick access to frequently used actions.
+
+```typescript
+interface QuickAction {
+  id: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  onClick: () => void;
+  roles?: UserRole[];
+}
+
+interface QuickActionsProps {
+  actions: QuickAction[];
+  maxVisible?: number;
+}
+
+export function QuickActions({ actions, maxVisible = 4 }: QuickActionsProps): JSX.Element
+```
+
+**Features:**
+- Customizable actions
+- Role-based filtering
+- Dropdown for overflow
+- Persistent preferences
+
+### 8. NotificationCenter Component
+
+Notification bell with dropdown.
+
+```typescript
+interface NotificationCenterProps {
+  userId: string;
+}
+
+export function NotificationCenter({ userId }: NotificationCenterProps): JSX.Element
+```
+
+**State:**
+- `notifications: Notification[]` - List of notifications
+- `unreadCount: number` - Count of unread notifications
+- `isOpen: boolean` - Dropdown visibility
+
+**Features:**
+- Real-time updates via Supabase
+- Unread count badge
+- Mark as read functionality
+- Grouped by type
+- Link to full notifications page
+
+### 9. GGCoinDisplay Component
+
+Display user's GG Coin balance.
+
+```typescript
+interface GGCoinDisplayProps {
+  balance: number;
+  showAnimation?: boolean;
+}
+
+export function GGCoinDisplay({ balance, showAnimation = true }: GGCoinDisplayProps): JSX.Element
+```
+
+**Features:**
+- Real-time balance updates
+- Animation on balance change
+- Click to view transaction history
+- Tooltip with recent transactions
+
+### 10. SearchModal Component
+
+Global search functionality.
+
+```typescript
+interface SearchModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export function SearchModal({ isOpen, onClose }: SearchModalProps): JSX.Element
+```
+
+**Features:**
+- Keyboard shortcut (Cmd/Ctrl + K)
+- Search across initiatives, trees, users, pages
+- Grouped results
+- Recent searches
+- Keyboard navigation
+- Fuzzy search
+
+### 11. BottomNavBar Component
+
+Mobile bottom navigation bar.
+
+```typescript
+interface BottomNavBarProps {
+  activeSection: string;
+}
+
+export function BottomNavBar({ activeSection }: BottomNavBarProps): JSX.Element
+```
+
+**Features:**
+- Fixed bottom position
+- 5 primary sections
+- Active state highlighting
+- Badge support
+- Hide on keyboard open
+- Smooth transitions
+
 ## Data Models
 
 ### Navigation Configuration
@@ -160,34 +353,115 @@ interface NavItemConfig {
   to: string;
   label: string;
   icon: React.ComponentType<{ className?: string }>;
+  description?: string; // For mega menu descriptions
   roles?: UserRole[]; // Optional: restrict to specific roles
   badge?: () => number; // Optional: function to get badge count
+  children?: NavItemConfig[]; // For nested navigation
 }
 
-const navigationConfig: NavItemConfig[] = [
+interface NavGroupConfig {
+  id: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  items: NavItemConfig[];
+}
+
+const navigationGroups: NavGroupConfig[] = [
+  {
+    id: 'community',
+    label: 'Community',
+    icon: UsersIcon,
+    items: [
+      {
+        to: '/social-feed',
+        label: 'Social Feed',
+        icon: HashIcon,
+        description: 'Share and discover conservation stories',
+      },
+      {
+        to: '/forums',
+        label: 'Forums',
+        icon: MessageSquareIcon,
+        description: 'Discuss with the community',
+      },
+      {
+        to: '/events',
+        label: 'Events',
+        icon: CalendarIcon,
+        description: 'Join local conservation events',
+      },
+    ],
+  },
+  {
+    id: 'conservation',
+    label: 'Conservation',
+    icon: TreeIcon,
+    items: [
+      {
+        to: '/initiatives',
+        label: 'Initiatives',
+        icon: TreeIcon,
+        description: 'Browse and join conservation projects',
+      },
+      {
+        to: '/trees',
+        label: 'Tree Registry',
+        icon: LeafIcon,
+        description: 'Track planted trees and their impact',
+      },
+      {
+        to: '/journey',
+        label: 'My Journey',
+        icon: MapIcon,
+        description: 'Your personal conservation journey',
+      },
+      {
+        to: '/initiatives/create',
+        label: 'Create Initiative',
+        icon: PlusIcon,
+        description: 'Start a new conservation project',
+        roles: ['organization'],
+      },
+    ],
+  },
+  {
+    id: 'marketplace',
+    label: 'Marketplace',
+    icon: ShoppingBagIcon,
+    items: [
+      {
+        to: '/marketplace',
+        label: 'Carbon Credits',
+        icon: CloudIcon,
+        description: 'Trade verified carbon credits',
+      },
+      {
+        to: '/nft-badges',
+        label: 'NFT Badges',
+        icon: AwardIcon,
+        description: 'Collect achievement badges',
+        badge: () => getNewBadgesCount(),
+      },
+      {
+        to: '/donate',
+        label: 'Donate',
+        icon: HeartIcon,
+        description: 'Support conservation efforts',
+      },
+    ],
+  },
+];
+
+// Standalone navigation items (not in groups)
+const standaloneItems: NavItemConfig[] = [
   {
     to: '/dashboard',
     label: 'Dashboard',
     icon: HomeIcon,
   },
   {
-    to: '/initiatives',
-    label: 'Initiatives',
-    icon: TreeIcon,
-  },
-  {
-    to: '/trees',
-    label: 'Tree Registry',
-    icon: LeafIcon,
-  },
-  {
-    to: '/marketplace',
-    label: 'Marketplace',
-    icon: ShoppingCartIcon,
-  },
-  {
     to: '/gamification',
-    label: 'Gamification',
+    label: 'Rewards',
     icon: TrophyIcon,
     badge: () => getUnclaimedRewardsCount(),
   },
@@ -231,20 +505,33 @@ const userMenuConfig: UserMenuItemConfig[] = [
 
 - Fixed top position
 - White background with subtle shadow
-- Height: 64px
+- Height: 72px (increased for additional elements)
 - Logo on left
-- Navigation links centered
-- User menu on right
-- Horizontal layout
+- Navigation groups in center
+- Quick actions, search, notifications, GG coins, user menu on right
+- Horizontal layout with dropdowns
 
 ### Mobile Navigation (<768px)
 
+**Top Bar:**
 - Fixed top position
+- Height: 56px
 - Hamburger menu button on left
 - Logo centered
-- User avatar on right
-- Slide-in drawer from left
+- Notification bell and user avatar on right
+
+**Bottom Navigation Bar:**
+- Fixed bottom position
+- Height: 64px
+- 5 icon buttons with labels
+- Active state with color and indicator
+- Safe area insets for iOS
+
+**Side Drawer:**
+- Slide-in from left
 - Full-height overlay
+- Organized sections
+- Touch-friendly targets (min 44px)
 
 ### Color Scheme
 
@@ -257,6 +544,12 @@ const userMenuConfig: UserMenuItemConfig[] = [
 --nav-active: #059669;
 --nav-active-bg: #d1fae5;
 
+/* Dropdowns & Mega Menus */
+--dropdown-bg: #ffffff;
+--dropdown-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+--dropdown-border: #e5e7eb;
+--dropdown-item-hover: #f3f4f6;
+
 /* User Menu */
 --user-menu-bg: #ffffff;
 --user-menu-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
@@ -265,6 +558,19 @@ const userMenuConfig: UserMenuItemConfig[] = [
 /* Mobile Menu */
 --mobile-menu-bg: #ffffff;
 --mobile-overlay-bg: rgba(0, 0, 0, 0.5);
+--bottom-nav-bg: #ffffff;
+--bottom-nav-border: #e5e7eb;
+--bottom-nav-active: #059669;
+
+/* Notifications */
+--notification-badge-bg: #ef4444;
+--notification-badge-text: #ffffff;
+--notification-unread-bg: #f0fdf4;
+
+/* GG Coins */
+--gg-coin-bg: #fef3c7;
+--gg-coin-text: #92400e;
+--gg-coin-border: #fbbf24;
 ```
 
 ### Responsive Breakpoints
@@ -272,6 +578,15 @@ const userMenuConfig: UserMenuItemConfig[] = [
 - Mobile: < 768px
 - Tablet: 768px - 1024px
 - Desktop: ≥ 1024px
+
+### Animation Timings
+
+```css
+--transition-fast: 150ms;
+--transition-base: 200ms;
+--transition-slow: 300ms;
+--ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+```
 
 ## Role-Based Navigation
 
@@ -461,35 +776,41 @@ const MarketplacePage = lazy(() => import('./pages/MarketplacePage'));
 
 ## Implementation Phases
 
-### Phase 1: Core Navigation Structure
-- Create Layout component
-- Implement Navigation component
-- Add basic routing
-- Desktop-only styling
+### Phase 1: Navigation Restructuring
+- Update navigationConfig with groups
+- Implement NavDropdown component
+- Add mega menu styling
+- Test dropdown interactions
 
-### Phase 2: User Menu
-- Implement UserMenu component
-- Add dropdown functionality
-- Integrate logout
-- Add profile/settings links
+### Phase 2: Quick Actions & Search
+- Create QuickActions component
+- Implement SearchModal component
+- Add keyboard shortcuts
+- Integrate search service
 
-### Phase 3: Mobile Responsiveness
-- Create MobileMenu component
-- Add hamburger button
-- Implement slide-in animation
-- Test touch interactions
+### Phase 3: Notifications & Rewards
+- Create NotificationCenter component
+- Implement GGCoinDisplay component
+- Add real-time subscriptions
+- Test notification updates
 
-### Phase 4: Role-Based Features
-- Implement role filtering
-- Add organization-specific items
-- Add admin menu
-- Test permission logic
+### Phase 4: Mobile Bottom Navigation
+- Create BottomNavBar component
+- Implement mobile-specific layout
+- Add touch interactions
+- Test on actual devices
 
-### Phase 5: Notifications & Polish
-- Add notification badges
-- Implement real-time updates
+### Phase 5: Enhanced User Menu
+- Update UserMenu with level/points
+- Add NFT badges link
+- Add My Journey link
+- Style user stats display
+
+### Phase 6: Polish & Optimization
 - Add animations and transitions
+- Optimize performance
 - Accessibility audit
+- Cross-browser testing
 
 ## Dependencies
 

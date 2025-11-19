@@ -26,7 +26,7 @@ import { ProtectedRoute } from './components/auth';
 import { ChatWidget } from './components/chatbot';
 import { Layout } from './components/layout';
 import { SupabaseTest } from './components/auth/SupabaseTest';
-import { PixiPreloader } from './components/common';
+import StickmanPreloader from './components/common/StickmanPreloader';
 
 // Feature flag for chatbot (can be moved to environment variable)
 const CHATBOT_ENABLED = true;
@@ -230,26 +230,38 @@ function AppContent() {
 }
 
 function App() {
+  return (
+    <BrowserRouter>
+      <AppWithRouter />
+    </BrowserRouter>
+  );
+}
+
+function AppWithRouter() {
+  const location = useLocation();
   const [showPreloader, setShowPreloader] = useState(true);
+
+  // Routes where preloader should NOT be shown
+  // Authentication pages need immediate interaction without waiting for animations
+  const excludedRoutes = ['/login', '/register', '/reset-password'];
+  const shouldShowPreloader = !excludedRoutes.includes(location.pathname);
 
   return (
     <>
-      {showPreloader && (
-        <PixiPreloader
-          minDisplayDuration={3000}
+      {shouldShowPreloader && showPreloader && (
+        <StickmanPreloader
+          minDisplayDuration={1500}
           fadeOutDuration={500}
-          autoHide={true}
-          allowSkip={false}
+          backgroundColor="#0D4D2D"
+          textColorCycleSpeed={800}
           onComplete={() => setShowPreloader(false)}
         />
       )}
-      <BrowserRouter>
-        <AuthProvider>
-          <JourneyProviderWrapper>
-            <AppContent />
-          </JourneyProviderWrapper>
-        </AuthProvider>
-      </BrowserRouter>
+      <AuthProvider>
+        <JourneyProviderWrapper>
+          <AppContent />
+        </JourneyProviderWrapper>
+      </AuthProvider>
     </>
   );
 }

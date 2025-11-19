@@ -13,7 +13,9 @@ import { TimelineController } from './preloader/AnimationTimeline';
 import { createScene1 } from './preloader/Scene1';
 import { createScene2 } from './preloader/Scene2';
 import { createScene3 } from './preloader/Scene3';
-import type { PixiPreloaderProps } from '../../types';
+import { detectUserLocation } from '../../services/geolocation.service';
+import { getFlagColors } from './preloader/flagColors';
+import type { PixiPreloaderProps, FlagColors } from '../../types';
 import { DEFAULT_PRELOADER_CONFIG } from '../../types';
 
 export const PixiPreloader: React.FC<PixiPreloaderProps> = ({
@@ -32,8 +34,27 @@ export const PixiPreloader: React.FC<PixiPreloaderProps> = ({
   const [isAnimationComplete, setIsAnimationComplete] = useState(false);
   const [canSkipNow, setCanSkipNow] = useState(false);
   const [hasError, setHasError] = useState(false);
+  const [flagColors, setFlagColors] = useState<FlagColors | undefined>(undefined);
   
   const isAppReady = useAppReady();
+
+  // Detect user location and get flag colors
+  useEffect(() => {
+    const detectLocation = async () => {
+      try {
+        const location = await detectUserLocation();
+        const colors = getFlagColors(location.countryCode);
+        setFlagColors(colors);
+        console.log(`Using flag colors for: ${location.country} (${location.countryCode})`);
+      } catch (error) {
+        console.warn('Failed to detect location, using default (Kenya):', error);
+        // Default to Kenya colors
+        setFlagColors(getFlagColors('KE'));
+      }
+    };
+
+    detectLocation();
+  }, []);
 
   // Initialize Pixi.js application
   useEffect(() => {
@@ -83,7 +104,7 @@ export const PixiPreloader: React.FC<PixiPreloaderProps> = ({
           createScene3(),
         ];
 
-        // Create and start timeline
+        // Create and start timeline with flag colors
         timeline = new TimelineController(
           scenes,
           mainContainer,
@@ -92,7 +113,8 @@ export const PixiPreloader: React.FC<PixiPreloaderProps> = ({
             if (mounted) {
               setIsAnimationComplete(true);
             }
-          }
+          },
+          flagColors
         );
 
         timelineRef.current = timeline;
@@ -115,7 +137,10 @@ export const PixiPreloader: React.FC<PixiPreloaderProps> = ({
       }
     };
 
-    initPixi();
+    // Only initialize Pixi after flag colors are loaded
+    if (flagColors) {
+      initPixi();
+    }
 
     // Cleanup
     return () => {
@@ -140,7 +165,7 @@ export const PixiPreloader: React.FC<PixiPreloaderProps> = ({
         appRef.current = null;
       }
     };
-  }, [hasError]);
+  }, [hasError, flagColors]);
 
   // Handle minimum display duration
   useEffect(() => {

@@ -79,6 +79,7 @@ export type {
   PreloaderConfig,
   SceneConfig,
   AnimationTimeline,
+  FlagColors,
 } from './preloader.types';
 
 export { DEFAULT_PRELOADER_CONFIG } from './preloader.types';

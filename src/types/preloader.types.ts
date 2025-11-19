@@ -43,6 +43,23 @@ export interface PreloaderState {
 }
 
 /**
+ * Flag colors for Scene 3 background
+ */
+export interface FlagColors {
+  /** Primary color (hex number) */
+  primary: number;
+  
+  /** Secondary color (hex number) */
+  secondary: number;
+  
+  /** Tertiary color (hex number) */
+  tertiary: number;
+  
+  /** Accent color (hex number) */
+  accent: number;
+}
+
+/**
  * Scene configuration for Pixi.js animations
  */
 export interface SceneConfig {
@@ -56,7 +73,7 @@ export interface SceneConfig {
   endTime: number;
   
   /** Setup function to initialize scene elements */
-  setup: (container: Container) => void;
+  setup: (container: Container, flagColors?: FlagColors) => void;
   
   /** Animation function called on each frame with progress (0-1) */
   animate: (container: Container, progress: number) => void;

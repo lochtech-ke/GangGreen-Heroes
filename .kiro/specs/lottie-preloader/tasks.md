@@ -27,122 +27,70 @@
   - Use vibrant greens (#00FF00, #228B22), brown (#654321), sky blue (#87CEEB)
   - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5_
 
-- [x] 4. Implement Scene 3: Message display with Kenyan flag colors
+- [ ] 4. Implement geolocation detection service
+  - Create `src/services/geolocation.service.ts` module
+  - Implement function to detect user's country using browser Geolocation API
+  - Integrate with free geolocation service (ipapi.co or ip-api.com) to convert coordinates to country
+  - Implement localStorage caching to avoid repeated API calls
+  - Add error handling and fallback to Kenya as default
+  - Export GeolocationData interface and detection function
+  - _Requirements: 4.2, 4.7_
 
+- [ ] 5. Create flag color mappings
+  - Create `src/components/common/preloader/flagColors.ts` module
+  - Define FlagColors interface with primary, secondary, tertiary, and accent colors
+  - Create FLAG_COLORS mapping for African countries (Kenya, Nigeria, South Africa, Ghana, Ethiopia, etc.)
+  - Export function to get flag colors by country code with Kenya as default
+  - _Requirements: 4.3, 4.7_
 
-  - Create `src/components/common/preloader/Scene3.ts` module
-  - Implement parallax background layers with Kenyan flag colors (black, red, green, white)
+- [ ] 6. Create animation easing utilities
+  - Create `src/components/common/preloader/easingFunctions.ts` module
+  - Implement easing functions: easeInOutCubic, easeOutElastic, easeInOutQuad
+  - Export utility functions for smooth animations
+  - _Requirements: 7.2_
+
+- [ ] 7. Enhance Scene 1 with visual improvements
+  - Update `src/components/common/preloader/Scene1.ts` with particle effects
+  - Add soil particle system for digging animation
+  - Implement smooth easing for character movements
+  - Add gradient background for depth
+  - Apply drop shadows to character and seedling
+  - Enhance color vibrancy and contrast
+  - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 7.1, 7.2, 7.3, 7.4, 7.7_
+
+- [ ] 8. Enhance Scene 2 with visual improvements
+  - Update `src/components/common/preloader/Scene2.ts` with particle effects
+  - Add leaf particle system for growth animation
+  - Implement smooth easing for tree growth
+  - Add gradient sky background with lighting effects
+  - Apply glow effect to growing tree
+  - Add subtle wind animation to leaves
+  - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5, 7.1, 7.2, 7.3, 7.4, 7.7_
+
+- [ ] 9. Implement Scene 3 with geolocation-based flag colors
+  - Update `src/components/common/preloader/Scene3.ts` to accept flagColors parameter
+  - Implement parallax background layers with dynamic flag colors
   - Add Pixi.js BlurFilter to background layers
-  - Create text sprites for "Chill Kiasi..." message
+  - Create text sprites for "Chill Kiasi..." message with crisp anti-aliasing
   - Add hashtags "#GangGreen" and "#GreenBeltMovement" below main text
   - Implement fade-in animation and parallax scrolling effect (1.5s duration)
-  - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5_
+  - Apply smooth color transitions and text shadows
+  - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7, 7.5, 7.6, 7.7_
 
-- [x] 5. Implement animation timeline controller
+- [ ] 10. Update animation timeline controller
+  - Update `src/components/common/preloader/AnimationTimeline.ts` to pass flagColors to Scene 3
+  - Implement smooth scene transitions with color blending
+  - Ensure 60 FPS performance monitoring
+  - Add frame drop detection and quality adjustment
+  - _Requirements: 1.4, 2.3, 3.3, 7.1, 7.6_
 
-
-
-  - Create `src/components/common/preloader/AnimationTimeline.ts` module
-  - Implement timeline management for sequential scene playback
-  - Create scene transition logic with proper cleanup between scenes
-  - Implement progress tracking and scene switching at correct timestamps
-  - Handle Pixi.js ticker for 60 FPS animation loop
-  - _Requirements: 1.4, 2.3, 3.3_
-
-- [x] 6. Implement fallback loader component
-
-
-  - Create `src/components/common/FallbackLoader.tsx` with simple CSS spinner
-  - Style with Tailwind CSS using #GangGreen branding colors
-  - Add #GangGreen text below spinner
-  - Ensure responsive design for all screen sizes
-  - _Requirements: 5.4_
-
-- [x] 7. Implement app readiness tracking hook
-
-
-  - Create `src/hooks/useAppReady.ts` custom hook
-  - Track application initialization state (Supabase connection, route loading, etc.)
-  - Return boolean indicating when app is ready to display
-  - Handle edge cases for slow network conditions
-  - _Requirements: 1.3, 6.3_
-
-- [x] 8. Implement main PixiPreloader component
-
-  - [x] 8.1 Create component structure and Pixi.js initialization
-
-
-    - Create `src/components/common/PixiPreloader.tsx`
-    - Initialize Pixi.js Application with WebGL renderer
-    - Set up canvas element and attach to DOM
-    - Implement component state management for visibility and animation status
-    - Handle window resize events for responsive scaling
-    - _Requirements: 1.1, 5.2, 5.3, 6.1, 6.2, 6.3, 6.4_
-
-  - [x] 8.2 Integrate scenes and animation timeline
-
-    - Import Scene1, Scene2, Scene3 modules
-    - Initialize AnimationTimeline with scene configurations
-    - Wire up scene transitions and progress tracking
-    - Implement animation completion detection
-    - _Requirements: 1.4, 5.5_
-
-  - [x] 8.3 Implement timing and visibility logic
-
-    - Enforce minimum display duration using setTimeout
-    - Track app readiness state using useAppReady hook
-    - Calculate when to trigger fade-out based on animation completion and app readiness
-    - Implement fade-out transition with configurable duration
-    - _Requirements: 1.2, 1.3, 1.5, 6.1, 6.2_
-
-  - [x] 8.4 Implement error handling and fallback
-
-    - Detect WebGL support using feature detection
-    - Display FallbackLoader component if WebGL initialization fails
-    - Log errors to console for debugging
-    - Ensure preloader doesn't block app initialization
-    - _Requirements: 5.4_
-
-  - [x] 8.5 Implement cleanup and resource management
-
-    - Properly destroy Pixi.js application on component unmount
-    - Release WebGL context and textures
-    - Remove event listeners
-    - Prevent memory leaks
-    - _Requirements: 1.3_
-
-  - [x] 8.6 Add accessibility features
-
-    - Add ARIA attributes for screen readers (role, aria-live, aria-label)
-    - Implement prefers-reduced-motion media query support
-    - Ensure keyboard accessibility for skip functionality (if enabled)
-    - _Requirements: 1.1_
-
-  - [x] 8.7 Implement optional skip functionality
-
-    - Add skip button that appears after minimum display duration
-    - Wire skip button to immediately trigger fade-out
-    - Make skip button keyboard accessible
-    - Style skip button with Tailwind CSS
-    - _Requirements: 6.5_
-
-- [x] 9. Integrate preloader into application
-
-
-
-  - Import PixiPreloader in `src/App.tsx` or `src/main.tsx`
-  - Wrap main application content with conditional rendering based on preloader visibility
-  - Pass appropriate configuration props to preloader
-  - Test integration with React Suspense boundaries
-  - _Requirements: 1.1, 1.2, 1.3_
-
-- [x] 10. Export components from index files
-
-
-  - Export PixiPreloader from `src/components/common/index.ts`
-  - Export FallbackLoader from `src/components/common/index.ts`
-  - Export useAppReady hook from `src/hooks/index.ts`
-  - _Requirements: 5.5_
+- [ ] 11. Update main PixiPreloader component with geolocation
+  - Update `src/components/common/PixiPreloader.tsx` to detect user location on mount
+  - Call geolocation service to get country and flag colors
+  - Pass flag colors to Scene 3 setup function
+  - Handle geolocation errors gracefully with Kenya fallback
+  - Add loading state for geolocation detection
+  - _Requirements: 4.2, 4.3, 4.7_
 
 - [ ]*  11. Write unit tests for components and hooks
   - [ ]* 11.1 Test PixiPreloader component
@@ -179,14 +127,17 @@
     - Verify preloader hides when app is ready
     - Verify minimum display duration is respected
     - Test skip functionality (if enabled)
-    - _Requirements: 1.1, 1.2, 1.3, 1.5, 6.5_
+    - Test geolocation detection and flag color display
+    - Test fallback to Kenya when geolocation fails
+    - _Requirements: 1.1, 1.2, 1.3, 1.5, 4.2, 4.7, 6.5_
 
   - [ ]* 12.2 Test responsive behavior
     - Test animation renders correctly on desktop (1920x1080)
     - Test animation scales on tablet (768x1024)
     - Test animation scales on mobile (375x667)
     - Verify aspect ratio is maintained
-    - _Requirements: 5.2, 5.3_
+    - Test visual enhancements on different screen sizes
+    - _Requirements: 5.2, 5.3, 7.1_
 
   - [ ]* 12.3 Test performance
     - Verify Pixi.js initializes within 500ms
@@ -195,13 +146,23 @@
     - Check for memory leaks
     - Verify smooth fade-out transition
     - Verify WebGL context is properly released on cleanup
-    - _Requirements: 5.1, 5.2_
+    - Test particle effects performance
+    - _Requirements: 5.1, 5.2, 7.1, 7.3_
 
   - [ ]* 12.4 Test accessibility
     - Verify screen reader announcements
     - Test keyboard navigation for skip button
     - Verify prefers-reduced-motion support
     - _Requirements: 1.1_
+
+  - [ ]* 12.5 Test visual quality
+    - Verify smooth easing on all animations
+    - Test particle effects in Scene 1 and Scene 2
+    - Verify gradient backgrounds and lighting effects
+    - Test text crispness and anti-aliasing
+    - Verify shadow and glow effects
+    - Test color transitions between scenes
+    - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 7.6, 7.7_
 
 - [ ]* 13. Create documentation
   - Document component usage in README or component comments

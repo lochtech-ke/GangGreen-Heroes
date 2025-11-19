@@ -1,0 +1,155 @@
+/**
+ * StickmanPreloader CSS Animations
+ * 
+ * This file contains all CSS animations for the StickmanPreloader component.
+ * These animations are currently embedded in the component via a <style> tag,
+ * but can be imported here if preferred for better separation of concerns.
+ * 
+ * To use this file instead of inline styles:
+ * 1. Import this CSS file in StickmanPreloader.tsx
+ * 2. Remove the <style> tag from the component
+ * 3. Keep the class names on elements
+ */
+
+/* Stickman planting gesture animation */
+@keyframes stickman-plant {
+  0% {
+    /* Standing upright */
+    transform: translateY(0);
+  }
+  25% {
+    /* Bending down */
+    transform: translateY(15px);
+  }
+  50% {
+    /* Planting gesture - hands to ground */
+    transform: translateY(20px);
+  }
+  75% {
+    /* Standing back up */
+    transform: translateY(10px);
+  }
+  100% {
+    /* Back to standing */
+    transform: translateY(0);
+  }
+}
+
+/* Left arm planting motion */
+@keyframes arm-plant-left {
+  0%, 100% {
+    d: path("M 100 85 Q 75 95 65 110");
+  }
+  50% {
+    d: path("M 100 85 Q 80 120 75 145");
+  }
+}
+
+/* Right arm planting motion */
+@keyframes arm-plant-right {
+  0%, 100% {
+    d: path("M 100 85 Q 125 95 135 110");
+  }
+  50% {
+    d: path("M 100 85 Q 120 120 125 145");
+  }
+}
+
+/* Seedling appear/disappear animation */
+@keyframes seedling-appear {
+  0%, 40% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  50%, 60% {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+  70%, 100% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+}
+
+/* Text color cycle with light box effect */
+@keyframes text-color-cycle {
+  0% {
+    color: #FF0000;
+    text-shadow: 
+      0 0 10px rgba(255, 0, 0, 0.8),
+      0 0 20px rgba(255, 0, 0, 0.6),
+      0 0 30px rgba(255, 0, 0, 0.4),
+      0 0 40px rgba(255, 0, 0, 0.2);
+  }
+  25% {
+    color: #00FF00;
+    text-shadow: 
+      0 0 10px rgba(0, 255, 0, 0.8),
+      0 0 20px rgba(0, 255, 0, 0.6),
+      0 0 30px rgba(0, 255, 0, 0.4),
+      0 0 40px rgba(0, 255, 0, 0.2);
+  }
+  50% {
+    color: #000000;
+    text-shadow: 
+      0 0 10px rgba(102, 102, 102, 0.8),
+      0 0 20px rgba(102, 102, 102, 0.6),
+      0 0 30px rgba(102, 102, 102, 0.4),
+      0 0 40px rgba(102, 102, 102, 0.2);
+  }
+  75% {
+    color: #FFFFFF;
+    text-shadow: 
+      0 0 10px rgba(255, 255, 255, 0.8),
+      0 0 20px rgba(255, 255, 255, 0.6),
+      0 0 30px rgba(255, 255, 255, 0.4),
+      0 0 40px rgba(255, 255, 255, 0.2);
+  }
+  100% {
+    color: #FF0000;
+    text-shadow: 
+      0 0 10px rgba(255, 0, 0, 0.8),
+      0 0 20px rgba(255, 0, 0, 0.6),
+      0 0 30px rgba(255, 0, 0, 0.4),
+      0 0 40px rgba(255, 0, 0, 0.2);
+  }
+}
+
+/* Apply animations to stickman parts */
+.stickman-part {
+  animation: stickman-plant 3s ease-in-out infinite;
+}
+
+.stickman-left-arm {
+  animation: stickman-plant 3s ease-in-out infinite, arm-plant-left 3s ease-in-out infinite;
+}
+
+.stickman-right-arm {
+  animation: stickman-plant 3s ease-in-out infinite, arm-plant-right 3s ease-in-out infinite;
+}
+
+.stickman-seedling {
+  animation: seedling-appear 3s ease-in-out infinite;
+  transform-origin: center;
+}
+
+/* Apply text color cycle animation */
+.pulsating-text {
+  animation: text-color-cycle var(--cycle-duration) infinite;
+}
+
+/* Reduced motion support - disable animations for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .stickman-part,
+  .stickman-left-arm,
+  .stickman-right-arm,
+  .stickman-seedling {
+    animation: none;
+  }
+  
+  .pulsating-text {
+    animation: none;
+    color: white;
+    text-shadow: none;
+  }
+}

@@ -6,7 +6,7 @@
  */
 
 import { Container, Ticker } from 'pixi.js';
-import type { SceneConfig, AnimationTimeline } from '../../../types';
+import type { SceneConfig, AnimationTimeline, FlagColors } from '../../../types';
 
 /**
  * Creates and manages the animation timeline
@@ -18,12 +18,14 @@ export class TimelineController {
   private onComplete?: () => void;
   private isPlaying: boolean = false;
   private currentSceneContainer: Container | null = null;
+  private flagColors?: FlagColors;
 
   constructor(
     scenes: SceneConfig[],
     container: Container,
     ticker: Ticker,
-    onComplete?: () => void
+    onComplete?: () => void,
+    flagColors?: FlagColors
   ) {
     // Calculate total duration and validate scenes
     const totalDuration = scenes.reduce((sum, scene) => sum + scene.duration, 0);
@@ -38,6 +40,7 @@ export class TimelineController {
     this.container = container;
     this.ticker = ticker;
     this.onComplete = onComplete;
+    this.flagColors = flagColors;
   }
 
   /**
@@ -141,7 +144,12 @@ export class TimelineController {
 
     const newScene = this.timeline.scenes[targetScene];
     if (newScene) {
-      newScene.setup(this.currentSceneContainer);
+      // Pass flag colors to Scene 3 (index 2)
+      if (targetScene === 2 && this.flagColors) {
+        newScene.setup(this.currentSceneContainer, this.flagColors);
+      } else {
+        newScene.setup(this.currentSceneContainer);
+      }
     }
   }
 

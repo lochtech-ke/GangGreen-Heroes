@@ -4,10 +4,12 @@
  * 
  * This scene shows a simple animated character planting a seedling,
  * representing grassroots conservation efforts.
+ * Enhanced with particle effects, smooth easing, and visual depth.
  */
 
-import { Container, Graphics } from 'pixi.js';
+import { Container, Graphics, BlurFilter } from 'pixi.js';
 import type { SceneConfig } from '../../../types';
+import { easeInOutCubic, easeOutQuad, interpolate } from './easingFunctions';
 
 // Color palette
 const COLORS = {
@@ -18,16 +20,30 @@ const COLORS = {
   skinTone: 0x8D5524,
   soil: 0x6B4423,
   sky: 0xE8F4F8,
+  sunlight: 0xFFF8DC,
+  shadow: 0x000000,
 };
+
+// Particle interface
+interface Particle {
+  graphics: Graphics;
+  vx: number;
+  vy: number;
+  life: number;
+  maxLife: number;
+}
 
 /**
  * Creates Scene 1 configuration
  */
 export function createScene1(): SceneConfig {
   let child: Graphics;
+  let childShadow: Graphics;
   let seedling: Graphics;
-  let soilParticles: Graphics[] = [];
+  let seedlingShadow: Graphics;
+  let soilParticles: Particle[] = [];
   let background: Graphics;
+  let sunGlow: Graphics;
 
   return {
     duration: 2000,
@@ -40,11 +56,30 @@ export function createScene1(): SceneConfig {
       const centerX = width / 2;
       const centerY = height / 2;
 
-      // Create green overlay background
+      // Create gradient background with depth
       background = new Graphics();
-      background.rect(0, 0, width, height);
-      background.fill({ color: 0x10B981, alpha: 0.15 }); // Green overlay
+      // Sky gradient (top to bottom)
+      const gradientSteps = 20;
+      for (let i = 0; i < gradientSteps; i++) {
+        const y = (height / gradientSteps) * i;
+        const h = height / gradientSteps;
+        const t = i / gradientSteps;
+        // Interpolate from light sky blue to warm earth tone
+        const r = Math.round(232 + (139 - 232) * t);
+        const g = Math.round(244 + (195 - 244) * t);
+        const b = Math.round(248 + (154 - 248) * t);
+        const color = (r << 16) | (g << 8) | b;
+        background.rect(0, y, width, h);
+        background.fill({ color, alpha: 1 });
+      }
       container.addChild(background);
+
+      // Add sun glow effect
+      sunGlow = new Graphics();
+      sunGlow.circle(width * 0.8, height * 0.2, 60);
+      sunGlow.fill({ color: COLORS.sunlight, alpha: 0.3 });
+      sunGlow.filters = [new BlurFilter({ strength: 20 })];
+      container.addChild(sunGlow);
 
       // Create child character (hand-drawn style)
       child = new Graphics();
@@ -104,6 +139,15 @@ export function createScene1(): SceneConfig {
       child.lineTo(8, 35);
       child.stroke({ width: 4, color: COLORS.brown });
 
+      // Create child shadow
+      childShadow = new Graphics();
+      childShadow.ellipse(0, 0, 25, 8);
+      childShadow.fill({ color: COLORS.shadow, alpha: 0.2 });
+      childShadow.filters = [new BlurFilter({ strength: 4 })];
+      childShadow.x = centerX;
+      childShadow.y = centerY + 60;
+      container.addChild(childShadow);
+
       // Position child in center (responsive)
       child.x = centerX;
       child.y = centerY + 20;
@@ -145,21 +189,41 @@ export function createScene1(): SceneConfig {
       seedling.fill(COLORS.lightGreen);
       seedling.stroke({ width: 1, color: COLORS.green, alpha: 0.7 });
 
+      // Create seedling shadow
+      seedlingShadow = new Graphics();
+      seedlingShadow.ellipse(0, 0, 8, 3);
+      seedlingShadow.fill({ color: COLORS.shadow, alpha: 0.15 });
+      seedlingShadow.filters = [new BlurFilter({ strength: 2 })];
+      seedlingShadow.x = centerX + 40;
+      seedlingShadow.y = centerY + 58;
+      seedlingShadow.alpha = 0;
+      container.addChild(seedlingShadow);
+
       // Position seedling near child (responsive)
       seedling.x = centerX + 40;
       seedling.y = centerY + 55;
       seedling.alpha = 0; // Start invisible
       container.addChild(seedling);
 
-      // Create soil particles
-      for (let i = 0; i < 8; i++) {
+      // Create enhanced soil particle system
+      for (let i = 0; i < 20; i++) {
         const particle = new Graphics();
-        particle.circle(0, 0, 2 + Math.random() * 2);
+        const size = 1 + Math.random() * 3;
+        particle.circle(0, 0, size);
         particle.fill(COLORS.soil);
-        particle.x = seedling.x + (Math.random() - 0.5) * 20;
-        particle.y = seedling.y + (Math.random() - 0.5) * 10;
+        
+        const particleData: Particle = {
+          graphics: particle,
+          vx: (Math.random() - 0.5) * 2,
+          vy: -Math.random() * 3 - 1,
+          life: 0,
+          maxLife: 0.5 + Math.random() * 0.5,
+        };
+        
+        particle.x = centerX + 40 + (Math.random() - 0.5) * 15;
+        particle.y = centerY + 55;
         particle.alpha = 0;
-        soilParticles.push(particle);
+        soilParticles.push(particleData);
         container.addChild(particle);
       }
     },
@@ -170,54 +234,95 @@ export function createScene1(): SceneConfig {
       const centerX = width / 2;
       const centerY = height / 2;
 
-      // Animation phases:
+      // Animation phases with smooth easing:
       // 0-0.3: Child kneels down
-      // 0.3-0.5: Digging motion
+      // 0.3-0.5: Digging motion with particles
       // 0.5-0.7: Place seedling
       // 0.7-1.0: Cover with soil
 
       if (progress < 0.3) {
-        // Phase 1: Kneeling down
+        // Phase 1: Kneeling down with smooth easing
         const kneeProgress = progress / 0.3;
-        child.y = centerY + 20 + (kneeProgress * 20);
-        child.rotation = kneeProgress * 0.2;
+        const easedProgress = easeInOutCubic(kneeProgress);
+        child.y = interpolate(centerY + 20, centerY + 40, easedProgress);
+        child.rotation = interpolate(0, 0.2, easedProgress);
+        
+        // Shadow grows as child kneels
+        childShadow.scale.x = interpolate(1, 1.2, easedProgress);
+        childShadow.alpha = interpolate(0.2, 0.25, easedProgress);
+        
       } else if (progress < 0.5) {
-        // Phase 2: Digging motion (arm movement)
+        // Phase 2: Digging motion with enhanced particles
         const digProgress = (progress - 0.3) / 0.2;
-        const wobble = Math.sin(digProgress * Math.PI * 4) * 5;
+        const wobble = Math.sin(digProgress * Math.PI * 6) * 3;
         child.x = centerX + wobble;
         
-        // Show soil particles
-        soilParticles.forEach((particle) => {
-          particle.alpha = Math.sin(digProgress * Math.PI);
-          particle.y -= digProgress * 0.5;
+        // Animate soil particles with physics
+        soilParticles.forEach((particleData, index) => {
+          const particle = particleData.graphics;
+          const particleProgress = Math.max(0, digProgress - (index * 0.02));
+          
+          if (particleProgress > 0) {
+            particleData.life = Math.min(particleData.maxLife, particleData.life + 0.02);
+            const lifeRatio = particleData.life / particleData.maxLife;
+            
+            // Apply physics
+            particle.x += particleData.vx;
+            particle.y += particleData.vy;
+            particleData.vy += 0.2; // Gravity
+            
+            // Fade based on life
+            particle.alpha = easeOutQuad(1 - lifeRatio) * 0.8;
+          }
         });
+        
       } else if (progress < 0.7) {
-        // Phase 3: Place seedling
+        // Phase 3: Place seedling with smooth scaling
         const placeProgress = (progress - 0.5) / 0.2;
-        seedling.alpha = placeProgress;
-        seedling.scale.set(placeProgress);
+        const easedProgress = easeOutQuad(placeProgress);
+        seedling.alpha = easedProgress;
+        seedling.scale.set(easedProgress);
+        seedlingShadow.alpha = easedProgress * 0.15;
+        seedlingShadow.scale.set(easedProgress);
+        
+        // Slight bounce effect
+        const bounce = Math.sin(easedProgress * Math.PI) * 5;
+        seedling.y = centerY + 55 - bounce;
+        
       } else {
-        // Phase 4: Cover with soil
+        // Phase 4: Cover with soil and stand up
         const coverProgress = (progress - 0.7) / 0.3;
+        const easedProgress = easeInOutCubic(coverProgress);
         
         // Fade out soil particles
-        soilParticles.forEach((particle) => {
-          particle.alpha = 1 - coverProgress;
+        soilParticles.forEach((particleData) => {
+          const particle = particleData.graphics;
+          particle.alpha *= 0.95; // Gradual fade
         });
         
-        // Child stands up slightly
-        child.y = centerY + 40 - (coverProgress * 10);
-        child.rotation = 0.2 - (coverProgress * 0.1);
+        // Child stands up slightly with smooth easing
+        child.y = interpolate(centerY + 40, centerY + 30, easedProgress);
+        child.rotation = interpolate(0.2, 0.1, easedProgress);
+        
+        // Shadow adjusts
+        childShadow.scale.x = interpolate(1.2, 1, easedProgress);
+      }
+      
+      // Subtle sun glow pulsing
+      if (sunGlow) {
+        sunGlow.alpha = 0.3 + Math.sin(progress * Math.PI * 2) * 0.1;
       }
     },
 
     cleanup: (container: Container) => {
       // Remove all elements
       if (background) container.removeChild(background);
+      if (sunGlow) container.removeChild(sunGlow);
+      if (childShadow) container.removeChild(childShadow);
       if (child) container.removeChild(child);
+      if (seedlingShadow) container.removeChild(seedlingShadow);
       if (seedling) container.removeChild(seedling);
-      soilParticles.forEach((particle) => container.removeChild(particle));
+      soilParticles.forEach((particleData) => container.removeChild(particleData.graphics));
       
       // Clear references
       soilParticles = [];
