@@ -4,7 +4,6 @@ import type {
   MicroChallenge,
   MicroChallengeRow,
   UserChallengeProgress,
-  UserChallengeProgressRow,
   ChallengeFilters,
   JoinChallengeParams,
   UpdateProgressParams,

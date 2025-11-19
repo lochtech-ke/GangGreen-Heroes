@@ -179,7 +179,7 @@ export const FeedAnalytics: React.FC = () => {
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
-                data={analytics.platformBreakdown}
+                data={analytics.platformBreakdown as any[]}
                 dataKey="count"
                 nameKey="platform"
                 cx="50%"

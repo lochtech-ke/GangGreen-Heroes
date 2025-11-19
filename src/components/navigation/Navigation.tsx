@@ -6,7 +6,16 @@ import { authService } from '../../services/auth.service';
 import { NavItem } from './NavItem';
 import { UserMenu } from './UserMenu';
 import { MobileMenu } from './MobileMenu';
-import { getNavigationItems } from './navigationConfig';
+import { NavDropdown } from './NavDropdown';
+import { QuickActions } from './QuickActions';
+import { NotificationCenter } from './NotificationCenter';
+import { GGCoinDisplay } from './GGCoinDisplay';
+import {
+  getNavigationItems,
+  getNavigationGroups,
+  getStandaloneItems,
+  getAdminItems,
+} from './navigationConfig';
 
 interface NavigationProps {
   className?: string;
@@ -16,9 +25,13 @@ export function Navigation({ className = '' }: NavigationProps) {
   const { user } = useAuthContext();
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   // Get navigation items based on user role
   const navigationItems = getNavigationItems(user?.role);
+  const navigationGroups = getNavigationGroups(user?.role);
+  const standaloneItems = getStandaloneItems(user?.role);
+  const adminItems = getAdminItems(user?.role);
 
   // Handle logout
   const handleLogout = async () => {
@@ -31,6 +44,16 @@ export function Navigation({ className = '' }: NavigationProps) {
     }
   };
 
+  // Handle dropdown toggle
+  const handleDropdownToggle = (groupId: string) => {
+    setOpenDropdown(openDropdown === groupId ? null : groupId);
+  };
+
+  // Close all dropdowns
+  const closeAllDropdowns = () => {
+    setOpenDropdown(null);
+  };
+
   return (
     <>
       <nav
@@ -38,21 +61,22 @@ export function Navigation({ className = '' }: NavigationProps) {
         aria-label="Main navigation"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            {/* Mobile Menu Button */}
-            <div className="flex items-center md:hidden">
-              <button
-                onClick={() => setIsMobileMenuOpen(true)}
-                className="p-2 rounded-md text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-green-500"
-                aria-label="Open menu"
-                aria-expanded={isMobileMenuOpen}
-              >
-                <Menu className="w-6 h-6" />
-              </button>
-            </div>
+          <div className="flex justify-between items-center h-18">
+            {/* Left Section: Mobile Menu Button + Logo */}
+            <div className="flex items-center gap-4">
+              {/* Mobile Menu Button */}
+              <div className="md:hidden">
+                <button
+                  onClick={() => setIsMobileMenuOpen(true)}
+                  className="p-2 rounded-md text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-green-500"
+                  aria-label="Open menu"
+                  aria-expanded={isMobileMenuOpen}
+                >
+                  <Menu className="w-6 h-6" />
+                </button>
+              </div>
 
-            {/* Logo */}
-            <div className="flex items-center">
+              {/* Logo */}
               <Link
                 to="/dashboard"
                 className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
@@ -66,22 +90,63 @@ export function Navigation({ className = '' }: NavigationProps) {
               </Link>
             </div>
 
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex md:items-center md:space-x-1">
-              {navigationItems.map((item) => (
+            {/* Center Section: Desktop Navigation */}
+            <div className="hidden md:flex md:items-center md:space-x-2">
+              {/* Standalone Items */}
+              {standaloneItems.map((item) => (
                 <NavItem
                   key={item.to}
                   to={item.to}
                   icon={item.icon}
                   label={item.label}
-                  badge={item.badge}
+                  badge={typeof item.badge === 'function' ? item.badge() : item.badge}
                 />
               ))}
+
+              {/* Navigation Groups (Dropdowns) */}
+              {navigationGroups.map((group) => (
+                <NavDropdown
+                  key={group.id}
+                  group={group}
+                  isOpen={openDropdown === group.id}
+                  onToggle={() => handleDropdownToggle(group.id)}
+                  onClose={closeAllDropdowns}
+                />
+              ))}
+
+              {/* Admin Items */}
+              {adminItems.length > 0 && (
+                <div className="border-l border-gray-200 pl-2 ml-2">
+                  {adminItems.map((item) => (
+                    <NavItem
+                      key={item.to}
+                      to={item.to}
+                      icon={item.icon}
+                      label={item.label}
+                      badge={typeof item.badge === 'function' ? item.badge() : item.badge}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
 
-            {/* User Menu */}
+            {/* Right Section: Actions + User Menu */}
             {user && (
-              <div className="flex items-center">
+              <div className="flex items-center gap-2">
+                {/* Quick Actions - Desktop Only */}
+                <div className="hidden lg:block">
+                  <QuickActions userId={user.id} userRole={user.role} />
+                </div>
+
+                {/* GG Coin Display - Desktop Only */}
+                <div className="hidden md:block">
+                  <GGCoinDisplay userId={user.id} />
+                </div>
+
+                {/* Notification Center */}
+                <NotificationCenter userId={user.id} />
+
+                {/* User Menu */}
                 <UserMenu user={user} onLogout={handleLogout} />
               </div>
             )}
