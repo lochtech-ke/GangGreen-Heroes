@@ -126,6 +126,11 @@ SET role = 'admin'
 WHERE email = 'admin@ganggreen.org';
 ```
 
+**For detailed admin management, see:**
+- `supabase/ADMIN_MANAGEMENT_GUIDE.md` - Complete admin management guide
+- `supabase/admin-management.sql` - All SQL queries for admin management
+- `scripts/grant-admin.ps1` - PowerShell helper script
+
 ### 2. Seed Initial Data (Optional)
 
 #### Forest Data

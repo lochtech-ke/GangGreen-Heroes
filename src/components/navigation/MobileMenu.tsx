@@ -1,14 +1,16 @@
-import { useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { X, User, Settings, LogOut } from 'lucide-react';
-import { NavItem } from './NavItem';
-import type { NavItemConfig } from './types';
+import { useEffect, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { X, User, Settings, LogOut, ChevronRight, ChevronDown } from 'lucide-react';
+import { Icon } from './iconMap';
+import type { NavItemConfig, NavGroupConfig } from './types';
 import type { User as UserType } from '../../types/user.types';
 
 interface MobileMenuProps {
   isOpen: boolean;
   onClose: () => void;
-  navItems: NavItemConfig[];
+  standaloneItems: NavItemConfig[];
+  navigationGroups: NavGroupConfig[];
+  adminItems: NavItemConfig[];
   user: UserType;
   onLogout: () => Promise<void>;
 }
@@ -16,10 +18,28 @@ interface MobileMenuProps {
 export function MobileMenu({
   isOpen,
   onClose,
-  navItems,
+  standaloneItems,
+  navigationGroups,
+  adminItems,
   user,
   onLogout,
 }: MobileMenuProps) {
+  const location = useLocation();
+  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
+
+  // Toggle group expansion
+  const toggleGroup = (groupId: string) => {
+    setExpandedGroups((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(groupId)) {
+        newSet.delete(groupId);
+      } else {
+        newSet.add(groupId);
+      }
+      return newSet;
+    });
+  };
+
   // Prevent body scroll when menu is open
   useEffect(() => {
     if (isOpen) {
@@ -44,6 +64,20 @@ export function MobileMenu({
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
   }, [isOpen, onClose]);
+
+  // Auto-expand active group
+  useEffect(() => {
+    if (isOpen) {
+      navigationGroups.forEach((group) => {
+        const hasActiveItem = group.items.some(
+          (item) => item.to === location.pathname || location.pathname.startsWith(`${item.to}/`)
+        );
+        if (hasActiveItem) {
+          setExpandedGroups((prev) => new Set(prev).add(group.id));
+        }
+      });
+    }
+  }, [isOpen, location.pathname, navigationGroups]);
 
   if (!isOpen) return null;
 
@@ -102,17 +136,118 @@ export function MobileMenu({
 
         {/* Navigation Links */}
         <nav className="flex-1 overflow-y-auto p-4">
-          <div className="space-y-1">
-            {navItems.map((item) => (
-              <div key={item.to} onClick={onClose}>
-                <NavItem
+          <div className="space-y-2">
+            {/* Standalone Items */}
+            {standaloneItems.map((item) => {
+              const isActive = location.pathname === item.to || location.pathname.startsWith(`${item.to}/`);
+              return (
+                <Link
+                  key={item.to}
                   to={item.to}
-                  icon={item.icon}
-                  label={item.label}
-                  badge={item.badge}
-                />
-              </div>
-            ))}
+                  onClick={onClose}
+                  className={`
+                    flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium
+                    transition-colors
+                    ${isActive ? 'bg-green-50 text-green-700' : 'text-gray-700 hover:bg-gray-50'}
+                  `}
+                >
+                  <Icon name={item.icon} className="w-5 h-5" />
+                  <span className="flex-1">{item.label}</span>
+                  {item.badge && typeof item.badge === 'number' && item.badge > 0 && (
+                    <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-xs font-bold text-white bg-red-500 rounded-full">
+                      {item.badge > 9 ? '9+' : item.badge}
+                    </span>
+                  )}
+                </Link>
+              );
+            })}
+
+            {/* Navigation Groups */}
+            {navigationGroups.map((group) => {
+              const isExpanded = expandedGroups.has(group.id);
+              const hasActiveItem = group.items.some(
+                (item) => item.to === location.pathname || location.pathname.startsWith(`${item.to}/`)
+              );
+
+              return (
+                <div key={group.id} className="space-y-1">
+                  {/* Group Header */}
+                  <button
+                    onClick={() => toggleGroup(group.id)}
+                    className={`
+                      w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium
+                      transition-colors
+                      ${hasActiveItem ? 'bg-green-50 text-green-700' : 'text-gray-700 hover:bg-gray-50'}
+                    `}
+                  >
+                    <Icon name={group.icon} className="w-5 h-5" />
+                    <span className="flex-1 text-left">{group.label}</span>
+                    {isExpanded ? (
+                      <ChevronDown className="w-4 h-4" />
+                    ) : (
+                      <ChevronRight className="w-4 h-4" />
+                    )}
+                  </button>
+
+                  {/* Group Items */}
+                  {isExpanded && (
+                    <div className="ml-8 space-y-1">
+                      {group.items.map((item) => {
+                        const isActive = location.pathname === item.to || location.pathname.startsWith(`${item.to}/`);
+                        return (
+                          <Link
+                            key={item.to}
+                            to={item.to}
+                            onClick={onClose}
+                            className={`
+                              flex items-center gap-3 px-3 py-2 rounded-lg text-sm
+                              transition-colors
+                              ${isActive ? 'bg-green-50 text-green-700 font-medium' : 'text-gray-600 hover:bg-gray-50'}
+                            `}
+                          >
+                            <Icon name={item.icon} className="w-4 h-4" />
+                            <span className="flex-1">{item.label}</span>
+                            {item.badge && typeof item.badge === 'number' && item.badge > 0 && (
+                              <span className="inline-flex items-center justify-center min-w-[18px] h-4 px-1 text-[10px] font-bold text-white bg-red-500 rounded-full">
+                                {item.badge > 9 ? '9+' : item.badge}
+                              </span>
+                            )}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+
+            {/* Admin Items */}
+            {adminItems.length > 0 && (
+              <>
+                <div className="my-3 border-t border-gray-200" />
+                <div className="px-3 py-1 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Admin
+                </div>
+                {adminItems.map((item) => {
+                  const isActive = location.pathname === item.to || location.pathname.startsWith(`${item.to}/`);
+                  return (
+                    <Link
+                      key={item.to}
+                      to={item.to}
+                      onClick={onClose}
+                      className={`
+                        flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium
+                        transition-colors
+                        ${isActive ? 'bg-purple-50 text-purple-700' : 'text-gray-700 hover:bg-gray-50'}
+                      `}
+                    >
+                      <Icon name={item.icon} className="w-5 h-5" />
+                      <span className="flex-1">{item.label}</span>
+                    </Link>
+                  );
+                })}
+              </>
+            )}
           </div>
 
           {/* Divider */}
@@ -123,17 +258,17 @@ export function MobileMenu({
             <Link
               to="/profile"
               onClick={onClose}
-              className="flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
+              className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
             >
-              <User className="w-5 h-5 mr-3" />
+              <User className="w-5 h-5" />
               Profile
             </Link>
             <Link
               to="/settings"
               onClick={onClose}
-              className="flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
+              className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
             >
-              <Settings className="w-5 h-5 mr-3" />
+              <Settings className="w-5 h-5" />
               Settings
             </Link>
             <button
@@ -141,9 +276,9 @@ export function MobileMenu({
                 await onLogout();
                 onClose();
               }}
-              className="w-full flex items-center px-3 py-2 text-sm font-medium text-red-600 rounded-md hover:bg-red-50 transition-colors"
+              className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-red-600 rounded-lg hover:bg-red-50 transition-colors"
             >
-              <LogOut className="w-5 h-5 mr-3" />
+              <LogOut className="w-5 h-5" />
               Logout
             </button>
           </div>

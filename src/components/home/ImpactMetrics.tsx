@@ -1,4 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { TreePine, Leaf, Users, Award, TrendingUp } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { GlassCard } from '../common/GlassCard';
+import { AnimatedSection } from '../common/AnimatedSection';
 
 interface MetricsData {
   treesPlanted: number;
@@ -13,19 +17,23 @@ interface ImpactMetricsProps {
 }
 
 interface MetricCardProps {
-  icon: string;
+  icon: React.ElementType;
   value: number;
   label: string;
   unit?: string;
   animationDuration?: number;
+  accentColor: string;
+  trend?: number;
 }
 
 const MetricCard: React.FC<MetricCardProps> = ({
-  icon,
+  icon: Icon,
   value,
   label,
   unit = '',
   animationDuration = 2000,
+  accentColor,
+  trend,
 }) => {
   const [displayValue, setDisplayValue] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
@@ -61,11 +69,21 @@ const MetricCard: React.FC<MetricCardProps> = ({
     const updateCounter = () => {
       const now = Date.now();
       const progress = Math.min((now - startTime) / animationDuration, 1);
-      
-      // Easing function for smooth animation
-      const easeOutQuart = 1 - Math.pow(1 - progress, 4);
-      const currentValue = Math.floor(easeOutQuart * value);
-      
+
+      // Elastic easing function for smooth animation
+      const easeOutElastic = (x: number): number => {
+        const c4 = (2 * Math.PI) / 3;
+        return x === 0
+          ? 0
+          : x === 1
+          ? 1
+          : Math.pow(2, -10 * x) * Math.sin((x * 10 - 0.75) * c4) + 1;
+      };
+
+      const currentValue = unit
+        ? parseFloat((easeOutElastic(progress) * value).toFixed(1))
+        : Math.floor(easeOutElastic(progress) * value);
+
       setDisplayValue(currentValue);
 
       if (now < endTime) {
@@ -76,23 +94,50 @@ const MetricCard: React.FC<MetricCardProps> = ({
     };
 
     requestAnimationFrame(updateCounter);
-  }, [isVisible, value, animationDuration]);
+  }, [isVisible, value, animationDuration, unit]);
 
   const formatNumber = (num: number): string => {
     return num.toLocaleString();
   };
 
   return (
-    <div
-      ref={cardRef}
-      className="bg-white rounded-xl shadow-lg p-8 text-center hover:shadow-2xl transition-shadow duration-300"
-    >
-      <div className="text-6xl mb-4">{icon}</div>
-      <div className="text-4xl font-bold text-green-600 mb-2">
-        {formatNumber(displayValue)}
-        {unit && <span className="text-2xl ml-1">{unit}</span>}
-      </div>
-      <div className="text-lg text-gray-600 font-medium">{label}</div>
+    <div ref={cardRef}>
+      <GlassCard hover="lift" className="p-8 text-center relative overflow-hidden group">
+        {/* Accent glow effect */}
+        <div
+          className={`absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-300 ${accentColor}`}
+        ></div>
+
+        {/* Icon container with glass effect and pulse animation */}
+        <motion.div
+          className={`mb-4 flex justify-center`}
+          animate={isVisible ? { scale: [1, 1.1, 1] } : {}}
+          transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+        >
+          <div
+            className={`w-20 h-20 rounded-full glass flex items-center justify-center ${accentColor} bg-opacity-10`}
+          >
+            <Icon size={40} className={`${accentColor.replace('bg-', 'text-')}`} />
+          </div>
+        </motion.div>
+
+        {/* Value with animated counter */}
+        <div className="text-4xl md:text-5xl font-bold text-gray-900 mb-2">
+          {formatNumber(displayValue)}
+          {unit && <span className="text-2xl ml-1 text-gray-600">{unit}</span>}
+        </div>
+
+        {/* Label */}
+        <div className="text-lg text-gray-600 font-medium mb-2">{label}</div>
+
+        {/* Trend indicator */}
+        {trend && (
+          <div className="flex items-center justify-center gap-1 text-sm text-green-600">
+            <TrendingUp size={16} />
+            <span>+{trend}% this month</span>
+          </div>
+        )}
+      </GlassCard>
     </div>
   );
 };
@@ -138,10 +183,10 @@ export const ImpactMetrics: React.FC<ImpactMetricsProps> = ({
   }, [refreshInterval]);
 
   return (
-    <section className="py-16 bg-white">
+    <section className="py-16 bg-gradient-to-b from-green-50 to-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="text-center mb-12">
+        <AnimatedSection animation="fadeInUp" className="text-center mb-12">
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
             Our Impact in Real-Time
           </h2>
@@ -149,31 +194,47 @@ export const ImpactMetrics: React.FC<ImpactMetricsProps> = ({
             Watch as our community grows and makes a tangible difference in Africa's forests.
             Every number represents real action and real impact.
           </p>
-        </div>
+        </AnimatedSection>
 
         {/* Metrics Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          <MetricCard
-            icon="🌳"
-            value={metrics.treesPlanted}
-            label="Trees Planted"
-          />
-          <MetricCard
-            icon="🌍"
-            value={metrics.carbonSequestered}
-            label="Carbon Sequestered"
-            unit="tons"
-          />
-          <MetricCard
-            icon="👥"
-            value={metrics.activeUsers}
-            label="Active Heroes"
-          />
-          <MetricCard
-            icon="🏆"
-            value={metrics.badgesEarned}
-            label="NFT Badges Earned"
-          />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+          <AnimatedSection animation="scaleIn" delay={0.1}>
+            <MetricCard
+              icon={TreePine}
+              value={metrics.treesPlanted}
+              label="Trees Planted"
+              accentColor="bg-green-500"
+              trend={12}
+            />
+          </AnimatedSection>
+          <AnimatedSection animation="scaleIn" delay={0.2}>
+            <MetricCard
+              icon={Leaf}
+              value={metrics.carbonSequestered}
+              label="Carbon Sequestered"
+              unit="tons"
+              accentColor="bg-emerald-500"
+              trend={8}
+            />
+          </AnimatedSection>
+          <AnimatedSection animation="scaleIn" delay={0.3}>
+            <MetricCard
+              icon={Users}
+              value={metrics.activeUsers}
+              label="Active Heroes"
+              accentColor="bg-blue-500"
+              trend={15}
+            />
+          </AnimatedSection>
+          <AnimatedSection animation="scaleIn" delay={0.4}>
+            <MetricCard
+              icon={Award}
+              value={metrics.badgesEarned}
+              label="NFT Badges Earned"
+              accentColor="bg-amber-500"
+              trend={20}
+            />
+          </AnimatedSection>
         </div>
       </div>
     </section>

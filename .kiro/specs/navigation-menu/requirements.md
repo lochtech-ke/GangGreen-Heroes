@@ -24,10 +24,11 @@ The #GangGreen platform has evolved significantly with numerous features includi
 #### Acceptance Criteria
 
 1. WHEN an authenticated user views any protected page, THE Navigation System SHALL display a persistent navigation menu
-2. THE Navigation System SHALL organize features into logical groups: Dashboard, Community, Conservation, Marketplace, and Profile
-3. THE Navigation System SHALL highlight the currently active page or section
-4. THE Navigation System SHALL display the platform logo and name
-5. THE Navigation System SHALL remain visible when scrolling on desktop devices
+2. THE Navigation System SHALL show only top-level items in the main navigation bar: Logo, Dashboard, Community (dropdown), Conservation (dropdown), Marketplace (dropdown), Rewards, and user controls
+3. THE Navigation System SHALL hide detailed sub-items inside dropdown menus to reduce visual clutter
+4. THE Navigation System SHALL highlight the currently active page or section
+5. THE Navigation System SHALL display the platform logo and name
+6. THE Navigation System SHALL remain visible when scrolling on desktop devices
 
 ### Requirement 2
 
@@ -108,11 +109,14 @@ The #GangGreen platform has evolved significantly with numerous features includi
 
 #### Acceptance Criteria
 
-1. THE Navigation System SHALL group Community features (Social Feed, Forums, Events) under a Community dropdown
-2. THE Navigation System SHALL group Conservation features (Initiatives, Tree Registry, My Journey) under a Conservation dropdown
-3. THE Navigation System SHALL group Marketplace features (Carbon Credits, NFT Badges, Donations) under a Marketplace dropdown
-4. WHEN the user hovers over a navigation group, THE Navigation System SHALL display a dropdown with grouped items
-5. THE Navigation System SHALL close dropdowns when the user moves away or clicks elsewhere
+1. THE Navigation System SHALL group Community features (Social Feed, Forums, Events) under a Community dropdown button
+2. THE Navigation System SHALL group Conservation features (Initiatives, Tree Registry, My Journey, Create Initiative) under a Conservation dropdown button
+3. THE Navigation System SHALL group Marketplace features (Carbon Credits, NFT Badges, Donations) under a Marketplace dropdown button
+4. THE Navigation System SHALL NOT show individual sub-items (like "Social Feed", "Initiatives", "NFT Badges") as separate buttons in the main navigation bar
+5. WHEN the user clicks a navigation group button on desktop, THE Navigation System SHALL display a dropdown with grouped items
+6. WHEN the user hovers over a navigation group button on desktop, THE Navigation System SHALL display a dropdown with grouped items
+7. THE Navigation System SHALL close dropdowns when the user moves away or clicks elsewhere
+8. THE Navigation System SHALL show each dropdown item with an icon, label, and brief description
 
 ### Requirement 9
 

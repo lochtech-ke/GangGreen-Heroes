@@ -200,6 +200,45 @@
     - Test on various screen sizes
     - _Requirements: 3.1, 11.1_
 
+- [x] 16. Fix navigation to show only grouped dropdowns (CRITICAL)
+
+
+
+
+
+  - [ ] 16.1 Remove individual page links from main navigation bar
+    - Remove standalone NavItem components for Social Feed, Initiatives, Trees, NFT Badges, etc.
+    - Keep ONLY: Dashboard, Community (dropdown), Conservation (dropdown), Marketplace (dropdown), Rewards
+    - Ensure all individual pages are accessible through their respective dropdown menus
+    - Update Navigation.tsx to render only top-level items and dropdowns
+
+
+    - _Requirements: 1.2, 1.3, 8.1, 8.2, 8.3, 8.4_
+  
+  - [ ] 16.2 Verify dropdown menus contain all sub-items
+    - Ensure Community dropdown shows: Social Feed, Forums, Events
+    - Ensure Conservation dropdown shows: Initiatives, Tree Registry, My Journey, Create Initiative (org only)
+
+    - Ensure Marketplace dropdown shows: Carbon Credits, NFT Badges, Donate
+    - Test that clicking dropdown items navigates correctly
+    - _Requirements: 8.1, 8.2, 8.3, 8.8_
+  
+  - [ ] 16.3 Update mobile navigation to match grouped structure
+    - Update MobileMenu to show grouped sections
+
+
+    - Ensure bottom nav shows only 5 items: Home, Community, Conservation, Marketplace, Profile
+    - Remove individual page links from bottom nav
+    - Test mobile navigation flow
+    - _Requirements: 3.1, 11.1, 11.2_
+  
+  - [ ] 16.4 Test and validate simplified navigation
+    - Verify navigation bar is not cluttered
+    - Confirm all pages are still accessible
+    - Test dropdown open/close behavior
+    - Verify active state highlighting works for grouped items
+    - _Requirements: 1.1, 1.2, 1.3, 8.5_
+
 - [x] 9. Update UserMenu component
 
 

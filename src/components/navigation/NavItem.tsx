@@ -13,7 +13,7 @@ interface NavItemProps {
   to: string;
   icon: string;
   label: string;
-  badge?: number;
+  badge?: number | string;
   onClick?: () => void;
 }
 
@@ -58,9 +58,9 @@ export function NavItem({ to, icon, label, badge, onClick }: NavItemProps) {
     >
       <IconComponent className="w-5 h-5" />
       <span>{label}</span>
-      {badge !== undefined && badge > 0 && (
+      {badge !== undefined && (typeof badge === 'number' ? badge > 0 : badge) && (
         <span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full">
-          {badge > 9 ? '9+' : badge}
+          {typeof badge === 'number' && badge > 9 ? '9+' : badge}
         </span>
       )}
     </Link>

@@ -51,8 +51,12 @@
     - Add prop types for different glass variants
     - _Requirements: Design System_
 
-- [ ] 3. Implement Hero Section with glassmorphism and animations
-  - [ ] 3.1 Create HeroSection component with glass overlay
+- [x] 3. Implement Hero Section with glassmorphism and animations
+
+
+  - [x] 3.1 Create HeroSection component with glass overlay
+
+
     - Build component with full viewport height on desktop
     - Implement parallax background image
 
@@ -63,7 +67,8 @@
     - _Requirements: 1.1, 1.2, 1.3_
 
   
-  - [ ] 3.2 Add glass CTAs with hover effects
+  - [x] 3.2 Add glass CTAs with hover effects
+
     - Create primary glass button with green tint and `ArrowRight` icon
     - Create secondary glass button with white tint and `Sparkles` icon
     - Implement hover lift effect (translateY(-4px))
@@ -71,13 +76,15 @@
     - Connect CTAs to navigation functions
     - _Requirements: 1.5, 1.6_
   
-  - [ ] 3.3 Add floating particles and scroll indicator
+  - [x] 3.3 Add floating particles and scroll indicator
+
     - Implement subtle animated leaf/sparkle particles
     - Add animated scroll indicator with bounce effect
     - Use Framer Motion for particle animations
     - _Requirements: 1.1_
   
-  - [ ] 3.4 Make hero section responsive
+  - [x] 3.4 Make hero section responsive
+
     - Adjust font sizes for mobile (headline 40px, hashtag 48px)
     - Stack content vertically on mobile devices
     - Optimize background image with responsive srcset
@@ -86,6 +93,7 @@
     - _Requirements: 11.1, 11.2, 11.3_
 
 - [x] 4. Build NFT Badge Showcase with enhanced glass effects
+
 
 
 
@@ -99,28 +107,39 @@
     - Add "View All Badges" glass CTA with `ExternalLink` icon
     - _Requirements: 2.1, 2.5_
   
-  - [x] 4.2 Implement FeaturedBadgeCard with glass design
+  - [x] 4.2 Implement FeaturedBadgeCard with SVG badge design system
 
     - Create glass card with rounded corners (16px)
-    - Add badge image (200x200px) with rotation on hover
+    - Integrate SVG badge rendering using `badgeSvg.service.ts`
+    - Display badges at 200x200px with tier-specific styling (Bronze, Silver, Gold, Platinum, Diamond)
+    - Show forest-themed backgrounds (Kakamega, Karura, Mau) using forest theme system
+    - Render achievement icons (Tree Planter, Carbon Warrior, etc.) from icon set
+    - Apply tier-specific metallic gradients and borders
     - Display `Coins` icon + GG price and KES price
-    - Implement animated gradient border based on rarity
-    - Add rarity badge with `Sparkles` icon in corner
+    - Implement animated gradient border matching tier color
+    - Add tier badge with `Sparkles` icon in corner
     - Create hover effects: lift (translateY(-8px)), enhanced glass, glow
+    - Activate sparkle animation for Diamond tier badges on hover
     - Show unlock requirement in glass tooltip on hover
-    - _Requirements: 2.2, 2.3, 2.4, 2.6_
+    - _Requirements: 2.2, 2.3, 2.4, 2.6, 2.7, 2.8_
   
   - [x] 4.3 Connect to badge data service with loading states
 
-    - Fetch featured badges from API or database
+    - Fetch featured badges from API or database with tier and forest information
     - Implement glass skeleton cards for loading state
     - Handle error states with glass error card
-    - Filter to show 6 featured badges
+    - Filter to show 6 featured badges (mix of tiers and forests)
     - Add smooth transition when data loads
-    - _Requirements: 2.1, 2.5_
+    - Ensure badge metadata includes tier, forest, and achievement type
+    - _Requirements: 2.1, 2.5, 2.7, 2.8_
 
-- [ ] 5. Create Impact Metrics with glass cards and animations
-  - [ ] 5.1 Build ImpactMetrics component with glass design
+- [x] 5. Create Impact Metrics with glass cards and animations
+
+
+
+
+  - [x] 5.1 Build ImpactMetrics component with glass design
+
     - Create 4-column grid layout (responsive to 2x2 on tablet, stack on mobile)
     - Implement MetricCard sub-component with glassmorphism
     - Add Lucide icons: `TreePine`, `Leaf`, `Users`, `Award`
@@ -129,24 +148,29 @@
     - Implement 3D tilt effect on hover
     - _Requirements: 3.1, 3.5_
   
-  - [ ] 5.2 Implement animated counter with trend indicators
+  - [x] 5.2 Implement animated counter with trend indicators
+
     - Create counter animation with elastic easing
     - Add `TrendingUp` icon showing growth percentage
     - Trigger staggered animation when section enters viewport
     - Synchronize icon pulse with counter animation
     - Format numbers with commas and appropriate units
-    - _Requirements: 3.3_
+    - Display NFT badges earned broken down by tier (Bronze, Silver, Gold, Platinum, Diamond)
+    - _Requirements: 3.3, 3.6_
   
-  - [ ] 5.3 Add real-time data fetching with smooth transitions
-    - Fetch metrics from Supabase database
+  - [x] 5.3 Add real-time data fetching with smooth transitions
+
+    - Fetch metrics from Supabase database including badge tier counts
     - Update metrics every 60 seconds with fade transition
     - Implement smooth color transitions on value updates
     - Handle loading states with glass skeleton cards
     - Handle error states gracefully
-    - _Requirements: 3.2, 15.6_
+    - _Requirements: 3.2, 3.6, 15.6_
 
-- [ ] 6. Develop User Journey with flowing animations
-  - [ ] 6.1 Create UserJourneyVisualization with animated path
+- [x] 6. Develop User Journey with flowing animations
+
+  - [x] 6.1 Create UserJourneyVisualization with animated path
+
     - Build horizontal flowing path for desktop
     - Create vertical timeline for mobile
     - Implement animated gradient SVG path connecting steps
@@ -155,7 +179,8 @@
     - Import Lucide icons: `Compass`, `UserPlus`, `Target`, `Sprout`, `Trophy`, `BarChart3`, `Crown`
     - _Requirements: 4.1, 4.2_
   
-  - [ ] 6.2 Build JourneyStep glass cards with interactions
+  - [x] 6.2 Build JourneyStep glass cards with interactions
+
     - Create 7 glass step cards with unique color gradients
     - Add 72px Lucide icons in circular glass containers
     - Implement number badges showing step order
@@ -195,8 +220,11 @@
     - Create floating glass legend showing forest color codes
     - _Requirements: 5.4, 5.5, 5.6_
 
-- [ ] 8. Build Feature Highlights with 3D effects
-  - [ ] 8.1 Create FeatureHighlights with masonry layout
+- [x] 8. Build Feature Highlights with 3D effects
+
+
+  - [x] 8.1 Create FeatureHighlights with masonry layout
+
     - Build responsive masonry grid (3 columns desktop, 2 tablet, 1 mobile)
     - Create FeatureCard sub-component with glassmorphism
     - Add section header with animations
@@ -204,7 +232,8 @@
     - Import Lucide icons: `Sprout`, `Leaf`, `Award`, `Zap`, `Bot`, `Wallet`, `ArrowRight`
     - _Requirements: 7.1, 7.3_
   
-  - [ ] 8.2 Implement 6 feature cards with unique gradients
+  - [x] 8.2 Implement 6 feature cards with unique gradients
+
     - Create glass cards with feature-specific gradient accents
     - Add large circular glass icon containers (80px) with gradients
     - Implement 48px Lucide icons with animated float effect
@@ -213,7 +242,9 @@
     - Create glass "Learn More" button with `ArrowRight` icon
     - _Requirements: 7.2, 7.5, 7.6_
   
-  - [ ] 8.3 Add advanced hover interactions
+
+  - [x] 8.3 Add advanced hover interactions
+
     - Implement 3D tilt effect following mouse position
     - Add icon scale and rotation on hover
     - Create animated gradient border
@@ -222,15 +253,23 @@
     - Add floating particles matching feature theme
     - _Requirements: 7.4_
 
-- [ ] 9. Create Social Proof with glass panels
-  - [ ] 9.1 Build SocialProofSection with glass design
+- [x] 9. Create Social Proof with glass panels
+
+
+
+
+
+  - [x] 9.1 Build SocialProofSection with glass design
+
     - Create two-column glass panels layout
     - Add subtle gradient background with floating shapes
     - Implement section header
     - Import Lucide icons: `Quote`, `TreePine`, `Award`, `MapPin`, `Sparkles`, `Clock`
     - _Requirements: 6.1_
   
-  - [ ] 9.2 Implement testimonial carousel with glass cards
+
+  - [x] 9.2 Implement testimonial carousel with glass cards
+
     - Create large glass TestimonialCard with `Quote` icon
     - Add user avatar with glass border and glow
     - Style quote text (20px, italic) with gradient highlight
@@ -240,7 +279,8 @@
     - Include 3 diverse testimonials
     - _Requirements: 6.2, 6.3_
   
-  - [ ] 9.3 Add animated achievements feed
+  - [x] 9.3 Add animated achievements feed
+
     - Create vertical scrolling glass cards
     - Display avatar, badge image, name, and `Clock` timestamp
     - Add `Sparkles` icon for new achievements
@@ -249,14 +289,16 @@
     - Fetch latest 10 achievements with real-time updates
     - _Requirements: 6.5_
   
-  - [ ] 9.4 Add user photo masonry gallery
+  - [x] 9.4 Add user photo masonry gallery
+
     - Create masonry grid of 12 photos with glass overlay
     - Implement hover zoom and overlay fade
     - Add click to open lightbox with full image
     - Lazy load images for performance
     - _Requirements: 6.4_
   
-  - [ ] 9.5 Add social media integration widget
+  - [x] 9.5 Add social media integration widget
+
     - Create glass widget for live #GangGreen posts
     - Implement animated scroll of recent posts
     - Add floating testimonial count badge
@@ -303,8 +345,12 @@
     - Handle error states gracefully
     - _Requirements: 8.6_
 
-- [ ] 11. Build Partnership section with trust indicators
-  - [ ] 11.1 Create PartnershipSection with glass cards
+- [x] 11. Build Partnership section with trust indicators
+
+
+
+  - [x] 11.1 Create PartnershipSection with glass cards
+
     - Build responsive logo grid (4 columns desktop, 2 mobile)
     - Add section header "Trusted Partners" with `Handshake` icon
     - Create glass card containers for each partner
@@ -312,6 +358,7 @@
     - Import Lucide icons: `ExternalLink`, `Shield`, `Handshake`
     - _Requirements: 9.1, 9.5_
   
+
   - [ ] 11.2 Add partner logos with animations
     - Display logos for: Green Belt Movement, GSMA, Antugrow, Wangari Maathai Hackathon
     - Apply grayscale filter by default
@@ -319,6 +366,7 @@
     - Add category badge (glass pill) with icon
     - Add 40px spacing between cards
     - _Requirements: 9.1, 9.5_
+
   
   - [ ] 11.3 Implement hover interactions
     - Animate logo to color with smooth transition
@@ -328,6 +376,7 @@
     - Add subtle scale and rotation
     - Display `Shield` icon for verified partners
     - Add animated checkmark on hover
+
     - _Requirements: 9.2, 9.3, 9.4, 9.6_
   
   - [ ] 11.4 Add decorative elements
@@ -335,8 +384,13 @@
     - Add trust indicators and verification badges
     - _Requirements: 9.6_
 
-- [ ] 12. Implement sticky header with glass design
-  - [ ] 12.1 Create sticky glass header component
+- [x] 12. Implement sticky header with glass design
+
+
+
+  - [x] 12.1 Create sticky glass header component
+
+
     - Build header with #GangGreen logo and branding
     - Add navigation menu items
     - Implement sticky behavior with glassmorphism on scroll
@@ -344,7 +398,9 @@
     - Add smooth transition when becoming sticky
     - _Requirements: 10.3_
   
-  - [ ] 12.2 Add authentication CTAs with glass buttons
+  - [x] 12.2 Add authentication CTAs with glass buttons
+
+
     - Display glass "Sign In" and "Get Started" buttons for unauthenticated users
     - Show glass "Dashboard" button for authenticated users
     - Connect buttons to navigation functions
@@ -354,16 +410,23 @@
 
 
 
-- [ ] 13. Create footer with glass design
-  - Create footer with glass background
-  - Add quick links section with organized columns
-  - Add social media links with icon buttons
-  - Include copyright and Loch Tech Solutions credit
-  - Add Wangari Maathai Hackathon mention
-  - Style with subtle glass effect and top border
-  - Make responsive for mobile devices
-  - Add Lucide icons for social media and links
-  - _Requirements: 9.2_
+- [x] 13. Integrate UnifiedFooter component
+
+
+
+
+
+  - Import and use UnifiedFooter component from `src/components/common/UnifiedFooter.tsx`
+  - Ensure footer displays at bottom of home page
+  - Verify glassmorphism styling matches home page design
+  - Confirm all navigation links work correctly
+  - Verify pilot forests section displays (Kakamega, Karura, Mau)
+  - Check social media links open in new tabs
+  - Confirm partnership information displays correctly
+  - Verify legal links navigate to correct pages
+  - Test responsive behavior on mobile devices
+  - Ensure tax notice banner displays for Kenyan users
+  - _Requirements: 16.1, 16.2, 16.3, 16.4, 16.5, 16.6, 16.7_
 
 - [ ] 14. Implement performance optimizations
   - [ ] 14.1 Optimize images and assets

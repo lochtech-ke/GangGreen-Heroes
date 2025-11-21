@@ -11,8 +11,8 @@ import {
   SocialProofSection,
   LeaderboardPreview,
   PartnershipSection,
-  HomeFooter,
 } from '../components/home';
+import { UnifiedFooter } from '../components/common/UnifiedFooter';
 
 export function HomePage() {
   const navigate = useNavigate();
@@ -65,17 +65,25 @@ export function HomePage() {
           />
         </div>
 
-        <ImpactMetrics />
+        <div id="impact">
+          <ImpactMetrics />
+        </div>
 
-        <UserJourneyVisualization steps={mockSteps} />
+        <div id="journey">
+          <UserJourneyVisualization steps={mockSteps} />
+        </div>
 
-        <PilotForestsMap
-          forests={mockForests}
-          onForestClick={handleForestClick}
-          onJoinInitiative={handleJoinInitiative}
-        />
+        <div id="forests">
+          <PilotForestsMap
+            forests={mockForests}
+            onForestClick={handleForestClick}
+            onJoinInitiative={handleJoinInitiative}
+          />
+        </div>
 
-        <FeatureHighlights features={mockFeatures} />
+        <div id="features">
+          <FeatureHighlights features={mockFeatures} />
+        </div>
 
         <SocialProofSection
           testimonials={mockTestimonials}
@@ -93,7 +101,7 @@ export function HomePage() {
       </main>
 
       {/* Footer */}
-      <HomeFooter />
+      <UnifiedFooter />
     </div>
   );
 }

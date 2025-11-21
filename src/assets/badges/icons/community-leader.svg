@@ -1,0 +1,67 @@
+<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+  <title>Community Leader Achievement</title>
+  <desc>Group of people forming a tree shape representing community leadership</desc>
+  
+  <!-- Tree trunk formed by central person -->
+  <g transform="translate(60, 55)">
+    <!-- Head -->
+    <circle cx="0" cy="-15" r="6" fill="none" stroke="white" stroke-width="3"/>
+    <!-- Body (trunk) -->
+    <rect x="-3" y="-8" width="6" height="25" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"/>
+    <!-- Arms raised (branches) -->
+    <path d="M -3 -5 L -12 -12" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"/>
+    <path d="M 3 -5 L 12 -12" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  
+  <!-- Left person (branch) -->
+  <g transform="translate(38, 45)">
+    <!-- Head -->
+    <circle cx="0" cy="0" r="5" fill="none" stroke="white" stroke-width="2.5"/>
+    <!-- Body -->
+    <line x1="0" y1="5" x2="0" y2="15" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- Arms -->
+    <path d="M -5 8 L 0 10 L 5 8" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- Legs -->
+    <path d="M 0 15 L -3 22" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M 0 15 L 3 22" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+  
+  <!-- Right person (branch) -->
+  <g transform="translate(82, 45)">
+    <!-- Head -->
+    <circle cx="0" cy="0" r="5" fill="none" stroke="white" stroke-width="2.5"/>
+    <!-- Body -->
+    <line x1="0" y1="5" x2="0" y2="15" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- Arms -->
+    <path d="M -5 8 L 0 10 L 5 8" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- Legs -->
+    <path d="M 0 15 L -3 22" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M 0 15 L 3 22" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+  
+  <!-- Bottom left person (root) -->
+  <g transform="translate(45, 75)">
+    <!-- Head -->
+    <circle cx="0" cy="0" r="4" fill="none" stroke="white" stroke-width="2"/>
+    <!-- Body -->
+    <line x1="0" y1="4" x2="0" y2="12" stroke="white" stroke-width="2" stroke-linecap="round"/>
+    <!-- Arms -->
+    <path d="M -4 7 L 0 8 L 4 7" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"/>
+  </g>
+  
+  <!-- Bottom right person (root) -->
+  <g transform="translate(75, 75)">
+    <!-- Head -->
+    <circle cx="0" cy="0" r="4" fill="none" stroke="white" stroke-width="2"/>
+    <!-- Body -->
+    <line x1="0" y1="4" x2="0" y2="12" stroke="white" stroke-width="2" stroke-linecap="round"/>
+    <!-- Arms -->
+    <path d="M -4 7 L 0 8 L 4 7" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"/>
+  </g>
+  
+  <!-- Unity circle -->
+  <circle cx="60" cy="60" r="42" fill="none" stroke="white" stroke-width="2" opacity="0.3" stroke-dasharray="5,5"/>
+  
+  <!-- Shadow effect -->
+  <ellipse cx="60" cy="95" rx="35" ry="3" fill="white" opacity="0.2"/>
+</svg>

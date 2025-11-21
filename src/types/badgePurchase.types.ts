@@ -18,6 +18,8 @@ export interface BadgePurchase {
   gg_coins_awarded: number;
   gg_coins_credited: boolean;
   transaction_hash?: string;
+  badge_svg?: string;
+  badge_metadata?: Record<string, any>;
   metadata?: Record<string, any>;
   created_at: string;
   completed_at?: string;

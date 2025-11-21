@@ -28,6 +28,8 @@ export default {
         'pulse-glow': 'pulseGlow 2s ease-in-out infinite',
         'fade-in-up': 'fadeInUp 0.6s ease-out',
         'slide-in-right': 'slideInRight 0.5s ease-out',
+        'scale-in': 'scaleIn 0.5s ease-out',
+        'rotate-in': 'rotateIn 0.6s ease-out',
       },
       keyframes: {
         float: {
@@ -45,6 +47,14 @@ export default {
         slideInRight: {
           '0%': { opacity: '0', transform: 'translateX(30px)' },
           '100%': { opacity: '1', transform: 'translateX(0)' },
+        },
+        scaleIn: {
+          '0%': { opacity: '0', transform: 'scale(0.8)' },
+          '100%': { opacity: '1', transform: 'scale(1)' },
+        },
+        rotateIn: {
+          '0%': { opacity: '0', transform: 'rotate(-180deg) scale(0.5)' },
+          '100%': { opacity: '1', transform: 'rotate(0deg) scale(1)' },
         },
       },
       typography: {
@@ -79,6 +89,7 @@ export default {
     require('@tailwindcss/typography'),
     function({ addUtilities }) {
       const newUtilities = {
+        // Glass Card Utilities
         '.glass': {
           background: 'rgba(255, 255, 255, 0.7)',
           backdropFilter: 'blur(12px)',
@@ -87,10 +98,10 @@ export default {
           boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
         },
         '.glass-dark': {
-          background: 'rgba(255, 255, 255, 0.05)',
+          background: 'rgba(0, 0, 0, 0.05)',
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
+          border: '1px solid rgba(0, 0, 0, 0.1)',
           boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
         },
         '.glass-green': {
@@ -99,6 +110,77 @@ export default {
           WebkitBackdropFilter: 'blur(12px)',
           border: '1px solid rgba(16, 185, 129, 0.2)',
           boxShadow: '0 8px 32px rgba(16, 185, 129, 0.15)',
+        },
+        '.glass-heavy': {
+          background: 'rgba(255, 255, 255, 0.9)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          border: '1px solid rgba(255, 255, 255, 0.3)',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+        },
+        
+        // Glass Button Utilities
+        '.glass-button': {
+          background: 'rgba(255, 255, 255, 0.7)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          border: '1px solid rgba(255, 255, 255, 0.3)',
+          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        },
+        '.glass-button-primary': {
+          background: 'rgba(16, 185, 129, 0.8)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          border: '1px solid rgba(16, 185, 129, 0.3)',
+          color: '#ffffff',
+          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        },
+        '.glass-button-secondary': {
+          background: 'rgba(255, 255, 255, 0.5)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          border: '1px solid rgba(255, 255, 255, 0.3)',
+          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        },
+        '.glass-button-ghost': {
+          background: 'transparent',
+          backdropFilter: 'blur(0px)',
+          WebkitBackdropFilter: 'blur(0px)',
+          border: '1px solid rgba(16, 185, 129, 0.3)',
+          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        },
+        
+        // Hover Effect Utilities
+        '.hover-lift': {
+          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+          '&:hover': {
+            transform: 'translateY(-4px)',
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
+          },
+        },
+        '.hover-glow': {
+          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+          '&:hover': {
+            boxShadow: '0 0 20px rgba(16, 185, 129, 0.3)',
+          },
+        },
+        '.hover-tilt': {
+          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+          transformStyle: 'preserve-3d',
+        },
+        
+        // Gradient Utilities
+        '.bg-gradient-green': {
+          background: 'linear-gradient(to right, #10B981, #059669)',
+        },
+        '.bg-gradient-emerald': {
+          background: 'linear-gradient(to right, #10B981, #047857)',
+        },
+        '.text-gradient-green': {
+          background: 'linear-gradient(to right, #10B981, #059669)',
+          WebkitBackgroundClip: 'text',
+          backgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
         },
       };
       addUtilities(newUtilities);

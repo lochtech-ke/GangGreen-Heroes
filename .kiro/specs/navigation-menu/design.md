@@ -103,6 +103,38 @@ The navigation will integrate with React Router and support the following routes
 - `/legal/tax-receipts` - Tax Receipt Policy (existing)
 - `/legal/acceptable-use` - Acceptable Use Policy (existing)
 
+## Visual Structure
+
+### Desktop Navigation Bar Layout
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│ [Logo] [Dashboard] [Community▼] [Conservation▼] [Marketplace▼] [Rewards]│
+│                                                                           │
+│                    [🔍] [🔔3] [💰1,250] [👤 User▼]                       │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+**Key Points:**
+- Only 5-6 main buttons visible in center
+- Dropdowns contain the detailed navigation items
+- Right side has utility items (search, notifications, coins, user)
+
+### Community Dropdown Example
+
+```
+┌─────────────────────────────────────┐
+│ 📱 Social Feed                      │
+│    Share conservation stories       │
+│                                     │
+│ 💬 Forums                           │
+│    Discuss with community           │
+│                                     │
+│ 📅 Events                           │
+│    Join local events                │
+└─────────────────────────────────────┘
+```
+
 ## Components and Interfaces
 
 ### 1. Layout Component
@@ -507,9 +539,10 @@ const userMenuConfig: UserMenuItemConfig[] = [
 - White background with subtle shadow
 - Height: 72px (increased for additional elements)
 - Logo on left
-- Navigation groups in center
-- Quick actions, search, notifications, GG coins, user menu on right
+- **Center section shows ONLY**: Dashboard, Community (dropdown), Conservation (dropdown), Marketplace (dropdown), Rewards
+- **Right section shows**: Quick actions, notifications, GG coins, user menu
 - Horizontal layout with dropdowns
+- **Individual pages (Social Feed, Initiatives, NFT Badges, etc.) are HIDDEN inside dropdowns**
 
 ### Mobile Navigation (<768px)
 

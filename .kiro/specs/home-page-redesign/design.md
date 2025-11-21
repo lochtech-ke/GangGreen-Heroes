@@ -4,6 +4,10 @@
 
 This design document outlines the comprehensive redesign of the Gang Green platform's home page to create a conversion-focused, visually compelling landing experience. The redesign prominently features the NFT badge system with GG Coin integration, emphasizes the #GangGreen brand identity, and guides visitors through the complete conservation journey from awareness to action. The design leverages modern web technologies including glassmorphism UI patterns, fluid animations, and a cohesive icon system to deliver an engaging, premium experience across all devices.
 
+**Key Integrations**:
+- **SVG Badge Design System**: The NFT Badge Showcase uses the comprehensive SVG badge design system (`.kiro/specs/nft-badge-svg-designs/`) featuring tier-specific styling, forest themes, and achievement icons
+- **UnifiedFooter Component**: The home page footer uses the UnifiedFooter component (`.kiro/specs/unified-footer/`) for consistent branding and navigation across all pages
+
 ## Design System
 
 ### Visual Language
@@ -211,10 +215,14 @@ HomePage
 ├── PartnershipSection
 │   ├── Partner Logo Grid
 │   └── Partnership Descriptions
-└── Footer
-    ├── Quick Links
-    ├── Social Media Links
-    └── Copyright & Credits
+└── UnifiedFooter (from src/components/common/UnifiedFooter.tsx)
+    ├── Brand Section (Logo, tagline, mission)
+    ├── Navigation Grid (Platform, Support, Legal links)
+    ├── Pilot Forests Section (Kakamega, Karura, Mau)
+    ├── Social Media Links (Twitter, Facebook, Instagram, LinkedIn)
+    ├── Partnership Section (GBM, GSMA, Antugrow)
+    ├── Contact & Copyright
+    └── Tax Notice Banner
 ```
 
 ### Page Flow
@@ -269,6 +277,7 @@ const HeroSection: React.FC<HeroSectionProps>
 
 ```typescript
 import { Award, Coins, Sparkles, ExternalLink } from 'lucide-react';
+import { BadgeSvgService } from '@/services/badgeSvg.service';
 
 interface BadgeShowcaseProps {
   featuredBadges: NFTBadge[];
@@ -283,7 +292,9 @@ interface FeaturedBadge {
   description: string;
   priceGGCoins: number;
   priceKES: number;
-  rarity: 'common' | 'rare' | 'epic' | 'legendary';
+  tier: 'bronze' | 'silver' | 'gold' | 'platinum' | 'diamond';
+  forest: 'kakamega' | 'karura' | 'mau';
+  achievement: AchievementType;
   unlockRequirement?: string;
 }
 
@@ -293,20 +304,26 @@ const NFTBadgeShowcase: React.FC<BadgeShowcaseProps>
 **Design Specifications**:
 - Grid: 3 columns desktop, 2 tablet, 1 mobile with staggered fade-in animation
 - Card design: Glassmorphism with `glass-card` class, rounded corners (16px)
-- Badge image: 200x200px, centered with subtle rotation on hover
+- Badge rendering: Use SVG badge design system from `badgeSvg.service.ts`
+  - Render badges at 200x200px with tier-specific styling
+  - Display forest-themed backgrounds (Kakamega, Karura, Mau)
+  - Show achievement icons (Tree Planter, Carbon Warrior, etc.)
+  - Apply tier-specific metallic gradients (Bronze, Silver, Gold, Platinum, Diamond)
 - Price display: `<Coins>` icon + GG amount, KES below with smaller text
 - Hover effect: 
   - Lift transform (translateY(-8px))
   - Enhanced glass effect (increased opacity)
-  - Animated border gradient
+  - Animated border gradient matching tier color
   - Show unlock requirement tooltip with glass background
-- Rarity indicator: 
-  - Animated gradient border (gold for legendary, purple for epic, blue for rare)
-  - Rarity badge with `<Sparkles>` icon in corner
-  - Glow effect matching rarity color
+  - For Diamond tier: Activate sparkle animation
+- Tier indicator: 
+  - Animated gradient border matching tier (bronze, silver, gold, platinum, diamond)
+  - Tier badge with `<Sparkles>` icon in corner
+  - Glow effect matching tier color
 - Section background: Subtle gradient with floating geometric shapes
 - Section header: Large title with `<Award>` icon, animated underline
 - "View All" CTA: Glass button with `<ExternalLink>` icon and hover glow
+- Badge integration: Leverage existing SVG badge templates, patterns, and icon system
 
 ### 3. Impact Metrics Component
 
@@ -685,6 +702,8 @@ const PartnershipSection: React.FC<PartnershipSectionProps>
   - Animated checkmark on hover
 - Background: Subtle gradient with floating partner logos (very faint)
 - Decorative: Connecting lines between partner cards (subtle)
+
+**Note**: This section is also included in the UnifiedFooter component for consistency across all pages.
 
 ## Data Models
 
@@ -1098,6 +1117,63 @@ npm install react-intersection-observer  # For scroll animations
 }
 ```
 
+## Integration with Existing Systems
+
+### SVG Badge Design System Integration
+
+The home page NFT Badge Showcase leverages the comprehensive SVG badge design system (see `.kiro/specs/nft-badge-svg-designs/`):
+
+**Badge Rendering**:
+- Use `BadgeSvgService` from `src/services/badgeSvg.service.ts` to generate badge SVGs
+- Load badge templates from `src/assets/badges/templates/`
+- Apply tier-specific styles from `src/assets/badges/styles/tierStyles.ts`
+- Use forest themes from `src/assets/badges/styles/forestThemes.ts`
+- Render achievement icons from `src/assets/badges/icons/`
+
+**Tier System**:
+- Bronze: #CD7F32 with brushed metal effect
+- Silver: #C0C0C0 with polished shine
+- Gold: #FFD700 with radiant glow
+- Platinum: #E5E4E2 with mirror finish
+- Diamond: #B9F2FF with prismatic sparkle and animation
+
+**Forest Themes**:
+- Kakamega: Tropical rainforest with deep emerald tones
+- Karura: Urban forest with balanced green and earth tones
+- Mau: Highland forest with cool teal and blue tones
+
+**Achievement Icons**:
+- Tree Planter, Carbon Warrior, Water Guardian, Biodiversity Champion
+- Community Leader, Climate Hero, Forest Protector, Green Ambassador
+
+**Badge Features**:
+- Glassmorphism effects using SVG filters
+- Embedded metadata (tier, forest, achievement, date)
+- Animated sparkle effects for Diamond tier
+- Optimized for social media sharing (1200x1200px PNG export)
+
+### UnifiedFooter Integration
+
+The home page uses the UnifiedFooter component (see `.kiro/specs/unified-footer/`) for consistency:
+
+**Component Location**: `src/components/common/UnifiedFooter.tsx`
+
+**Features**:
+- Glassmorphism styling matching home page design
+- Navigation links to all major platform sections
+- Pilot forests information (Kakamega, Karura, Mau)
+- Social media links with hover effects
+- Partnership section (GBM, GSMA, Antugrow, Wangari Maathai Hackathon)
+- Legal links (Terms, Privacy, Cookie Policy, Tax Receipt Policy, AUP)
+- Tax notice banner for Kenyan users
+- Responsive design (4 columns desktop, stacked mobile)
+
+**Integration**:
+- Import UnifiedFooter in HomePage.tsx
+- No customization needed - uses default variant
+- Maintains consistent branding across all pages
+- Shares glassmorphism design tokens with home page components
+
 ## Deployment Checklist
 
 - [ ] All components implemented and tested
@@ -1118,10 +1194,16 @@ npm install react-intersection-observer  # For scroll animations
 - [ ] Loading states with glass skeletons implemented
 - [ ] Social share functionality tested
 - [ ] Map integration working with glass popups
-- [ ] Badge showcase connected to real data
+- [ ] Badge showcase connected to real data with SVG badge system
+- [ ] SVG badges render correctly with tier and forest themes
+- [ ] Badge animations work (Diamond tier sparkle)
+- [ ] Badge metadata embedded correctly
 - [ ] Metrics updating in real-time with smooth animations
+- [ ] Badge tier counts display correctly in metrics
 - [ ] CTAs navigating correctly
-- [ ] Footer links working
+- [ ] UnifiedFooter integrated and links working
+- [ ] Footer pilot forests section displays correctly
+- [ ] Footer social media links functional
 - [ ] Mobile menu functional with glass design
 - [ ] Animations smooth and performant (60fps)
 - [ ] Glass effects render correctly on all browsers

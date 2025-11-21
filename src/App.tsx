@@ -15,6 +15,9 @@ import { GamificationPage } from './pages/GamificationPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { SocialFeedPage } from './pages/SocialFeedPage';
 import { JourneyDashboardPage } from './pages/JourneyDashboardPage';
+import { GovernancePage } from './pages/GovernancePage';
+import { ProposalDetailPage } from './pages/ProposalDetailPage';
+import { PetitionDetailPage } from './pages/PetitionDetailPage';
 import {
   TermsOfServicePage,
   PrivacyPolicyPage,
@@ -22,6 +25,7 @@ import {
   TaxReceiptPolicyPage,
   AcceptableUsePolicyPage,
 } from './pages/legal';
+import { LegalPage } from './pages/legal/LegalPage';
 import { ProtectedRoute } from './components/auth';
 import { ChatWidget } from './components/chatbot';
 import { Layout } from './components/layout';
@@ -101,7 +105,17 @@ function AppContent() {
           }
         />
         
-        {/* Legal Pages */}
+        {/* Legal Pages - Dynamic route using Strapi CMS */}
+        <Route
+          path="/legal/:slug"
+          element={
+            <Layout>
+              <LegalPage />
+            </Layout>
+          }
+        />
+        
+        {/* Legacy Legal Pages - Keep for backwards compatibility */}
         <Route
           path="/legal/terms"
           element={
@@ -219,6 +233,56 @@ function AppContent() {
             <ProtectedRoute>
               <Layout>
                 <SettingsPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/governance"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <GovernancePage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/governance/proposals"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <GovernancePage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/governance/proposals/:id"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <ProposalDetailPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/governance/petitions"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <GovernancePage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/governance/petitions/:id"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <PetitionDetailPage />
               </Layout>
             </ProtectedRoute>
           }

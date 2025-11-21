@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Menu } from 'lucide-react';
+import { Icon } from './iconMap';
 import { useAuthContext } from '../../contexts/AuthContext';
 import { authService } from '../../services/auth.service';
 import { NavItem } from './NavItem';
@@ -11,7 +11,6 @@ import { QuickActions } from './QuickActions';
 import { NotificationCenter } from './NotificationCenter';
 import { GGCoinDisplay } from './GGCoinDisplay';
 import {
-  getNavigationItems,
   getNavigationGroups,
   getStandaloneItems,
   getAdminItems,
@@ -28,7 +27,6 @@ export function Navigation({ className = '' }: NavigationProps) {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   // Get navigation items based on user role
-  const navigationItems = getNavigationItems(user?.role);
   const navigationGroups = getNavigationGroups(user?.role);
   const standaloneItems = getStandaloneItems(user?.role);
   const adminItems = getAdminItems(user?.role);
@@ -57,7 +55,7 @@ export function Navigation({ className = '' }: NavigationProps) {
   return (
     <>
       <nav
-        className={`fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-sm ${className}`}
+        className={`fixed top-0 left-0 right-0 z-fixed glass backdrop-blur-md border-b border-white/20 shadow-lg ${className}`}
         aria-label="Main navigation"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -68,11 +66,11 @@ export function Navigation({ className = '' }: NavigationProps) {
               <div className="md:hidden">
                 <button
                   onClick={() => setIsMobileMenuOpen(true)}
-                  className="p-2 rounded-md text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="p-2 rounded-md text-gray-600 hover:bg-white/50 focus-ring transition-smooth"
                   aria-label="Open menu"
                   aria-expanded={isMobileMenuOpen}
                 >
-                  <Menu className="w-6 h-6" />
+                  <Icon name="menu" size="ui" ariaHidden />
                 </button>
               </div>
 
@@ -159,7 +157,9 @@ export function Navigation({ className = '' }: NavigationProps) {
         <MobileMenu
           isOpen={isMobileMenuOpen}
           onClose={() => setIsMobileMenuOpen(false)}
-          navItems={navigationItems}
+          standaloneItems={standaloneItems}
+          navigationGroups={navigationGroups}
+          adminItems={adminItems}
           user={user}
           onLogout={handleLogout}
         />

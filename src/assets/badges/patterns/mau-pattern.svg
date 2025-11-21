@@ -1,0 +1,134 @@
+<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <title>Mau Forest Pattern</title>
+  <desc>Highland forest pattern with mountains and water streams</desc>
+  
+  <!-- Background gradient -->
+  <defs>
+    <linearGradient id="mauBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3A5F5F" stop-opacity="0.3"/>
+      <stop offset="50%" stop-color="#5B8A8A" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#B0C4C4" stop-opacity="0.2"/>
+    </linearGradient>
+    
+    <!-- Mountain ridge pattern -->
+    <pattern id="mauMountains" x="0" y="0" width="150" height="150" patternUnits="userSpaceOnUse">
+      <!-- Mountain peaks -->
+      <path d="M 0 100 L 30 60 L 50 80 L 75 40 L 100 70 L 120 50 L 150 90 L 150 100 Z" 
+            fill="#3A5F5F" opacity="0.3"/>
+      <path d="M 0 110 L 40 75 L 70 90 L 110 60 L 150 95 L 150 110 Z" 
+            fill="#5B8A8A" opacity="0.25"/>
+    </pattern>
+    
+    <!-- Wave and mountain border pattern -->
+    <pattern id="mauWave" x="0" y="0" width="80" height="40" patternUnits="userSpaceOnUse">
+      <!-- Water wave -->
+      <path d="M 0 20 Q 20 15 40 20 Q 60 25 80 20" 
+            fill="none" stroke="#5B8A8A" stroke-width="2" opacity="0.3"/>
+      <path d="M 0 28 Q 20 23 40 28 Q 60 33 80 28" 
+            fill="none" stroke="#B0C4C4" stroke-width="1.5" opacity="0.25"/>
+      <!-- Mountain peak -->
+      <path d="M 20 10 L 30 0 L 40 10" 
+            fill="none" stroke="#3A5F5F" stroke-width="1.5" opacity="0.3"/>
+      <path d="M 50 12 L 58 4 L 66 12" 
+            fill="none" stroke="#3A5F5F" stroke-width="1.5" opacity="0.3"/>
+    </pattern>
+  </defs>
+  
+  <!-- Base gradient -->
+  <rect width="400" height="400" fill="url(#mauBg)"/>
+  
+  <!-- Mountain pattern -->
+  <rect width="400" height="400" fill="url(#mauMountains)"/>
+  
+  <!-- Mountain ridges with forest coverage (layered) -->
+  <g opacity="0.25">
+    <!-- Distant mountains -->
+    <path d="M 0 180 L 80 120 L 140 150 L 200 100 L 260 140 L 320 110 L 400 160 L 400 180 Z" 
+          fill="#3A5F5F"/>
+    
+    <!-- Mid-range mountains -->
+    <path d="M 0 240 L 60 190 L 120 210 L 180 170 L 240 200 L 300 180 L 360 210 L 400 190 L 400 240 Z" 
+          fill="#5B8A8A"/>
+    
+    <!-- Near mountains with forest -->
+    <path d="M 0 300 L 50 260 L 100 280 L 150 250 L 200 270 L 250 245 L 300 265 L 350 250 L 400 275 L 400 300 Z" 
+          fill="#3A5F5F" opacity="0.8"/>
+    
+    <!-- Forest tree line on mountains -->
+    <g opacity="0.6">
+      <circle cx="60" cy="265" r="8" fill="#5B8A8A"/>
+      <circle cx="75" cy="268" r="6" fill="#5B8A8A"/>
+      <circle cx="90" cy="270" r="7" fill="#5B8A8A"/>
+      <circle cx="160" cy="255" r="8" fill="#5B8A8A"/>
+      <circle cx="175" cy="258" r="6" fill="#5B8A8A"/>
+      <circle cx="260" cy="250" r="7" fill="#5B8A8A"/>
+      <circle cx="275" cy="253" r="6" fill="#5B8A8A"/>
+      <circle cx="310" cy="268" r="8" fill="#5B8A8A"/>
+    </g>
+  </g>
+  
+  <!-- Water streams -->
+  <g opacity="0.2">
+    <!-- Main stream -->
+    <path d="M 100 200 Q 120 240 140 280 Q 150 310 160 350 Q 165 370 170 400" 
+          fill="none" stroke="#B0C4C4" stroke-width="4" stroke-linecap="round"/>
+    <path d="M 100 200 Q 118 238 138 278 Q 148 308 158 348 Q 163 368 168 400" 
+          fill="none" stroke="#5B8A8A" stroke-width="2" stroke-linecap="round"/>
+    
+    <!-- Tributary stream -->
+    <path d="M 280 220 Q 260 250 240 280 Q 220 310 200 340" 
+          fill="none" stroke="#B0C4C4" stroke-width="3" stroke-linecap="round"/>
+    <path d="M 280 220 Q 262 248 242 278 Q 222 308 202 338" 
+          fill="none" stroke="#5B8A8A" stroke-width="1.5" stroke-linecap="round"/>
+    
+    <!-- Small cascade -->
+    <ellipse cx="140" cy="260" rx="8" ry="12" fill="#B0C4C4" opacity="0.5"/>
+    <ellipse cx="160" cy="330" rx="10" ry="15" fill="#B0C4C4" opacity="0.5"/>
+  </g>
+  
+  <!-- Clouds and mist -->
+  <g opacity="0.15">
+    <!-- Low-lying mist -->
+    <ellipse cx="80" cy="280" rx="50" ry="15" fill="#B0C4C4"/>
+    <ellipse cx="250" cy="260" rx="60" ry="18" fill="#B0C4C4"/>
+    <ellipse cx="350" cy="290" rx="45" ry="14" fill="#B0C4C4"/>
+    
+    <!-- High clouds -->
+    <ellipse cx="150" cy="80" rx="40" ry="15" fill="#B0C4C4"/>
+    <ellipse cx="130" cy="85" rx="25" ry="12" fill="#B0C4C4"/>
+    <ellipse cx="170" cy="85" rx="25" ry="12" fill="#B0C4C4"/>
+    
+    <ellipse cx="320" cy="60" rx="45" ry="16" fill="#B0C4C4"/>
+    <ellipse cx="300" cy="65" rx="28" ry="13" fill="#B0C4C4"/>
+    <ellipse cx="340" cy="65" rx="28" ry="13" fill="#B0C4C4"/>
+  </g>
+  
+  <!-- Highland vegetation (scattered) -->
+  <g opacity="0.25">
+    <!-- Conifer clusters -->
+    <g transform="translate(50, 320)">
+      <path d="M 0 0 L -8 15 L 8 15 Z" fill="#3A5F5F"/>
+      <path d="M 0 8 L -10 20 L 10 20 Z" fill="#3A5F5F"/>
+      <rect x="-2" y="20" width="4" height="10" fill="#5B8A8A"/>
+    </g>
+    
+    <g transform="translate(350, 300)">
+      <path d="M 0 0 L -7 12 L 7 12 Z" fill="#3A5F5F"/>
+      <path d="M 0 6 L -9 18 L 9 18 Z" fill="#3A5F5F"/>
+      <rect x="-2" y="18" width="4" height="8" fill="#5B8A8A"/>
+    </g>
+    
+    <g transform="translate(200, 340)">
+      <path d="M 0 0 L -6 10 L 6 10 Z" fill="#5B8A8A"/>
+      <path d="M 0 5 L -8 15 L 8 15 Z" fill="#5B8A8A"/>
+      <rect x="-1.5" y="15" width="3" height="7" fill="#3A5F5F"/>
+    </g>
+  </g>
+  
+  <!-- Snow caps on peaks (subtle) -->
+  <g opacity="0.2">
+    <ellipse cx="200" cy="100" rx="15" ry="5" fill="#B0C4C4"/>
+    <ellipse cx="320" cy="110" rx="12" ry="4" fill="#B0C4C4"/>
+    <ellipse cx="80" cy="120" rx="10" ry="4" fill="#B0C4C4"/>
+  </g>
+</svg>

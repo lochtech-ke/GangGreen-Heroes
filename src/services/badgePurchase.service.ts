@@ -1,6 +1,8 @@
 import { supabase } from './supabase';
 import { paystackService } from './paystack.service';
 import { ggCoinService } from './ggCoin.service';
+import { badgeSvgService } from './badgeSvg.service';
+import { createBadgeMetadata } from '../utils/badgeMetadata';
 import type {
   BadgePurchase,
   InitiatePurchaseParams,
@@ -10,6 +12,7 @@ import type {
   VerifyAndRewardParams,
   VerifyAndRewardResult,
 } from '../types/badgePurchase.types';
+import type { BadgeTier, ForestType, AchievementType } from '../types/badge.types';
 import { BADGE_PRICE_KES, BADGE_PURCHASE_GG_COIN_REWARD } from '../types/badgePurchase.types';
 
 /**
@@ -207,6 +210,21 @@ class BadgePurchaseService {
         }
       }
 
+      // Generate badge SVG
+      // Extract forest and achievement from metadata or use defaults
+      const forest = (purchase.metadata?.forest as ForestType) || 'kakamega';
+      const achievement = (purchase.metadata?.achievement as AchievementType) || 'tree_planter';
+      const achievementCount = purchase.metadata?.achievement_count || 1;
+
+      await this.generateBadgeSVG({
+        purchaseId: purchase.id,
+        userId: userId,
+        tier: purchase.tier as BadgeTier,
+        forest,
+        achievement,
+        achievementCount,
+      });
+
       return {
         success: true,
         purchase: updatedPurchase as BadgePurchase,
@@ -378,7 +396,7 @@ class BadgePurchaseService {
    */
   async getUserPurchases(userId: string, limit: number = 50): Promise<BadgePurchase[]> {
     try {
-      const { data, error } = await supabase
+      const { data, error} = await supabase
         .from('badge_purchases')
         .select('*')
         .eq('user_id', userId)
@@ -394,6 +412,105 @@ class BadgePurchaseService {
     } catch (error) {
       console.error('[BadgePurchaseService] Exception fetching purchases:', error);
       return [];
+    }
+  }
+
+  /**
+   * Generate badge SVG after successful purchase
+   */
+  async generateBadgeSVG(params: {
+    purchaseId: string;
+    userId: string;
+    tier: BadgeTier;
+    forest: ForestType;
+    achievement: AchievementType;
+    achievementCount?: number;
+  }): Promise<{ success: boolean; svg?: string; error?: string }> {
+    try {
+      console.log(`[BadgePurchaseService] Generating badge SVG for purchase ${params.purchaseId}`);
+
+      // Create badge metadata
+      const metadata = createBadgeMetadata({
+        tier: params.tier,
+        forest: params.forest,
+        achievement: params.achievement,
+        achievementCount: params.achievementCount || 1,
+        userId: params.userId,
+      });
+
+      // Generate badge configuration
+      const badgeConfig = {
+        id: params.purchaseId,
+        tier: params.tier,
+        forest: params.forest,
+        achievement: params.achievement,
+        metadata,
+        animated: params.tier === 'diamond', // Enable animations for diamond tier
+      };
+
+      // Generate badge SVG
+      const result = await badgeSvgService.generateBadge(badgeConfig);
+
+      if (!result.success || !result.svg) {
+        console.error('[BadgePurchaseService] Badge generation failed:', result.error);
+        return {
+          success: false,
+          error: result.error || 'Failed to generate badge',
+        };
+      }
+
+      // Store badge SVG in database
+      const { error: updateError } = await supabase
+        .from('badge_purchases')
+        .update({
+          badge_svg: result.svg,
+          badge_metadata: result.metadata,
+        })
+        .eq('id', params.purchaseId);
+
+      if (updateError) {
+        console.error('[BadgePurchaseService] Error storing badge SVG:', updateError);
+        return {
+          success: false,
+          error: 'Failed to store badge SVG',
+        };
+      }
+
+      console.log('[BadgePurchaseService] Badge SVG generated and stored successfully');
+
+      return {
+        success: true,
+        svg: result.svg,
+      };
+    } catch (error) {
+      console.error('[BadgePurchaseService] Exception generating badge SVG:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to generate badge SVG',
+      };
+    }
+  }
+
+  /**
+   * Get badge SVG for a purchase
+   */
+  async getBadgeSVG(purchaseId: string): Promise<string | null> {
+    try {
+      const { data, error } = await supabase
+        .from('badge_purchases')
+        .select('badge_svg')
+        .eq('id', purchaseId)
+        .single();
+
+      if (error || !data) {
+        console.error('[BadgePurchaseService] Error fetching badge SVG:', error);
+        return null;
+      }
+
+      return data.badge_svg;
+    } catch (error) {
+      console.error('[BadgePurchaseService] Exception fetching badge SVG:', error);
+      return null;
     }
   }
 }

@@ -40,11 +40,13 @@ The Home Page Redesign feature transforms the Gang Green platform's landing page
 #### Acceptance Criteria
 
 1. THE Gang Green Platform SHALL display a dedicated "Earn NFT Badges" section within the first two screen scrolls
-2. THE Gang Green Platform SHALL showcase at least 6 featured NFT badges with visual previews
+2. THE Gang Green Platform SHALL showcase at least 6 featured NFT badges with visual previews using the SVG badge design system
 3. WHEN a visitor hovers over an NFT badge, THE Gang Green Platform SHALL display a tooltip with the badge name and unlock requirement
 4. THE Gang Green Platform SHALL display the GG Coin price for each purchasable badge
 5. THE Gang Green Platform SHALL include a "View All Badges" CTA that navigates to the full badge marketplace
 6. THE Gang Green Platform SHALL highlight limited edition or seasonal badges with special visual indicators
+7. THE Gang Green Platform SHALL display badges with tier-specific styling (Bronze, Silver, Gold, Platinum, Diamond) using the SVG badge design system
+8. THE Gang Green Platform SHALL showcase badges representing the three pilot forests (Kakamega, Karura, Mau) with forest-specific themes
 
 ### Requirement 3: Real-Time Impact Metrics
 
@@ -57,7 +59,7 @@ The Home Page Redesign feature transforms the Gang Green platform's landing page
 3. THE Gang Green Platform SHALL use animated counters that increment to the current values when the section becomes visible
 4. THE Gang Green Platform SHALL display metrics with appropriate units (e.g., "12,543 Trees Planted", "45.2 Tons CO₂ Sequestered")
 5. THE Gang Green Platform SHALL include a visual representation such as icons or progress bars alongside each metric
-6. THE Gang Green Platform SHALL display the number of NFT badges earned by the community
+6. THE Gang Green Platform SHALL display the number of NFT badges earned by the community, broken down by tier (Bronze, Silver, Gold, Platinum, Diamond)
 
 ### Requirement 4: User Journey Visualization
 
@@ -214,3 +216,17 @@ The Home Page Redesign feature transforms the Gang Green platform's landing page
 4. WHEN a user is authenticated, THE Gang Green Platform SHALL replace signup CTAs with "Go to Dashboard" buttons
 5. THE Gang Green Platform SHALL display location-specific content when geographic data is available
 6. THE Gang Green Platform SHALL update impact metrics from the database at least every 5 minutes
+
+### Requirement 16: Unified Footer Integration
+
+**User Story:** As a visitor, I want to see a consistent, informative footer on the home page, so that I can access important links and information about the platform.
+
+#### Acceptance Criteria
+
+1. THE Gang Green Platform SHALL display the UnifiedFooter component at the bottom of the home page
+2. THE UnifiedFooter SHALL include navigation links to all major platform sections (Initiatives, Trees, Marketplace, NFT Badges)
+3. THE UnifiedFooter SHALL display information about the three pilot forests (Kakamega, Karura, Mau)
+4. THE UnifiedFooter SHALL include social media links with glassmorphism styling
+5. THE UnifiedFooter SHALL display partnership information (Green Belt Movement, GSMA, Antugrow)
+6. THE UnifiedFooter SHALL include legal links (Terms, Privacy, Cookie Policy, Tax Receipt Policy, Acceptable Use Policy)
+7. THE UnifiedFooter SHALL maintain glassmorphism design consistency with the rest of the home page

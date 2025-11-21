@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { Menu, X } from 'lucide-react';
+import { GlassButton } from '../common/GlassButton';
 
 interface HeaderProps {
   isAuthenticated: boolean;
@@ -10,7 +12,7 @@ export const Header: React.FC<HeaderProps> = ({ isAuthenticated }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Handle scroll to add shadow when scrolled
+  // Handle scroll to add glassmorphism effect when scrolled
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
@@ -20,149 +22,160 @@ export const Header: React.FC<HeaderProps> = ({ isAuthenticated }) => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Smooth scroll to section
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+      setIsMobileMenuOpen(false);
+    }
+  };
+
   const navLinks = [
-    { label: 'Home', path: '/' },
-    { label: 'Initiatives', path: '/initiatives' },
-    { label: 'Trees', path: '/trees' },
-    { label: 'Marketplace', path: '/marketplace' },
-    { label: 'Gamification', path: '/gamification' },
+    { label: 'Features', sectionId: 'features' },
+    { label: 'Impact', sectionId: 'impact' },
+    { label: 'Journey', sectionId: 'journey' },
+    { label: 'Forests', sectionId: 'forests' },
   ];
 
   return (
     <header
-      className={`bg-white sticky top-0 z-50 transition-shadow duration-300 ${
-        isScrolled ? 'shadow-md' : 'shadow-sm'
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        isScrolled
+          ? 'glass backdrop-blur-md border-b border-white/20 shadow-lg'
+          : 'bg-transparent'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center py-4">
+        <div className="flex justify-between items-center h-18">
           {/* Logo */}
-          <div
-            className="flex items-center space-x-2 cursor-pointer"
-            onClick={() => navigate('/')}
+          <Link
+            to="/"
+            className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
           >
-            <span className="text-3xl">🌳</span>
-            <h1 className="text-2xl font-bold text-green-700">#GangGreen</h1>
-          </div>
+            <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">
+              <span className="text-white font-bold text-sm">#GG</span>
+            </div>
+            <span
+              className={`text-xl font-bold transition-colors ${
+                isScrolled ? 'text-green-700' : 'text-white'
+              }`}
+            >
+              #GangGreen
+            </span>
+          </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
+          <nav className="hidden md:flex items-center space-x-6">
             {navLinks.map((link) => (
               <button
-                key={link.path}
-                onClick={() => navigate(link.path)}
-                className="text-gray-700 hover:text-green-600 font-medium transition-colors"
+                key={link.sectionId}
+                onClick={() => scrollToSection(link.sectionId)}
+                className={`font-medium transition-colors hover:text-green-600 ${
+                  isScrolled ? 'text-gray-700' : 'text-white/90'
+                }`}
               >
                 {link.label}
               </button>
             ))}
           </nav>
 
-          {/* Auth Buttons */}
+          {/* Auth Buttons - Desktop */}
           <div className="hidden md:flex gap-3">
             {isAuthenticated ? (
-              <button
+              <GlassButton
+                variant="primary"
+                size="md"
                 onClick={() => navigate('/dashboard')}
-                className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-md transition-colors"
               >
                 Dashboard
-              </button>
+              </GlassButton>
             ) : (
               <>
-                <button
+                <GlassButton
+                  variant="secondary"
+                  size="md"
                   onClick={() => navigate('/login')}
-                  className="px-6 py-2 border-2 border-green-600 text-green-600 hover:bg-green-50 font-semibold rounded-md transition-colors"
+                  className={!isScrolled ? 'border-white/30 text-white' : ''}
                 >
                   Sign In
-                </button>
-                <button
+                </GlassButton>
+                <GlassButton
+                  variant="primary"
+                  size="md"
                   onClick={() => navigate('/register')}
-                  className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-md transition-colors"
                 >
                   Get Started
-                </button>
+                </GlassButton>
               </>
             )}
           </div>
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden p-2 text-gray-700 hover:text-green-600"
+            className={`md:hidden p-2 rounded-md transition-colors ${
+              isScrolled
+                ? 'text-gray-700 hover:bg-white/50'
+                : 'text-white hover:bg-white/10'
+            }`}
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label="Toggle menu"
+            aria-expanded={isMobileMenuOpen}
           >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              {isMobileMenuOpen ? (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              ) : (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              )}
-            </svg>
+            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-gray-200">
+          <div className="md:hidden py-4 border-t border-white/20 glass backdrop-blur-md">
             <nav className="flex flex-col space-y-4">
               {navLinks.map((link) => (
                 <button
-                  key={link.path}
-                  onClick={() => {
-                    navigate(link.path);
-                    setIsMobileMenuOpen(false);
-                  }}
+                  key={link.sectionId}
+                  onClick={() => scrollToSection(link.sectionId)}
                   className="text-left text-gray-700 hover:text-green-600 font-medium transition-colors px-2"
                 >
                   {link.label}
                 </button>
               ))}
-              <div className="flex flex-col gap-3 pt-4 border-t border-gray-200">
+              <div className="flex flex-col gap-3 pt-4 border-t border-white/20">
                 {isAuthenticated ? (
-                  <button
+                  <GlassButton
+                    variant="primary"
+                    size="md"
                     onClick={() => {
                       navigate('/dashboard');
                       setIsMobileMenuOpen(false);
                     }}
-                    className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-md transition-colors"
+                    className="w-full"
                   >
                     Dashboard
-                  </button>
+                  </GlassButton>
                 ) : (
                   <>
-                    <button
+                    <GlassButton
+                      variant="secondary"
+                      size="md"
                       onClick={() => {
                         navigate('/login');
                         setIsMobileMenuOpen(false);
                       }}
-                      className="px-6 py-2 border-2 border-green-600 text-green-600 hover:bg-green-50 font-semibold rounded-md transition-colors"
+                      className="w-full"
                     >
                       Sign In
-                    </button>
-                    <button
+                    </GlassButton>
+                    <GlassButton
+                      variant="primary"
+                      size="md"
                       onClick={() => {
                         navigate('/register');
                         setIsMobileMenuOpen(false);
                       }}
-                      className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-md transition-colors"
+                      className="w-full"
                     >
                       Get Started
-                    </button>
+                    </GlassButton>
                   </>
                 )}
               </div>

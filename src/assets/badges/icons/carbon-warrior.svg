@@ -1,0 +1,33 @@
+<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+  <title>Carbon Warrior Achievement</title>
+  <desc>Shield with CO2 molecule crossed out representing carbon offset achievements</desc>
+  
+  <!-- Shield outline -->
+  <path d="M 60 15 L 85 25 L 85 55 Q 85 80 60 100 Q 35 80 35 55 L 35 25 Z" 
+        fill="none" stroke="white" stroke-width="4" stroke-linejoin="round"/>
+  
+  <!-- Inner shield detail -->
+  <path d="M 60 22 L 80 30 L 80 55 Q 80 75 60 92 Q 40 75 40 55 L 40 30 Z" 
+        fill="none" stroke="white" stroke-width="2" opacity="0.6"/>
+  
+  <!-- CO2 molecule -->
+  <g opacity="0.9">
+    <!-- Carbon atom (center) -->
+    <circle cx="60" cy="55" r="6" fill="none" stroke="white" stroke-width="3"/>
+    
+    <!-- Oxygen atoms -->
+    <circle cx="45" cy="55" r="5" fill="none" stroke="white" stroke-width="2.5"/>
+    <circle cx="75" cy="55" r="5" fill="none" stroke="white" stroke-width="2.5"/>
+    
+    <!-- Bonds -->
+    <line x1="51" y1="55" x2="54" y2="55" stroke="white" stroke-width="2"/>
+    <line x1="66" y1="55" x2="69" y2="55" stroke="white" stroke-width="2"/>
+  </g>
+  
+  <!-- Cross-out line (diagonal) -->
+  <line x1="35" y1="35" x2="85" y2="75" 
+        stroke="white" stroke-width="5" stroke-linecap="round" opacity="0.95"/>
+  
+  <!-- Shadow effect -->
+  <ellipse cx="60" cy="102" rx="22" ry="3" fill="white" opacity="0.2"/>
+</svg>

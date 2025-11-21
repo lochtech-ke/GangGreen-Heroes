@@ -14,9 +14,6 @@ export function Footer() {
               Catalyzing a carbon-negative Africa through technology-driven forest conservation,
               carbon credit markets, and community engagement.
             </p>
-            <p className="text-sm text-gray-400">
-              Built for the Wangari Maathai Hackathon - Track 3: Community Engagement and Sustainability
-            </p>
           </div>
 
           {/* Quick Links */}

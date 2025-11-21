@@ -135,3 +135,24 @@ export type {
   PetitionFilters,
   PetitionServiceResponse,
 } from './petition.types';
+
+export type {
+  BadgeTier,
+  ForestType,
+  AchievementType,
+  BadgeMetadata,
+  BadgeConfig,
+  TierStyle,
+  ForestTheme,
+  SVGGradient,
+  SVGFilter,
+  SVGPattern,
+  SVGClipPath,
+  SVGDefs,
+  SVGElement,
+  SVGLayer,
+  SVGTemplate,
+  BadgeExportOptions,
+  BadgeGenerationResult,
+  BadgeValidationResult,
+} from './badge.types';

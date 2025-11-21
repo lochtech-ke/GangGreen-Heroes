@@ -1,15 +1,20 @@
 import type { UserRole } from '../../types/user.types';
 
+/**
+ * Configuration for a single navigation item
+ */
 export interface NavItemConfig {
   to: string;
   label: string;
   icon: string;
-  description?: string; // For mega menu descriptions
+  description?: string;
+  badge?: number | string | (() => number | string);
   roles?: UserRole[];
-  badge?: number | (() => number); // Support function for dynamic badge count
-  children?: NavItemConfig[]; // For nested navigation
 }
 
+/**
+ * Configuration for a navigation group (dropdown menu)
+ */
 export interface NavGroupConfig {
   id: string;
   label: string;
@@ -17,14 +22,29 @@ export interface NavGroupConfig {
   items: NavItemConfig[];
 }
 
+/**
+ * Overall navigation configuration
+ */
+export interface NavigationConfig {
+  standalone: NavItemConfig[];
+  groups: NavGroupConfig[];
+  admin: NavItemConfig[];
+}
+
+/**
+ * Configuration for a user menu item
+ */
 export interface UserMenuItemConfig {
-  to?: string;
+  id: string;
   label: string;
   icon: string;
-  onClick?: () => void;
+  onClick: () => void;
   variant?: 'default' | 'danger';
 }
 
+/**
+ * Configuration for a quick action
+ */
 export interface QuickAction {
   id: string;
   label: string;

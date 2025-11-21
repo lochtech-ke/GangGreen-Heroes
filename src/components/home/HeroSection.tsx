@@ -134,7 +134,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.6 }}
-          className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+          className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-20"
         >
           {!isAuthenticated && (
             <GlassButton
@@ -158,25 +158,25 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             Explore NFT Badges
           </GlassButton>
         </motion.div>
-
-        {/* Scroll Indicator with Animation */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 1 }}
-          className="absolute bottom-8 left-1/2 transform -translate-x-1/2 cursor-pointer"
-          onClick={scrollToContent}
-        >
-          <motion.div
-            animate={{ y: [0, 10, 0] }}
-            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-            className="flex flex-col items-center gap-2"
-          >
-            <span className="text-white/70 text-sm font-medium">Scroll to explore</span>
-            <ChevronDown size={32} className="text-white/70" />
-          </motion.div>
-        </motion.div>
       </div>
+
+      {/* Scroll Indicator with Animation - Positioned relative to section */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1, delay: 1 }}
+        className="absolute bottom-8 left-1/2 transform -translate-x-1/2 cursor-pointer z-20"
+        onClick={scrollToContent}
+      >
+        <motion.div
+          animate={{ y: [0, 10, 0] }}
+          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+          className="flex flex-col items-center gap-2"
+        >
+          <span className="text-white/70 text-sm font-medium">Scroll to explore</span>
+          <ChevronDown size={32} className="text-white/70" />
+        </motion.div>
+      </motion.div>
     </section>
   );
 };

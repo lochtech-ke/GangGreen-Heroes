@@ -3,15 +3,19 @@ import { motion } from 'framer-motion';
 import { Award, Coins, Sparkles, ExternalLink, Lock } from 'lucide-react';
 import { GlassButton } from '../common/GlassButton';
 import { AnimatedSection } from '../common/AnimatedSection';
+import { BadgeSvgService } from '../../services/badgeSvg.service';
+import type { BadgeTier, ForestType, AchievementType } from '../../types/badge.types';
 
 interface FeaturedBadge {
   id: string;
   name: string;
-  imageUrl: string;
+  imageUrl?: string;
   description: string;
   priceGGCoins: number;
   priceKES: number;
-  rarity: 'common' | 'rare' | 'epic' | 'legendary';
+  tier: BadgeTier;
+  forest: ForestType;
+  achievement: AchievementType;
   unlockRequirement?: string;
 }
 
@@ -21,30 +25,37 @@ interface BadgeShowcaseProps {
   onViewAll: () => void;
 }
 
-const rarityConfig = {
-  common: {
-    gradient: 'from-gray-400 to-gray-600',
+// Tier configuration matching SVG badge system
+const tierConfig = {
+  bronze: {
+    gradient: 'from-orange-700 to-orange-900',
+    glow: 'shadow-orange-700/50',
+    border: 'border-orange-700/30',
+    bg: 'bg-orange-700/10',
+  },
+  silver: {
+    gradient: 'from-gray-300 to-gray-500',
     glow: 'shadow-gray-400/50',
     border: 'border-gray-400/30',
     bg: 'bg-gray-400/10',
   },
-  rare: {
-    gradient: 'from-blue-400 to-blue-600',
-    glow: 'shadow-blue-400/50',
-    border: 'border-blue-400/30',
-    bg: 'bg-blue-400/10',
+  gold: {
+    gradient: 'from-yellow-400 to-yellow-600',
+    glow: 'shadow-yellow-400/50',
+    border: 'border-yellow-400/30',
+    bg: 'bg-yellow-400/10',
   },
-  epic: {
-    gradient: 'from-purple-400 to-purple-600',
-    glow: 'shadow-purple-400/50',
-    border: 'border-purple-400/30',
-    bg: 'bg-purple-400/10',
+  platinum: {
+    gradient: 'from-slate-200 to-slate-400',
+    glow: 'shadow-slate-300/50',
+    border: 'border-slate-300/30',
+    bg: 'bg-slate-300/10',
   },
-  legendary: {
-    gradient: 'from-amber-400 to-amber-600',
-    glow: 'shadow-amber-400/50',
-    border: 'border-amber-400/30',
-    bg: 'bg-amber-400/10',
+  diamond: {
+    gradient: 'from-cyan-300 to-cyan-500',
+    glow: 'shadow-cyan-400/50',
+    border: 'border-cyan-400/30',
+    bg: 'bg-cyan-400/10',
   },
 };
 
@@ -54,7 +65,62 @@ const FeaturedBadgeCard: React.FC<{
   index: number;
 }> = ({ badge, onClick, index }) => {
   const [isHovered, setIsHovered] = useState(false);
-  const config = rarityConfig[badge.rarity];
+  const [badgeSvg, setBadgeSvg] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
+  const config = tierConfig[badge.tier];
+  
+  // Generate SVG badge using the badge service
+  React.useEffect(() => {
+    const generateBadge = async () => {
+      setIsLoading(true);
+      setHasError(false);
+      
+      try {
+        const badgeService = new BadgeSvgService();
+        const result = await badgeService.generateBadge({
+          id: badge.id,
+          tier: badge.tier,
+          forest: badge.forest,
+          achievement: badge.achievement,
+          metadata: {
+            badgeName: badge.name,
+            tierLevel: ['bronze', 'silver', 'gold', 'platinum', 'diamond'].indexOf(badge.tier) + 1,
+            forestName: badge.forest,
+            achievementType: badge.achievement,
+            achievementCount: 0,
+            earnedDate: new Date().toISOString(),
+            uniqueBadgeId: badge.id,
+            userId: 'preview',
+          },
+          animated: badge.tier === 'diamond',
+        });
+        
+        if (result.success && result.svg) {
+          setBadgeSvg(result.svg);
+          setHasError(false);
+        } else {
+          console.error('[NFTBadgeShowcase] Badge generation failed:', {
+            badgeId: badge.id,
+            badgeName: badge.name,
+            error: result.error,
+          });
+          setHasError(true);
+        }
+      } catch (error) {
+        console.error('[NFTBadgeShowcase] Exception generating badge SVG:', {
+          badgeId: badge.id,
+          badgeName: badge.name,
+          error: error instanceof Error ? error.message : 'Unknown error',
+        });
+        setHasError(true);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    generateBadge();
+  }, [badge]);
 
   return (
     <motion.div
@@ -83,28 +149,46 @@ const FeaturedBadgeCard: React.FC<{
           `}
         />
 
-        {/* Rarity Badge with Sparkles */}
+        {/* Tier Badge with Sparkles */}
         <div className={`absolute top-3 right-3 glass ${config.bg} px-3 py-1 rounded-full flex items-center gap-1 z-10`}>
           <Sparkles size={12} className={`bg-gradient-to-r ${config.gradient} bg-clip-text text-transparent`} />
           <span className={`text-xs font-bold uppercase bg-gradient-to-r ${config.gradient} bg-clip-text text-transparent`}>
-            {badge.rarity}
+            {badge.tier}
           </span>
         </div>
 
-        {/* Badge Image with Rotation on Hover */}
+        {/* Badge SVG with Rotation on Hover */}
         <div className="p-6 flex justify-center items-center bg-gradient-to-br from-green-50/50 to-emerald-50/50 backdrop-blur-sm">
           <motion.div
             className="w-48 h-48 flex items-center justify-center"
             animate={{ rotate: isHovered ? 5 : 0 }}
             transition={{ duration: 0.3 }}
           >
-            {badge.imageUrl ? (
+            {isLoading ? (
+              // Loading state
+              <div className="w-full h-full flex items-center justify-center">
+                <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-green-600"></div>
+              </div>
+            ) : badgeSvg && !hasError ? (
+              // Successfully generated SVG
+              <div
+                className="w-full h-full drop-shadow-2xl"
+                dangerouslySetInnerHTML={{ __html: badgeSvg }}
+              />
+            ) : badge.imageUrl ? (
+              // Fallback to imageUrl if provided
               <img
                 src={badge.imageUrl}
                 alt={badge.name}
                 className="w-full h-full object-contain drop-shadow-2xl"
+                onError={(e) => {
+                  console.error('[NFTBadgeShowcase] Image load failed:', badge.imageUrl);
+                  // Hide broken image
+                  e.currentTarget.style.display = 'none';
+                }}
               />
             ) : (
+              // Final fallback: placeholder icon
               <div className={`w-full h-full rounded-full flex items-center justify-center text-6xl ${config.bg} backdrop-blur-sm`}>
                 <Award size={80} className={`bg-gradient-to-r ${config.gradient} bg-clip-text text-transparent`} />
               </div>
@@ -170,64 +254,70 @@ export const NFTBadgeShowcase: React.FC<BadgeShowcaseProps> = ({
   // Mock data for demonstration if no badges provided
   const mockBadges: FeaturedBadge[] = [
     {
-      id: '1',
-      name: 'Tree Planter',
-      imageUrl: '',
-      description: 'Plant your first tree and start your conservation journey',
+      id: 'badge-001-kakamega-tree-planter',
+      name: 'Kakamega Tree Planter',
+      description: 'Plant your first tree in Kakamega Forest and start your conservation journey',
       priceGGCoins: 50,
       priceKES: 200,
-      rarity: 'common',
-      unlockRequirement: 'Plant 1 tree',
+      tier: 'bronze',
+      forest: 'kakamega',
+      achievement: 'tree_planter',
+      unlockRequirement: 'Plant 1 tree in Kakamega Forest',
     },
     {
-      id: '2',
-      name: 'Forest Guardian',
-      imageUrl: '',
-      description: 'Protect and nurture 10 trees in your local forest',
+      id: 'badge-002-karura-forest-guardian',
+      name: 'Karura Forest Guardian',
+      description: 'Protect and nurture 10 trees in Karura urban forest',
       priceGGCoins: 150,
-      priceKES: 200,
-      rarity: 'rare',
-      unlockRequirement: 'Plant 10 trees',
+      priceKES: 600,
+      tier: 'silver',
+      forest: 'karura',
+      achievement: 'forest_protector',
+      unlockRequirement: 'Plant 10 trees in Karura Forest',
     },
     {
-      id: '3',
-      name: 'Carbon Warrior',
-      imageUrl: '',
-      description: 'Offset 1 ton of CO₂ through verified conservation activities',
+      id: 'badge-003-mau-carbon-warrior',
+      name: 'Mau Carbon Warrior',
+      description: 'Offset 1 ton of CO₂ through verified conservation in Mau Forest',
       priceGGCoins: 300,
-      priceKES: 200,
-      rarity: 'epic',
-      unlockRequirement: 'Sequester 1 ton CO₂',
+      priceKES: 1200,
+      tier: 'gold',
+      forest: 'mau',
+      achievement: 'carbon_warrior',
+      unlockRequirement: 'Sequester 1 ton CO₂ in Mau Forest',
     },
     {
-      id: '4',
-      name: 'Eco Champion',
-      imageUrl: '',
-      description: 'Lead a conservation initiative and inspire your community',
-      priceGGCoins: 500,
-      priceKES: 200,
-      rarity: 'legendary',
-      unlockRequirement: 'Create an initiative',
-    },
-    {
-      id: '5',
-      name: 'Green Investor',
-      imageUrl: '',
-      description: 'Trade carbon credits and support sustainable development',
-      priceGGCoins: 200,
-      priceKES: 200,
-      rarity: 'rare',
-      unlockRequirement: 'Trade 5 carbon credits',
-    },
-    {
-      id: '6',
-      name: 'Community Hero',
-      imageUrl: '',
-      description: 'Engage 50 community members in conservation activities',
+      id: 'badge-004-kakamega-community-leader',
+      name: 'Kakamega Community Leader',
+      description: 'Lead a conservation initiative and inspire your community in Kakamega',
       priceGGCoins: 400,
-      priceKES: 200,
-      rarity: 'epic',
-      unlockRequirement: 'Recruit 50 members',
+      priceKES: 1600,
+      tier: 'platinum',
+      forest: 'kakamega',
+      achievement: 'community_leader',
+      unlockRequirement: 'Create an initiative in Kakamega',
+    },
+    {
+      id: 'badge-005-karura-water-guardian',
+      name: 'Karura Water Guardian',
+      description: 'Protect water sources and support sustainable water management',
+      priceGGCoins: 200,
+      priceKES: 800,
+      tier: 'silver',
+      forest: 'karura',
+      achievement: 'water_guardian',
+      unlockRequirement: 'Complete 5 water conservation activities',
+    },
+    {
+      id: 'badge-006-mau-climate-hero',
+      name: 'Mau Climate Hero',
+      description: 'Champion climate action and achieve diamond-level conservation impact',
+      priceGGCoins: 500,
+      priceKES: 2000,
+      tier: 'diamond',
+      forest: 'mau',
+      achievement: 'climate_hero',
+      unlockRequirement: 'Achieve 100 conservation actions',
     },
   ];
 

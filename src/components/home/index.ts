@@ -9,4 +9,3 @@ export { FeatureHighlights } from './FeatureHighlights';
 export { SocialProofSection } from './SocialProofSection';
 export { LeaderboardPreview } from './LeaderboardPreview';
 export { PartnershipSection } from './PartnershipSection';
-export { HomeFooter } from './HomeFooter';

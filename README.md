@@ -890,7 +890,6 @@ Copyright (c) 2025 Loch Tech Solutions
 
 ## 🙏 Acknowledgments
 
-- Built for the Wangari Maathai Hackathon - Track 3 (Community Engagement and Sustainability)
 - Powered by Antugrow API for AI-driven tree monitoring
 - Supported by Supabase for backend infrastructure
 

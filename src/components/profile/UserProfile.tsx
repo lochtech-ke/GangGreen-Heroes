@@ -4,6 +4,7 @@ import type { GGCoinTransaction } from '../../types/ggCoin.types';
 import { profileService } from '../../services/profile.service';
 import { ggCoinService } from '../../services/ggCoin.service';
 import { GGCoinBalance } from '../gamification/GGCoinBalance';
+import { BadgeGallery } from './BadgeGallery';
 
 interface UserProfileProps {
   user: User;
@@ -268,6 +269,14 @@ export function UserProfile({ user, onEdit }: UserProfileProps) {
               </div>
             )}
           </div>
+        </div>
+
+        {/* NFT Badge Gallery Section */}
+        <div className="border-t pt-4">
+          <h4 className="text-sm font-semibold text-gray-700 mb-4">
+            NFT Badge Collection
+          </h4>
+          <BadgeGallery userId={user.id} limit={12} />
         </div>
       </div>
     </div>

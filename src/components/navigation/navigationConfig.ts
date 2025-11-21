@@ -46,12 +46,12 @@ export const navigationGroups: NavGroupConfig[] = [
   {
     id: 'conservation',
     label: 'Conservation',
-    icon: 'tree',
+    icon: 'tree-pine',
     items: [
       {
         to: '/initiatives',
         label: 'Initiatives',
-        icon: 'tree',
+        icon: 'tree-pine',
         description: 'Browse and join conservation projects',
       },
       {
@@ -82,22 +82,53 @@ export const navigationGroups: NavGroupConfig[] = [
     items: [
       {
         to: '/marketplace',
-        label: 'Carbon Credits',
-        icon: 'cloud',
-        description: 'Trade verified carbon credits',
-      },
-      {
-        to: '/nft-badges',
         label: 'NFT Badges',
         icon: 'award',
-        description: 'Collect achievement badges',
+        description: 'Browse and purchase achievement badges',
         badge: 0, // Will be updated dynamically
+      },
+      {
+        to: '/carbon-credits',
+        label: 'Carbon Credits',
+        icon: 'cloud',
+        description: 'Trade verified carbon credits (Coming Soon)',
       },
       {
         to: '/donate',
         label: 'Donate',
         icon: 'heart',
         description: 'Support conservation efforts',
+      },
+    ],
+  },
+  {
+    id: 'governance',
+    label: 'Governance',
+    icon: 'vote',
+    items: [
+      {
+        to: '/governance',
+        label: 'Overview',
+        icon: 'layout-dashboard',
+        description: 'Governance dashboard and token balance',
+      },
+      {
+        to: '/governance/proposals',
+        label: 'Proposals',
+        icon: 'file-text',
+        description: 'Vote on platform features and improvements',
+      },
+      {
+        to: '/governance/petitions',
+        label: 'Petitions',
+        icon: 'pen-tool',
+        description: 'Support community initiatives with signatures',
+      },
+      {
+        to: '/governance/delegate',
+        label: 'Delegate Voting',
+        icon: 'users',
+        description: 'Delegate your voting power',
       },
     ],
   },
@@ -115,7 +146,7 @@ export const adminNavigationItems: NavItemConfig[] = [
   {
     to: '/admin/analytics',
     label: 'Analytics',
-    icon: 'bar-chart',
+    icon: 'bar-chart-3',
     description: 'Platform analytics and insights',
     roles: ['admin'],
   },

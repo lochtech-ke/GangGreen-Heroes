@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { badgeSvgService } from '../../services/badgeSvg.service';
+import type { BadgePurchase } from '../../types/badgePurchase.types';
 
 interface BadgeSocialShareProps {
   badgeName: string;
@@ -6,19 +8,56 @@ interface BadgeSocialShareProps {
   tier: string;
   userProfileUrl?: string;
   badgeImageUrl?: string;
+  badgeSvg?: string;
+  badge?: BadgePurchase;
   className?: string;
 }
 
 export const BadgeSocialShare: React.FC<BadgeSocialShareProps> = ({
   badgeName,
   userProfileUrl,
+  badgeSvg,
+  badge: _badge,
   className = '',
 }) => {
   const [copied, setCopied] = useState(false);
+  const [exporting, setExporting] = useState(false);
 
   // Generate share message
   const shareMessage = `I just earned the ${badgeName} badge on #GangGreen! 🌳 Join me in making Africa carbon-negative. #GBM #ClimateAction`;
   const shareUrl = userProfileUrl || window.location.origin;
+
+  // Export badge as PNG for sharing
+  const exportBadgeForSharing = async (platform?: string): Promise<string | null> => {
+    if (!badgeSvg) return null;
+
+    try {
+      setExporting(true);
+      const pngBlob = await badgeSvgService.exportToPng(
+        badgeSvg,
+        platform === 'instagram' ? 1080 : 1200
+      );
+      const url = URL.createObjectURL(pngBlob);
+      return url;
+    } catch (error) {
+      console.error('Error exporting badge:', error);
+      return null;
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  // Download badge image
+  const downloadBadge = async () => {
+    const imageUrl = await exportBadgeForSharing();
+    if (imageUrl) {
+      const link = document.createElement('a');
+      link.href = imageUrl;
+      link.download = `${badgeName.replace(/\s+/g, '-').toLowerCase()}-badge.png`;
+      link.click();
+      URL.revokeObjectURL(imageUrl);
+    }
+  };
 
   // Platform-specific share handlers
   const shareOnTwitter = () => {
@@ -105,6 +144,32 @@ export const BadgeSocialShare: React.FC<BadgeSocialShareProps> = ({
           <span className="font-medium">LinkedIn</span>
         </button>
       </div>
+
+      {/* Download Badge Button */}
+      {badgeSvg && (
+        <button
+          onClick={downloadBadge}
+          disabled={exporting}
+          className="w-full mt-3 flex items-center justify-center gap-2 px-4 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {exporting ? (
+            <>
+              <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <span className="font-medium">Exporting...</span>
+            </>
+          ) : (
+            <>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              <span className="font-medium">Download Badge Image</span>
+            </>
+          )}
+        </button>
+      )}
 
       {/* Copy to Clipboard */}
       <button

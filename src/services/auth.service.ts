@@ -31,16 +31,12 @@ class AuthService {
         email: data.email,
       });
 
-      // Check service health first
+      // Perform health check but don't block on failure
       const isHealthy = await checkSupabaseHealth();
       if (!isHealthy) {
-        console.warn('[AuthService] Service health check failed');
-        return {
-          user: null,
-          error: new Error(
-            'Service temporarily unavailable. Please try again in a few moments.'
-          ),
-        };
+        console.warn('[AuthService] Health check failed, proceeding anyway');
+      } else {
+        console.log('[AuthService] Health check passed');
       }
 
       // Step 1: Create auth user with retry logic
@@ -152,16 +148,12 @@ class AuthService {
     try {
       console.log('[AuthService] Starting login for:', credentials.email);
 
-      // Check service health first
+      // Perform health check but don't block on failure
       const isHealthy = await checkSupabaseHealth();
       if (!isHealthy) {
-        console.warn('[AuthService] Service health check failed');
-        return {
-          user: null,
-          error: new Error(
-            'Service temporarily unavailable. Please try again in a few moments.'
-          ),
-        };
+        console.warn('[AuthService] Health check failed, proceeding anyway');
+      } else {
+        console.log('[AuthService] Health check passed');
       }
 
       // Attempt login with retry logic
