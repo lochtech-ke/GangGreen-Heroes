@@ -1,12 +1,10 @@
 import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Menu, ChevronDown } from 'lucide-react';
+import { Menu, ChevronDown, Search } from 'lucide-react';
 import { useAuthContext } from '../../contexts/AuthContext';
 import { authService } from '../../services/auth.service';
-import { NavItem } from './NavItem';
 import { UserMenu } from './UserMenu';
 import { MobileMenu } from './MobileMenu';
-import { NavDropdown } from './NavDropdown';
 import { QuickActions } from './QuickActions';
 import { NotificationCenter } from './NotificationCenter';
 import { GGCoinDisplay } from './GGCoinDisplay';
@@ -16,7 +14,7 @@ import {
   getNavigationGroups,
   getStandaloneItems,
   getAdminItems,
-  getFooterItems, // NEW: Import footer items
+  getFooterItems,
 } from './navigationConfig';
 
 interface NavigationProps {
@@ -116,44 +114,16 @@ export function Navigation({ className = '' }: NavigationProps) {
               </Link>
             </div>
 
-            {/* Center Section: Desktop Navigation */}
-            <div className="hidden md:flex md:items-center md:space-x-2">
-              {/* Standalone Items */}
-              {standaloneItems.map((item) => (
-                <NavItem
-                  key={item.to}
-                  to={item.to}
-                  icon={item.icon}
-                  label={item.label}
-                  badge={typeof item.badge === 'function' ? item.badge() : item.badge}
+            {/* Center Section: Search Bar */}
+            <div className="hidden md:flex flex-1 max-w-xl mx-8">
+              <div className="relative w-full">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search initiatives, trees, achievements..."
+                  className="w-full pl-10 pr-4 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent bg-gray-50"
                 />
-              ))}
-
-              {/* Navigation Groups (Dropdowns) */}
-              {navigationGroups.map((group) => (
-                <NavDropdown
-                  key={group.id}
-                  group={group}
-                  isOpen={openDropdown === group.id}
-                  onToggle={() => handleDropdownToggle(group.id)}
-                  onClose={closeAllDropdowns}
-                />
-              ))}
-
-              {/* Admin Items */}
-              {adminItems.length > 0 && (
-                <div className="border-l border-gray-200 pl-2 ml-2">
-                  {adminItems.map((item) => (
-                    <NavItem
-                      key={item.to}
-                      to={item.to}
-                      icon={item.icon}
-                      label={item.label}
-                      badge={typeof item.badge === 'function' ? item.badge() : item.badge}
-                    />
-                  ))}
-                </div>
-              )}
+              </div>
             </div>
 
             {/* Right Section: Actions + User Menu */}
