@@ -1,118 +1,80 @@
+import React from 'react';
+import { TreePine, Users, Target } from 'lucide-react';
+import { GlassCard } from '../common/GlassCard';
 import type { Initiative } from '../../types/initiative.types';
 
-interface InitiativeCardProps {
+export interface InitiativeCardProps {
   initiative: Initiative;
-  onClick?: () => void;
+  onClick: () => void;
 }
 
-export function InitiativeCard({
-  initiative,
-  onClick,
-}: InitiativeCardProps) {
-  const progressPercentage = Math.min(
-    Math.round((initiative.trees_planted / initiative.target_trees) * 100),
-    100
-  );
-
-  const getStatusColor = (status: string) => {
-    const colors = {
-      active: 'bg-green-100 text-green-700',
-      completed: 'bg-blue-100 text-blue-700',
-      paused: 'bg-yellow-100 text-yellow-700',
-    };
-    return colors[status as keyof typeof colors] || 'bg-gray-100 text-gray-700';
+const InitiativeCard: React.FC<InitiativeCardProps> = ({ initiative, onClick }) => {
+  const forestNames = {
+    kakamega: 'Kakamega Forest',
+    karura: 'Karura Forest',
+    mau: 'Mau Forest',
   };
 
-  const getForestDisplay = (forest: string) => {
-    const forestMap: Record<string, string> = {
-      kakamega: 'Kakamega Forest',
-      karura: 'Karura Forest',
-      mau: 'Mau Forest',
-    };
-    return forestMap[forest] || forest;
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
+  const statusColors = {
+    active: 'bg-green-100 text-green-800',
+    completed: 'bg-blue-100 text-blue-800',
+    paused: 'bg-yellow-100 text-yellow-800',
   };
 
   return (
-    <div
+    <GlassCard
+      className="p-6 cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
       onClick={onClick}
-      className={`bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 p-6 ${
-        onClick ? 'cursor-pointer' : ''
-      }`}
     >
-      {/* Header */}
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex-1">
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">
-            {initiative.title}
-          </h3>
-          <div className="flex items-center gap-2 flex-wrap">
-            <span
-              className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                initiative.status
-              )}`}
-            >
-              {initiative.status.charAt(0).toUpperCase() + initiative.status.slice(1)}
-            </span>
-            <span className="px-3 py-1 bg-green-50 text-green-700 rounded-full text-xs font-medium">
-              {getForestDisplay(initiative.forest)}
-            </span>
+      <div className="flex justify-between items-start mb-4">
+        <h3 className="text-xl font-bold text-gray-900 line-clamp-2 flex-1 pr-2">
+          {initiative.title}
+        </h3>
+        <span
+          className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${statusColors[initiative.status]}`}
+        >
+          {initiative.status}
+        </span>
+      </div>
+
+      <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+        {initiative.description || 'No description available'}
+      </p>
+
+      <div className="space-y-3">
+        <div className="flex items-center gap-2 text-sm text-gray-700">
+          <TreePine size={16} className="text-green-600 flex-shrink-0" />
+          <span>{forestNames[initiative.forest]}</span>
+        </div>
+
+        <div className="flex items-center gap-2 text-sm text-gray-700">
+          <Users size={16} className="text-blue-600 flex-shrink-0" />
+          <span>{initiative.participant_count || 0} participants</span>
+        </div>
+
+        <div className="flex items-center gap-2 text-sm text-gray-700">
+          <Target size={16} className="text-purple-600 flex-shrink-0" />
+          <span>
+            {initiative.trees_planted.toLocaleString()} / {initiative.target_trees.toLocaleString()} trees
+          </span>
+        </div>
+
+        {/* Progress Bar */}
+        <div className="mt-4">
+          <div className="flex justify-between text-xs text-gray-600 mb-1">
+            <span>Progress</span>
+            <span>{initiative.progress_percentage?.toFixed(0)}%</span>
+          </div>
+          <div className="w-full bg-gray-200 rounded-full h-2">
+            <div
+              className="bg-green-500 h-2 rounded-full transition-all duration-500"
+              style={{ width: `${Math.min(initiative.progress_percentage || 0, 100)}%` }}
+            />
           </div>
         </div>
       </div>
-
-      {/* Description */}
-      <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-        {initiative.description}
-      </p>
-
-      {/* Progress */}
-      <div className="mb-4">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium text-gray-700">Progress</span>
-          <span className="text-sm font-semibold text-green-600">
-            {progressPercentage}%
-          </span>
-        </div>
-        <div className="w-full bg-gray-200 rounded-full h-2">
-          <div
-            className="bg-green-600 h-2 rounded-full transition-all duration-300"
-            style={{ width: `${progressPercentage}%` }}
-          />
-        </div>
-        <div className="flex items-center justify-between mt-2">
-          <span className="text-xs text-gray-600">
-            {initiative.trees_planted.toLocaleString()} planted
-          </span>
-          <span className="text-xs text-gray-600">
-            {initiative.target_trees.toLocaleString()} target
-          </span>
-        </div>
-      </div>
-
-      {/* Stats */}
-      <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-200">
-        <div>
-          <p className="text-xs text-gray-600 mb-1">Area</p>
-          <p className="text-sm font-semibold text-gray-900">
-            {initiative.area_hectares} hectares
-          </p>
-        </div>
-        <div>
-          <p className="text-xs text-gray-600 mb-1">Timeline</p>
-          <p className="text-sm font-semibold text-gray-900">
-            {formatDate(initiative.start_date)}
-            {initiative.end_date && ` - ${formatDate(initiative.end_date)}`}
-          </p>
-        </div>
-      </div>
-    </div>
+    </GlassCard>
   );
-}
+};
+
+export default InitiativeCard;

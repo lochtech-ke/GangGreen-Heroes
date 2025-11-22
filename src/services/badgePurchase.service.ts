@@ -13,7 +13,7 @@ import type {
   VerifyAndRewardResult,
 } from '../types/badgePurchase.types';
 import type { BadgeTier, ForestType, AchievementType } from '../types/badge.types';
-import { BADGE_PRICE_KES, BADGE_PURCHASE_GG_COIN_REWARD } from '../types/badgePurchase.types';
+import { BADGE_PRICE_KES } from '../types/badgePurchase.types';
 
 /**
  * Badge Purchase Service
@@ -33,6 +33,9 @@ class BadgePurchaseService {
       // Generate unique reference
       const reference = paystackService.generateReference();
 
+      // Calculate GG Coin reward based on purchase amount
+      const ggCoinsAwarded = ggCoinService.calculatePurchaseReward(BADGE_PRICE_KES);
+
       // Create purchase record
       const { data: purchase, error: purchaseError } = await supabase
         .from('badge_purchases')
@@ -43,7 +46,7 @@ class BadgePurchaseService {
           amount_kes: BADGE_PRICE_KES,
           paystack_reference: reference,
           payment_status: 'pending',
-          gg_coins_awarded: BADGE_PURCHASE_GG_COIN_REWARD,
+          gg_coins_awarded: ggCoinsAwarded,
           metadata: metadata || {},
         })
         .select()
@@ -188,13 +191,15 @@ class BadgePurchaseService {
 
       // Credit GG Coins (will be handled by webhook, but we can try here as backup)
       if (!purchase.gg_coins_credited) {
+        const ggCoinsToCredit = purchase.gg_coins_awarded || ggCoinService.calculatePurchaseReward(purchase.amount_kes);
+        
         const creditResult = await ggCoinService.creditCoins({
           userId: userId,
-          amount: BADGE_PURCHASE_GG_COIN_REWARD,
+          amount: ggCoinsToCredit,
           transactionType: 'purchase_reward',
           referenceType: 'badge_purchase',
           referenceId: purchase.id,
-          description: `Earned ${BADGE_PURCHASE_GG_COIN_REWARD} GG Coin for purchasing ${purchase.badge_type} ${purchase.tier} badge`,
+          description: `Earned ${ggCoinsToCredit} GG Coins for purchasing ${purchase.badge_type} ${purchase.tier} badge (${purchase.amount_kes} KES)`,
           metadata: {
             badge_type: purchase.badge_type,
             tier: purchase.tier,
@@ -228,7 +233,7 @@ class BadgePurchaseService {
       return {
         success: true,
         purchase: updatedPurchase as BadgePurchase,
-        gg_coins_earned: BADGE_PURCHASE_GG_COIN_REWARD,
+        gg_coins_earned: updatedPurchase.gg_coins_awarded,
       };
     } catch (error) {
       console.error('[BadgePurchaseService] Complete purchase exception:', error);
@@ -287,14 +292,17 @@ class BadgePurchaseService {
         })
         .eq('id', purchase.id);
 
+      // Calculate GG Coins to credit (use stored amount or calculate from purchase amount)
+      const ggCoinsToCredit = purchase.gg_coins_awarded || ggCoinService.calculatePurchaseReward(purchase.amount_kes);
+
       // Credit GG Coins
       const creditResult = await ggCoinService.creditCoins({
         userId: purchase.user_id,
-        amount: BADGE_PURCHASE_GG_COIN_REWARD,
+        amount: ggCoinsToCredit,
         transactionType: 'purchase_reward',
         referenceType: 'badge_purchase',
         referenceId: purchase.id,
-        description: `Earned ${BADGE_PURCHASE_GG_COIN_REWARD} GG Coin for purchasing ${purchase.badge_type} ${purchase.tier} badge`,
+        description: `Earned ${ggCoinsToCredit} GG Coins for purchasing ${purchase.badge_type} ${purchase.tier} badge (${purchase.amount_kes} KES)`,
         metadata: {
           badge_type: purchase.badge_type,
           tier: purchase.tier,
@@ -317,7 +325,7 @@ class BadgePurchaseService {
         .update({ gg_coins_credited: true })
         .eq('id', purchase.id);
 
-      console.log(`[BadgePurchaseService] Successfully credited ${BADGE_PURCHASE_GG_COIN_REWARD} GG Coins`);
+      console.log(`[BadgePurchaseService] Successfully credited ${ggCoinsToCredit} GG Coins`);
 
       return {
         success: true,

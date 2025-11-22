@@ -1,12 +1,27 @@
+import { useEffect } from 'react';
 import { useAuthContext } from '../contexts/AuthContext';
 import { BadgeMarketplace } from '../components/nft/BadgeMarketplace';
 
 export function MarketplacePage() {
-  const { user } = useAuthContext();
+  const { user, isAuthenticated } = useAuthContext();
+
+  // Set page title and metadata
+  useEffect(() => {
+    document.title = 'Badge Marketplace | #GangGreen';
+    
+    // Update meta description
+    const metaDescription = document.querySelector('meta[name="description"]');
+    if (metaDescription) {
+      metaDescription.setAttribute(
+        'content',
+        'Browse and purchase exclusive NFT badges to showcase your conservation achievements. Earn GG Coins with every purchase!'
+      );
+    }
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-green-100">
-      {user ? (
+      {isAuthenticated && user ? (
         <BadgeMarketplace
           userId={user.id}
           userEmail={user.email || ''}
@@ -19,7 +34,7 @@ export function MarketplacePage() {
             <p className="text-gray-600 mb-6">
               Browse and purchase exclusive NFT badges to showcase your conservation achievements.
             </p>
-            <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
+            <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-6">
               <p className="text-sm text-blue-800">
                 <strong>Please log in</strong> to purchase badges. You can browse available badges below.
               </p>

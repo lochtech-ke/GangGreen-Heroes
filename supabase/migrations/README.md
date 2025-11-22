@@ -13,6 +13,16 @@ This directory contains SQL migration scripts for the GangGreen platform databas
 7. **007_create_nft_badges.sql** - NFT badge reward system
 8. **008_create_gamification.sql** - Gamification and achievement system
 9. **009_create_quests_and_referrals.sql** - Challenge quests and referral system
+10. **010_rls_policies.sql** - Row-level security policies
+11. **011_fix_user_registration.sql** - User registration fixes
+12. **012_create_chatbot_tables.sql** - Chatbot conversation tables
+13. **013_add_paystack_fields.sql** - Paystack payment integration
+14. **014_add_badge_purchases_and_gg_coins.sql** - Badge purchases and GG Coins system
+15. **015_add_social_feed_tables.sql** - Social media feed tables
+16. **016_add_governance_token_system.sql** - Governance token system
+17. **017_add_individual_user_journey_tables.sql** - Individual user journey tracking
+18. **018_update_gg_coins_to_decimal.sql** - Update GG Coins to support decimal precision (3 decimal places)
+19. **019_add_antugrow_integration_tables.sql** - Antugrow API integration (sync logs, webhooks, SMS alerts)
 
 ## How to Execute Migrations
 

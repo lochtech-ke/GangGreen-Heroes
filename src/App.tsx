@@ -8,7 +8,9 @@ import { RegisterPage } from './pages/RegisterPage';
 import { ResetPasswordPage } from './pages/ResetPasswordPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { ProfilePage } from './pages/ProfilePage';
-import { InitiativesPage } from './pages/InitiativesPage';
+import InitiativesPage from './pages/InitiativesPage';
+import { InitiativeDetailsPage } from './pages/InitiativeDetailsPage';
+import { CreateInitiativePage } from './pages/CreateInitiativePage';
 import { TreesPage } from './pages/TreesPage';
 import { MarketplacePage } from './pages/MarketplacePage';
 import { GamificationPage } from './pages/GamificationPage';
@@ -183,6 +185,26 @@ function AppContent() {
             <ProtectedRoute>
               <Layout>
                 <InitiativesPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/initiatives/create"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <CreateInitiativePage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/initiatives/:id"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <InitiativeDetailsPage />
               </Layout>
             </ProtectedRoute>
           }

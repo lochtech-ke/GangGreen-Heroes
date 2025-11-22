@@ -139,30 +139,62 @@ function escapeXML(str: string): string {
 export function validateBadgeConfig(config: BadgeConfig): { valid: boolean; errors: string[] } {
   const errors: string[] = [];
   
+  // Validate ID
   if (!config.id || config.id.trim() === '') {
     errors.push('Badge ID is required');
   }
   
-  if (!['bronze', 'silver', 'gold', 'platinum', 'diamond'].includes(config.tier)) {
-    errors.push('Invalid tier');
+  // Validate tier
+  const validTiers = ['bronze', 'silver', 'gold', 'platinum', 'diamond'];
+  if (!validTiers.includes(config.tier)) {
+    errors.push(`Invalid tier: ${config.tier}. Must be one of: ${validTiers.join(', ')}`);
   }
   
-  if (!['kakamega', 'karura', 'mau'].includes(config.forest)) {
-    errors.push('Invalid forest');
+  // Validate forest
+  const validForests = ['kakamega', 'karura', 'mau'];
+  if (!validForests.includes(config.forest)) {
+    errors.push(`Invalid forest: ${config.forest}. Must be one of: ${validForests.join(', ')}`);
   }
   
-  // Only validate UUID format if uniqueBadgeId looks like a UUID (contains hyphens)
-  if (config.metadata.uniqueBadgeId.includes('-') && 
-      !config.metadata.uniqueBadgeId.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
+  // Validate achievement type
+  const validAchievements = [
+    'tree_planter',
+    'carbon_warrior',
+    'water_guardian',
+    'biodiversity_champion',
+    'community_leader',
+    'climate_hero',
+    'forest_protector',
+    'green_ambassador',
+  ];
+  if (!validAchievements.includes(config.achievement)) {
+    errors.push(`Invalid achievement: ${config.achievement}. Must be one of: ${validAchievements.join(', ')}`);
+  }
+  
+  // Validate metadata exists
+  if (!config.metadata) {
+    errors.push('Metadata is required');
+    return { valid: false, errors };
+  }
+  
+  // Only validate UUID format if uniqueBadgeId looks like a UUID
+  // A UUID has exactly 5 groups: 8-4-4-4-12 hex characters
+  // Badge IDs like "badge-001-kakamega-tree-planter" are not UUIDs
+  const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (config.metadata.uniqueBadgeId && 
+      config.metadata.uniqueBadgeId.match(/^[0-9a-f]{8}-[0-9a-f]{4}/i) && // Starts like a UUID
+      !config.metadata.uniqueBadgeId.match(uuidPattern)) {
     errors.push('Invalid UUID format for badge ID');
   }
   
   // Make date validation more lenient - accept any ISO-like date
-  if (!config.metadata.earnedDate.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/)) {
+  if (config.metadata.earnedDate && 
+      !config.metadata.earnedDate.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/)) {
     errors.push('Invalid ISO 8601 date format');
   }
   
-  if (config.metadata.achievementCount < 0) {
+  // Validate achievement count
+  if (config.metadata.achievementCount !== undefined && config.metadata.achievementCount < 0) {
     errors.push('Achievement count must be positive');
   }
   

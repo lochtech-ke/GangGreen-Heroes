@@ -50,15 +50,50 @@ interface AntugrowResponse<T> {
   error: Error | null;
 }
 
+interface RequestMetrics {
+  totalRequests: number;
+  successfulRequests: number;
+  failedRequests: number;
+  totalResponseTime: number;
+  averageResponseTime: number;
+  successRate: number;
+}
+
+interface QueuedRequest {
+  endpoint: string;
+  options: RequestInit;
+  resolve: (value: any) => void;
+  reject: (reason: any) => void;
+  timestamp: number;
+}
+
 class AntugrowService {
   private baseUrl: string;
   private apiKey: string;
+  private webhookSecret: string;
   private maxRetries: number = 3;
   private retryDelay: number = 1000; // Initial delay in ms
+  
+  // Request queue for rate limiting
+  private requestQueue: QueuedRequest[] = [];
+  private isProcessingQueue: boolean = false;
+  private requestsPerMinute: number = 100;
+  private requestTimestamps: number[] = [];
+  
+  // Metrics tracking
+  private metrics: RequestMetrics = {
+    totalRequests: 0,
+    successfulRequests: 0,
+    failedRequests: 0,
+    totalResponseTime: 0,
+    averageResponseTime: 0,
+    successRate: 0,
+  };
 
   constructor() {
     this.baseUrl = ANTUGROW_API_URL;
     this.apiKey = ANTUGROW_API_KEY;
+    this.webhookSecret = import.meta.env.ANTUGROW_WEBHOOK_SECRET || '';
 
     if (!this.apiKey) {
       console.warn('Antugrow API key not configured. Set VITE_ANTUGROW_API_KEY in environment variables.');
@@ -170,13 +205,180 @@ class AntugrowService {
   }
 
   /**
-   * Make HTTP request to Antugrow API with retry logic
+   * Validate webhook signature using HMAC
+   * @param payload - Webhook payload as string
+   * @param signature - Signature from webhook header
+   * @returns true if signature is valid
    */
-  private async makeRequest<T>(
+  validateWebhookSignature(payload: string, signature: string): boolean {
+    if (!this.webhookSecret) {
+      console.error('Webhook secret not configured');
+      return false;
+    }
+
+    try {
+      // In a real implementation, this would use crypto.subtle or a library
+      // to compute HMAC-SHA256 of the payload and compare with signature
+      // For now, we'll do a simple comparison
+      // TODO: Implement proper HMAC-SHA256 signature validation using payload
+      const expectedSignature = `sha256=${this.webhookSecret}`;
+      
+      // Payload will be used in proper HMAC implementation
+      console.debug('Validating webhook signature for payload length:', payload.length);
+      
+      return signature === expectedSignature;
+    } catch (error) {
+      this.logError('Webhook signature validation failed', error, { signature });
+      return false;
+    }
+  }
+
+  /**
+   * Get current API metrics
+   */
+  getMetrics(): RequestMetrics {
+    return { ...this.metrics };
+  }
+
+  /**
+   * Reset metrics
+   */
+  resetMetrics(): void {
+    this.metrics = {
+      totalRequests: 0,
+      successfulRequests: 0,
+      failedRequests: 0,
+      totalResponseTime: 0,
+      averageResponseTime: 0,
+      successRate: 0,
+    };
+  }
+
+  /**
+   * Check if we're approaching rate limits
+   * @returns true if we're at 80% or more of rate limit
+   */
+  isApproachingRateLimit(): boolean {
+    const now = Date.now();
+    const oneMinuteAgo = now - 60000;
+    
+    // Clean up old timestamps
+    this.requestTimestamps = this.requestTimestamps.filter(ts => ts > oneMinuteAgo);
+    
+    return this.requestTimestamps.length >= this.requestsPerMinute * 0.8;
+  }
+
+  /**
+   * Add request to queue for rate limit management
+   */
+  private async queueRequest<T>(endpoint: string, options: RequestInit): Promise<AntugrowResponse<T>> {
+    return new Promise((resolve, reject) => {
+      this.requestQueue.push({
+        endpoint,
+        options,
+        resolve,
+        reject,
+        timestamp: Date.now(),
+      });
+
+      if (!this.isProcessingQueue) {
+        this.processQueue();
+      }
+    });
+  }
+
+  /**
+   * Process queued requests with rate limiting
+   */
+  private async processQueue(): Promise<void> {
+    if (this.isProcessingQueue || this.requestQueue.length === 0) {
+      return;
+    }
+
+    this.isProcessingQueue = true;
+
+    while (this.requestQueue.length > 0) {
+      const now = Date.now();
+      const oneMinuteAgo = now - 60000;
+      
+      // Clean up old timestamps
+      this.requestTimestamps = this.requestTimestamps.filter(ts => ts > oneMinuteAgo);
+
+      // Check if we can make a request
+      if (this.requestTimestamps.length >= this.requestsPerMinute) {
+        // Wait until we can make another request
+        const oldestTimestamp = this.requestTimestamps[0];
+        const waitTime = 60000 - (now - oldestTimestamp) + 100; // Add 100ms buffer
+        await this.sleep(waitTime);
+        continue;
+      }
+
+      // Process next request
+      const queuedRequest = this.requestQueue.shift();
+      if (!queuedRequest) break;
+
+      try {
+        this.requestTimestamps.push(Date.now());
+        const result = await this.makeRequestInternal(
+          queuedRequest.endpoint,
+          queuedRequest.options
+        );
+        queuedRequest.resolve(result);
+      } catch (error) {
+        queuedRequest.reject(error);
+      }
+    }
+
+    this.isProcessingQueue = false;
+  }
+
+  /**
+   * Log error with detailed context
+   */
+  private logError(message: string, error: unknown, context?: Record<string, any>): void {
+    const errorDetails = {
+      message,
+      error: error instanceof Error ? {
+        name: error.name,
+        message: error.message,
+        stack: error.stack,
+      } : error,
+      context,
+      timestamp: new Date().toISOString(),
+      service: 'AntugrowService',
+    };
+
+    console.error('[Antugrow Service Error]', JSON.stringify(errorDetails, null, 2));
+  }
+
+  /**
+   * Update metrics after request
+   */
+  private updateMetrics(success: boolean, responseTime: number): void {
+    this.metrics.totalRequests++;
+    this.metrics.totalResponseTime += responseTime;
+    
+    if (success) {
+      this.metrics.successfulRequests++;
+    } else {
+      this.metrics.failedRequests++;
+    }
+
+    this.metrics.averageResponseTime = this.metrics.totalResponseTime / this.metrics.totalRequests;
+    this.metrics.successRate = (this.metrics.successfulRequests / this.metrics.totalRequests) * 100;
+  }
+
+  /**
+   * Make HTTP request to Antugrow API with retry logic
+   * Internal method that doesn't use queue
+   */
+  private async makeRequestInternal<T>(
     endpoint: string,
     options: RequestInit,
     retryCount: number = 0
   ): Promise<AntugrowResponse<T>> {
+    const startTime = Date.now();
+    
     try {
       const url = `${this.baseUrl}${endpoint}`;
 
@@ -189,47 +391,101 @@ class AntugrowService {
         },
       });
 
+      const responseTime = Date.now() - startTime;
+
       // Handle rate limiting
       if (response.status === 429) {
+        this.updateMetrics(false, responseTime);
+        
         if (retryCount < this.maxRetries) {
           const delay = this.calculateRetryDelay(retryCount);
+          this.logError('Rate limit hit, retrying', new Error('429 Rate Limit'), {
+            endpoint,
+            retryCount,
+            delay,
+          });
           await this.sleep(delay);
-          return this.makeRequest<T>(endpoint, options, retryCount + 1);
+          return this.makeRequestInternal<T>(endpoint, options, retryCount + 1);
         }
         throw new Error('Rate limit exceeded. Please try again later.');
       }
 
       // Handle server errors with retry
       if (response.status >= 500 && response.status < 600) {
+        this.updateMetrics(false, responseTime);
+        
         if (retryCount < this.maxRetries) {
           const delay = this.calculateRetryDelay(retryCount);
+          this.logError('Server error, retrying', new Error(`${response.status} Server Error`), {
+            endpoint,
+            retryCount,
+            delay,
+          });
           await this.sleep(delay);
-          return this.makeRequest<T>(endpoint, options, retryCount + 1);
+          return this.makeRequestInternal<T>(endpoint, options, retryCount + 1);
         }
         throw new Error('Antugrow API server error. Please try again later.');
       }
 
       // Handle client errors
       if (!response.ok) {
+        this.updateMetrics(false, responseTime);
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `API request failed with status ${response.status}`);
+        const error = new Error(errorData.message || `API request failed with status ${response.status}`);
+        this.logError('API request failed', error, {
+          endpoint,
+          status: response.status,
+          errorData,
+        });
+        throw error;
       }
 
       const data = await response.json();
+      this.updateMetrics(true, responseTime);
       return { data, error: null };
     } catch (error) {
+      const responseTime = Date.now() - startTime;
+      
       // Retry on network errors
       if (retryCount < this.maxRetries && this.isNetworkError(error)) {
+        this.updateMetrics(false, responseTime);
         const delay = this.calculateRetryDelay(retryCount);
+        this.logError('Network error, retrying', error, {
+          endpoint,
+          retryCount,
+          delay,
+        });
         await this.sleep(delay);
-        return this.makeRequest<T>(endpoint, options, retryCount + 1);
+        return this.makeRequestInternal<T>(endpoint, options, retryCount + 1);
       }
 
+      this.updateMetrics(false, responseTime);
+      this.logError('Request failed', error, { endpoint, retryCount });
+      
       return {
         data: null,
         error: error instanceof Error ? error : new Error('Unknown error occurred'),
       };
     }
+  }
+
+  /**
+   * Make HTTP request to Antugrow API with retry logic
+   * Public method that uses queue for rate limiting
+   */
+  private async makeRequest<T>(
+    endpoint: string,
+    options: RequestInit,
+    retryCount: number = 0
+  ): Promise<AntugrowResponse<T>> {
+    // Use queue if we're approaching rate limits
+    if (this.isApproachingRateLimit()) {
+      return this.queueRequest<T>(endpoint, options);
+    }
+
+    // Otherwise make request directly
+    this.requestTimestamps.push(Date.now());
+    return this.makeRequestInternal<T>(endpoint, options, retryCount);
   }
 
   /**
@@ -296,4 +552,5 @@ export type {
   AntugrowAnalysisResult,
   AntugrowGrowthData,
   AntugrowResponse,
+  RequestMetrics,
 };

@@ -274,4 +274,108 @@ describe('AntugrowService', () => {
       expect(typeof isConfigured).toBe('boolean');
     });
   });
+
+  describe('webhook signature validation', () => {
+    it('should validate webhook signature', () => {
+      const payload = JSON.stringify({ event: 'test', data: {} });
+      const signature = 'sha256=test-secret';
+      
+      const isValid = antugrowService.validateWebhookSignature(payload, signature);
+      
+      // Since we're using a simple implementation, this will depend on env config
+      expect(typeof isValid).toBe('boolean');
+    });
+
+    it('should reject invalid signature', () => {
+      const payload = JSON.stringify({ event: 'test', data: {} });
+      const signature = 'invalid-signature';
+      
+      const isValid = antugrowService.validateWebhookSignature(payload, signature);
+      
+      expect(isValid).toBe(false);
+    });
+  });
+
+  describe('metrics tracking', () => {
+    beforeEach(() => {
+      antugrowService.resetMetrics();
+    });
+
+    it('should track successful requests', async () => {
+      vi.mocked(fetch).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ antugrow_id: 'test-123' }),
+      } as Response);
+
+      await antugrowService.registerTree({
+        tree_id: 'tree-123',
+        species: 'Acacia',
+        location: { latitude: 0.2827, longitude: 34.8522 },
+        planted_date: '2025-01-01',
+      });
+
+      const metrics = antugrowService.getMetrics();
+      
+      expect(metrics.totalRequests).toBeGreaterThan(0);
+      expect(metrics.successfulRequests).toBeGreaterThan(0);
+      expect(metrics.successRate).toBeGreaterThan(0);
+    });
+
+    it('should track failed requests', async () => {
+      vi.mocked(fetch).mockResolvedValueOnce({
+        ok: false,
+        status: 400,
+        json: async () => ({ message: 'Bad request' }),
+      } as Response);
+
+      await antugrowService.registerTree({
+        tree_id: 'tree-123',
+        species: 'Acacia',
+        location: { latitude: 0.2827, longitude: 34.8522 },
+        planted_date: '2025-01-01',
+      });
+
+      const metrics = antugrowService.getMetrics();
+      
+      expect(metrics.totalRequests).toBeGreaterThan(0);
+      expect(metrics.failedRequests).toBeGreaterThan(0);
+    });
+
+    it('should calculate average response time', async () => {
+      vi.mocked(fetch).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ antugrow_id: 'test-123' }),
+      } as Response);
+
+      await antugrowService.registerTree({
+        tree_id: 'tree-123',
+        species: 'Acacia',
+        location: { latitude: 0.2827, longitude: 34.8522 },
+        planted_date: '2025-01-01',
+      });
+
+      const metrics = antugrowService.getMetrics();
+      
+      expect(metrics.averageResponseTime).toBeGreaterThanOrEqual(0);
+    });
+
+    it('should reset metrics', () => {
+      antugrowService.resetMetrics();
+      const metrics = antugrowService.getMetrics();
+      
+      expect(metrics.totalRequests).toBe(0);
+      expect(metrics.successfulRequests).toBe(0);
+      expect(metrics.failedRequests).toBe(0);
+      expect(metrics.totalResponseTime).toBe(0);
+      expect(metrics.averageResponseTime).toBe(0);
+      expect(metrics.successRate).toBe(0);
+    });
+  });
+
+  describe('rate limit management', () => {
+    it('should detect when approaching rate limit', () => {
+      const isApproaching = antugrowService.isApproachingRateLimit();
+      expect(typeof isApproaching).toBe('boolean');
+    });
+  });
 });

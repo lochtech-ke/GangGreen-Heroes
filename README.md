@@ -4,6 +4,25 @@ A comprehensive digital platform designed to catalyze a carbon-negative Africa b
 
 Built for **Track 3 (Community Engagement and Sustainability)** of the Wangari Maathai Hackathon.
 
+---
+
+## 📚 **NEW: Complete Documentation Wiki**
+
+We've created comprehensive documentation for the entire development journey:
+
+- **[📖 Development Wiki](docs/DEVELOPMENT_WIKI.md)** - Complete feature journey, architecture, and lessons learned
+- **[🗺️ Feature Map](docs/FEATURE_MAP.md)** - Interactive feature relationships and status dashboard
+- **[🏗️ Architecture Guide](docs/ARCHITECTURE.md)** - Deep technical dive into system design
+- **[✅ Build & Test Summary](docs/BUILD_AND_TEST_SUMMARY.md)** - Latest build status and metrics
+- **[📑 Documentation Index](docs/INDEX.md)** - Navigate all 100+ documentation files
+
+**Quick Links:**
+- New Developer? → [Setup Guide](docs/SETUP_INSTRUCTIONS.md) + [Quick Reference](docs/QUICK_REFERENCE.md)
+- Want to Understand the System? → [Architecture](docs/ARCHITECTURE.md) + [Feature Map](docs/FEATURE_MAP.md)
+- Looking for Specific Features? → [Development Wiki](docs/DEVELOPMENT_WIKI.md)
+
+---
+
 ## 🌳 Mission
 
 The #GangGreen platform facilitates tree planting initiatives, carbon credit trading, community engagement, and transparent monitoring of environmental impact across African regions, with a focus on Technology for Forest Conservation.

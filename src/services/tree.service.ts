@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { antugrowService } from './antugrow.service';
 import type {
   Tree,
   CreateTreeData,
@@ -15,10 +16,12 @@ import type {
 /**
  * Tree Service
  * Handles tree registry, monitoring, and statistics
+ * Integrates with Antugrow API for AI-powered tree monitoring
  */
 class TreeService {
   /**
    * Create a new tree record
+   * Automatically registers with Antugrow if configured
    */
   async createTree(data: CreateTreeData): Promise<TreeResponse> {
     try {
@@ -26,6 +29,12 @@ class TreeService {
       const validationError = this.validateTreeData(data);
       if (validationError) {
         return { tree: null, error: validationError };
+      }
+
+      // Validate coordinates for Antugrow
+      const coordValidationError = this.validateCoordinates(data.location.coordinates);
+      if (coordValidationError) {
+        return { tree: null, error: coordValidationError };
       }
 
       // Convert GeoPoint to PostGIS format
@@ -49,13 +58,135 @@ class TreeService {
         return { tree: null, error };
       }
 
-      return { tree: this.formatTree(tree), error: null };
+      const formattedTree = this.formatTree(tree);
+
+      // Register with Antugrow if configured
+      if (antugrowService.isConfigured()) {
+        await this.registerTreeWithAntugrow(formattedTree);
+      }
+
+      return { tree: formattedTree, error: null };
     } catch (error) {
       return {
         tree: null,
         error: error instanceof Error ? error : new Error('Failed to create tree'),
       };
     }
+  }
+
+  /**
+   * Register tree with Antugrow API
+   * Updates tree record with antugrow_id on success
+   */
+  private async registerTreeWithAntugrow(tree: Tree): Promise<void> {
+    try {
+      // Validate species is non-empty
+      if (!tree.species || tree.species.trim().length === 0) {
+        console.warn(`Skipping Antugrow registration for tree ${tree.id}: empty species`);
+        return;
+      }
+
+      // Validate coordinates
+      if (!tree.location || !tree.location.coordinates) {
+        console.warn(`Skipping Antugrow registration for tree ${tree.id}: invalid location`);
+        return;
+      }
+
+      const [longitude, latitude] = tree.location.coordinates;
+      const coordError = this.validateCoordinates([longitude, latitude]);
+      if (coordError) {
+        console.warn(`Skipping Antugrow registration for tree ${tree.id}: ${coordError.message}`);
+        return;
+      }
+
+      // Register with Antugrow
+      const { data, error } = await antugrowService.registerTree({
+        tree_id: tree.id,
+        species: tree.species,
+        location: {
+          latitude,
+          longitude,
+        },
+        planted_date: tree.planted_date,
+      });
+
+      if (error) {
+        console.error(`Failed to register tree ${tree.id} with Antugrow:`, error);
+        // Don't throw - tree creation should succeed even if Antugrow registration fails
+        return;
+      }
+
+      if (data?.antugrow_id) {
+        // Update tree with antugrow_id
+        await supabase
+          .from('trees')
+          .update({ antugrow_id: data.antugrow_id })
+          .eq('id', tree.id);
+
+        console.log(`Tree ${tree.id} registered with Antugrow: ${data.antugrow_id}`);
+      }
+    } catch (error) {
+      console.error(`Error registering tree ${tree.id} with Antugrow:`, error);
+      // Don't throw - tree creation should succeed even if Antugrow registration fails
+    }
+  }
+
+  /**
+   * Register multiple trees with Antugrow sequentially
+   * Processes trees one at a time to avoid rate limiting
+   */
+  async registerTreesWithAntugrow(treeIds: string[]): Promise<{
+    succeeded: string[];
+    failed: string[];
+    errors: Record<string, string>;
+  }> {
+    const succeeded: string[] = [];
+    const failed: string[] = [];
+    const errors: Record<string, string> = {};
+
+    if (!antugrowService.isConfigured()) {
+      return {
+        succeeded: [],
+        failed: treeIds,
+        errors: { _global: 'Antugrow API not configured' },
+      };
+    }
+
+    // Process trees sequentially to avoid rate limiting
+    for (const treeId of treeIds) {
+      try {
+        const { tree, error } = await this.getTree(treeId);
+
+        if (error || !tree) {
+          failed.push(treeId);
+          errors[treeId] = error?.message || 'Tree not found';
+          continue;
+        }
+
+        // Skip if already registered
+        if (tree.antugrow_id) {
+          succeeded.push(treeId);
+          continue;
+        }
+
+        // Register with Antugrow
+        await this.registerTreeWithAntugrow(tree);
+
+        // Check if registration succeeded
+        const { tree: updatedTree } = await this.getTree(treeId);
+        if (updatedTree?.antugrow_id) {
+          succeeded.push(treeId);
+        } else {
+          failed.push(treeId);
+          errors[treeId] = 'Registration completed but antugrow_id not set';
+        }
+      } catch (error) {
+        failed.push(treeId);
+        errors[treeId] = error instanceof Error ? error.message : 'Unknown error';
+      }
+    }
+
+    return { succeeded, failed, errors };
   }
 
   /**
@@ -419,6 +550,32 @@ class TreeService {
       ...data,
       location,
     };
+  }
+
+  /**
+   * Validate coordinates for Antugrow API
+   * Ensures coordinates are within valid ranges
+   */
+  private validateCoordinates(coordinates: [number, number]): Error | null {
+    const [longitude, latitude] = coordinates;
+
+    if (typeof longitude !== 'number' || typeof latitude !== 'number') {
+      return new Error('Coordinates must be numbers');
+    }
+
+    if (isNaN(longitude) || isNaN(latitude)) {
+      return new Error('Invalid coordinates: NaN values');
+    }
+
+    if (latitude < -90 || latitude > 90) {
+      return new Error('Latitude must be between -90 and 90 degrees');
+    }
+
+    if (longitude < -180 || longitude > 180) {
+      return new Error('Longitude must be between -180 and 180 degrees');
+    }
+
+    return null;
   }
 
   /**

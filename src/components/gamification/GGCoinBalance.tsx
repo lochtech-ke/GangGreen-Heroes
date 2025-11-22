@@ -18,8 +18,6 @@ export const GGCoinBalance: React.FC<GGCoinBalanceProps> = ({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let unsubscribe: (() => void) | undefined;
-
     const loadBalance = async () => {
       try {
         const currentBalance = await ggCoinService.getBalance(userId);
@@ -35,7 +33,7 @@ export const GGCoinBalance: React.FC<GGCoinBalanceProps> = ({
     loadBalance();
 
     // Subscribe to real-time balance updates
-    unsubscribe = ggCoinService.subscribeToBalance(userId, (newBalance) => {
+    const unsubscribe = ggCoinService.subscribeToBalance(userId, (newBalance) => {
       if (newBalance !== balance) {
         setPreviousBalance(balance);
         setBalance(newBalance);
@@ -45,11 +43,9 @@ export const GGCoinBalance: React.FC<GGCoinBalanceProps> = ({
     });
 
     return () => {
-      if (unsubscribe) {
-        unsubscribe();
-      }
+      unsubscribe();
     };
-  }, [userId]);
+  }, [userId, balance]);
 
   const balanceChange = balance - previousBalance;
   const showChange = isAnimating && balanceChange !== 0;
@@ -78,7 +74,7 @@ export const GGCoinBalance: React.FC<GGCoinBalanceProps> = ({
               isAnimating ? 'scale-110 text-green-600' : 'text-gray-900'
             }`}
           >
-            {balance.toLocaleString()}
+            {ggCoinService.formatGGCoins(balance, true)}
           </span>
           <span className="text-sm text-gray-500">coins</span>
         </div>
@@ -91,7 +87,7 @@ export const GGCoinBalance: React.FC<GGCoinBalanceProps> = ({
             }`}
           >
             {balanceChange > 0 ? '+' : ''}
-            {balanceChange}
+            {ggCoinService.formatGGCoins(Math.abs(balanceChange), false)}
           </span>
         )}
       </div>

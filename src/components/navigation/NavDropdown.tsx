@@ -14,6 +14,8 @@ interface NavDropdownProps {
 export function NavDropdown({ group, isOpen, onToggle, onClose }: NavDropdownProps) {
   const location = useLocation();
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const enterTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const leaveTimerRef = useRef<NodeJS.Timeout | null>(null);
   const [isMobile, setIsMobile] = useState(false);
 
   // Check if any item in the group is active
@@ -60,16 +62,48 @@ export function NavDropdown({ group, isOpen, onToggle, onClose }: NavDropdownPro
     return () => document.removeEventListener('keydown', handleEscape);
   }, [isOpen, onClose]);
 
+  // Cleanup timers on unmount
+  useEffect(() => {
+    return () => {
+      if (enterTimerRef.current) {
+        clearTimeout(enterTimerRef.current);
+      }
+      if (leaveTimerRef.current) {
+        clearTimeout(leaveTimerRef.current);
+      }
+    };
+  }, []);
+
   const handleMouseEnter = () => {
-    if (!isMobile) {
-      onToggle();
+    if (isMobile) return;
+    
+    // Cancel any pending close
+    if (leaveTimerRef.current) {
+      clearTimeout(leaveTimerRef.current);
+      leaveTimerRef.current = null;
+    }
+    
+    // Open with slight delay for hover intent
+    if (!isOpen) {
+      enterTimerRef.current = setTimeout(() => {
+        onToggle();
+      }, 150);
     }
   };
 
   const handleMouseLeave = () => {
-    if (!isMobile) {
-      onClose();
+    if (isMobile) return;
+    
+    // Cancel any pending open
+    if (enterTimerRef.current) {
+      clearTimeout(enterTimerRef.current);
+      enterTimerRef.current = null;
     }
+    
+    // Close with delay to allow cursor movement to dropdown
+    leaveTimerRef.current = setTimeout(() => {
+      onClose();
+    }, 300);
   };
 
   const handleClick = () => {
@@ -82,37 +116,40 @@ export function NavDropdown({ group, isOpen, onToggle, onClose }: NavDropdownPro
     <div
       ref={dropdownRef}
       className="relative"
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
     >
-      {/* Dropdown Trigger Button */}
-      <button
-        onClick={handleClick}
-        className={`
-          flex items-center gap-2 px-4 py-2 rounded-lg
-          text-sm font-medium transition-all duration-200
-          focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2
-          ${
-            isGroupActive
-              ? 'text-green-600 bg-green-50'
-              : 'text-gray-700 hover:text-green-600 hover:bg-gray-50'
-          }
-        `}
-        aria-haspopup="true"
-        aria-expanded={isOpen}
-        aria-label={`${group.label} menu`}
+      {/* Unified container for hover intent - wraps trigger and dropdown */}
+      <div
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
       >
-        <Icon name={group.icon} className="w-5 h-5" />
-        <span>{group.label}</span>
-        <ChevronDown
-          className={`w-4 h-4 transition-transform duration-200 ${
-            isOpen ? 'rotate-180' : ''
-          }`}
-        />
-      </button>
+        {/* Dropdown Trigger Button */}
+        <button
+          onClick={handleClick}
+          className={`
+            flex items-center gap-2 px-4 py-2 rounded-lg
+            text-sm font-medium transition-all duration-200
+            focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2
+            ${
+              isGroupActive
+                ? 'text-green-600 bg-green-50'
+                : 'text-gray-700 hover:text-green-600 hover:bg-gray-50'
+            }
+          `}
+          aria-haspopup="true"
+          aria-expanded={isOpen}
+          aria-label={`${group.label} menu`}
+        >
+          <Icon name={group.icon} className="w-5 h-5" />
+          <span>{group.label}</span>
+          <ChevronDown
+            className={`w-4 h-4 transition-transform duration-200 ${
+              isOpen ? 'rotate-180' : ''
+            }`}
+          />
+        </button>
 
-      {/* Dropdown Menu */}
-      {isOpen && (
+        {/* Dropdown Menu */}
+        {isOpen && (
         <>
           {/* Backdrop for mobile */}
           {isMobile && (
@@ -187,7 +224,8 @@ export function NavDropdown({ group, isOpen, onToggle, onClose }: NavDropdownPro
             </div>
           </div>
         </>
-      )}
+        )}
+      </div>
     </div>
   );
 }

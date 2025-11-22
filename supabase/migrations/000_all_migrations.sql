@@ -438,3 +438,66 @@ CREATE INDEX idx_referrals_status ON referrals(status);
 -- All tables, indexes, and triggers have been created successfully
 -- Next steps: Configure Row Level Security (RLS) policies
 -- ============================================================================
+
+-- ============================================================================
+-- MIGRATION 019: Antugrow Integration Tables
+-- ============================================================================
+
+-- Antugrow Sync Log Table
+CREATE TABLE IF NOT EXISTS antugrow_sync_log (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  sync_started_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  sync_completed_at TIMESTAMPTZ,
+  trees_processed INTEGER DEFAULT 0 CHECK (trees_processed >= 0),
+  trees_succeeded INTEGER DEFAULT 0 CHECK (trees_succeeded >= 0),
+  trees_failed INTEGER DEFAULT 0 CHECK (trees_failed >= 0),
+  errors JSONB DEFAULT '[]'::jsonb,
+  status TEXT NOT NULL CHECK (status IN ('in_progress', 'completed', 'failed')) DEFAULT 'in_progress',
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_antugrow_sync_log_status ON antugrow_sync_log(status);
+CREATE INDEX idx_antugrow_sync_log_started_at ON antugrow_sync_log(sync_started_at DESC);
+
+-- Antugrow Webhooks Table
+CREATE TABLE IF NOT EXISTS antugrow_webhooks (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  event_type TEXT NOT NULL,
+  payload JSONB NOT NULL,
+  processed BOOLEAN DEFAULT FALSE,
+  processed_at TIMESTAMPTZ,
+  error TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_antugrow_webhooks_processed ON antugrow_webhooks(processed);
+CREATE INDEX idx_antugrow_webhooks_event_type ON antugrow_webhooks(event_type);
+CREATE INDEX idx_antugrow_webhooks_created_at ON antugrow_webhooks(created_at DESC);
+
+-- SMS Alerts Table
+CREATE TABLE IF NOT EXISTS sms_alerts (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  tree_id UUID REFERENCES trees(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  phone_number TEXT NOT NULL,
+  message TEXT NOT NULL,
+  alert_type TEXT NOT NULL CHECK (alert_type IN ('critical_health', 'disease_detected', 'urgent_attention')),
+  delivery_status TEXT NOT NULL CHECK (delivery_status IN ('sent', 'failed', 'pending')) DEFAULT 'pending',
+  message_id TEXT,
+  retry_count INTEGER DEFAULT 0 CHECK (retry_count >= 0),
+  error TEXT,
+  sent_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_sms_alerts_tree_id ON sms_alerts(tree_id);
+CREATE INDEX idx_sms_alerts_user_id ON sms_alerts(user_id);
+CREATE INDEX idx_sms_alerts_delivery_status ON sms_alerts(delivery_status);
+CREATE INDEX idx_sms_alerts_created_at ON sms_alerts(created_at DESC);
+
+-- User Profile Extensions
+ALTER TABLE user_profiles 
+ADD COLUMN IF NOT EXISTS phone_number TEXT,
+ADD COLUMN IF NOT EXISTS sms_alerts_enabled BOOLEAN DEFAULT TRUE;
+
+CREATE INDEX IF NOT EXISTS idx_user_profiles_phone_number ON user_profiles(phone_number) WHERE phone_number IS NOT NULL;

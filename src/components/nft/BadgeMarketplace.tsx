@@ -1,16 +1,22 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { BadgePurchaseModal } from './BadgePurchaseModal';
 import { BadgePurchaseConfirmation } from './BadgePurchaseConfirmation';
 import { BADGE_PRICE_KES } from '../../types/badgePurchase.types';
+import { BadgeSvgService } from '../../services/badgeSvg.service';
+import type { BadgeTier, ForestType, AchievementType } from '../../types/badge.types';
+import { Award } from 'lucide-react';
 
 interface Badge {
   id: string;
   name: string;
-  type: string;
-  tier: string;
+  type: AchievementType;
+  tier: BadgeTier;
+  forest: ForestType;
   description: string;
-  image_url: string;
+  image_url?: string;
   rarity_score: number;
+  unlockRequirement?: string;
+  priceGGCoins: number;
 }
 
 interface BadgeMarketplaceProps {
@@ -19,45 +25,232 @@ interface BadgeMarketplaceProps {
   userProfileUrl?: string;
 }
 
-// Mock badge data - replace with actual data from your backend
+// Comprehensive badge catalog matching homepage showcase
 const AVAILABLE_BADGES: Badge[] = [
   {
-    id: '1',
-    name: 'Tree Planter Bronze',
+    id: 'badge-001-kakamega-tree-planter',
+    name: 'Kakamega Tree Planter',
     type: 'tree_planter',
     tier: 'bronze',
-    description: 'Awarded for planting your first trees',
-    image_url: '/badges/tree-planter-bronze.png',
+    forest: 'kakamega',
+    description: 'Plant your first tree in Kakamega Forest and start your conservation journey',
     rarity_score: 10,
+    unlockRequirement: 'Plant 1 tree in Kakamega Forest',
+    priceGGCoins: 50,
   },
   {
-    id: '2',
-    name: 'Tree Planter Silver',
-    type: 'tree_planter',
+    id: 'badge-002-karura-forest-guardian',
+    name: 'Karura Forest Guardian',
+    type: 'forest_protector',
     tier: 'silver',
-    description: 'Awarded for planting 10+ trees',
-    image_url: '/badges/tree-planter-silver.png',
+    forest: 'karura',
+    description: 'Protect and nurture 10 trees in Karura urban forest',
     rarity_score: 25,
+    unlockRequirement: 'Plant 10 trees in Karura Forest',
+    priceGGCoins: 150,
   },
   {
-    id: '3',
-    name: 'Donor Bronze',
-    type: 'donor',
-    tier: 'bronze',
-    description: 'Awarded for your first donation',
-    image_url: '/badges/donor-bronze.png',
-    rarity_score: 15,
-  },
-  {
-    id: '4',
-    name: 'Monitor Gold',
-    type: 'monitor',
+    id: 'badge-003-mau-carbon-warrior',
+    name: 'Mau Carbon Warrior',
+    type: 'carbon_warrior',
     tier: 'gold',
-    description: 'Awarded for monitoring 50+ trees',
-    image_url: '/badges/monitor-gold.png',
+    forest: 'mau',
+    description: 'Offset 1 ton of CO₂ through verified conservation in Mau Forest',
     rarity_score: 50,
+    unlockRequirement: 'Sequester 1 ton CO₂ in Mau Forest',
+    priceGGCoins: 300,
+  },
+  {
+    id: 'badge-004-kakamega-community-leader',
+    name: 'Kakamega Community Leader',
+    type: 'community_leader',
+    tier: 'platinum',
+    forest: 'kakamega',
+    description: 'Lead a conservation initiative and inspire your community in Kakamega',
+    rarity_score: 75,
+    unlockRequirement: 'Create an initiative in Kakamega',
+    priceGGCoins: 400,
+  },
+  {
+    id: 'badge-005-karura-water-guardian',
+    name: 'Karura Water Guardian',
+    type: 'water_guardian',
+    tier: 'silver',
+    forest: 'karura',
+    description: 'Protect water sources and support sustainable water management',
+    rarity_score: 30,
+    unlockRequirement: 'Complete 5 water conservation activities',
+    priceGGCoins: 200,
+  },
+  {
+    id: 'badge-006-mau-climate-hero',
+    name: 'Mau Climate Hero',
+    type: 'climate_hero',
+    tier: 'diamond',
+    forest: 'mau',
+    description: 'Champion climate action and achieve diamond-level conservation impact',
+    rarity_score: 100,
+    unlockRequirement: 'Achieve 100 conservation actions',
+    priceGGCoins: 500,
+  },
+  {
+    id: 'badge-007-kakamega-biodiversity-champion',
+    name: 'Kakamega Biodiversity Champion',
+    type: 'biodiversity_champion',
+    tier: 'gold',
+    forest: 'kakamega',
+    description: 'Protect endangered species and preserve biodiversity in Kakamega',
+    rarity_score: 60,
+    unlockRequirement: 'Complete 25 biodiversity activities',
+    priceGGCoins: 350,
+  },
+  {
+    id: 'badge-008-karura-tree-planter',
+    name: 'Karura Tree Planter',
+    type: 'tree_planter',
+    tier: 'bronze',
+    forest: 'karura',
+    description: 'Begin your urban forestry journey in Karura Forest',
+    rarity_score: 10,
+    unlockRequirement: 'Plant 1 tree in Karura Forest',
+    priceGGCoins: 50,
   },
 ];
+
+// Badge Card Component with SVG Generation
+const BadgeCard: React.FC<{
+  badge: Badge;
+  onPurchaseClick: (badge: Badge) => void;
+  getTierColor: (tier: string) => string;
+}> = ({ badge, onPurchaseClick, getTierColor }) => {
+  const [badgeSvg, setBadgeSvg] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
+
+  useEffect(() => {
+    const generateBadge = async () => {
+      setIsLoading(true);
+      setHasError(false);
+
+      try {
+        const badgeService = new BadgeSvgService();
+        const result = await badgeService.generateBadge({
+          id: badge.id,
+          tier: badge.tier,
+          forest: badge.forest,
+          achievement: badge.type,
+          metadata: {
+            badgeName: badge.name,
+            tierLevel: ['bronze', 'silver', 'gold', 'platinum', 'diamond'].indexOf(badge.tier) + 1,
+            forestName: badge.forest,
+            achievementType: badge.type,
+            achievementCount: 0,
+            earnedDate: new Date().toISOString(),
+            uniqueBadgeId: badge.id,
+            userId: 'marketplace-preview',
+          },
+          animated: badge.tier === 'diamond',
+        });
+
+        if (result.success && result.svg) {
+          setBadgeSvg(result.svg);
+          setHasError(false);
+        } else {
+          console.error('[BadgeMarketplace] Badge generation failed:', {
+            badgeId: badge.id,
+            error: result.error,
+          });
+          setHasError(true);
+        }
+      } catch (error) {
+        console.error('[BadgeMarketplace] Exception generating badge SVG:', {
+          badgeId: badge.id,
+          error: error instanceof Error ? error.message : 'Unknown error',
+        });
+        setHasError(true);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    generateBadge();
+  }, [badge]);
+
+  return (
+    <div className="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden group">
+      {/* Badge Image */}
+      <div className="relative aspect-square bg-gradient-to-br from-green-50 to-blue-50 p-6 flex items-center justify-center">
+        {isLoading ? (
+          <div className="w-full h-full flex items-center justify-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-green-600"></div>
+          </div>
+        ) : badgeSvg && !hasError ? (
+          <div
+            className="w-full h-full group-hover:scale-110 transition-transform duration-300"
+            dangerouslySetInnerHTML={{ __html: badgeSvg }}
+          />
+        ) : badge.image_url ? (
+          <img
+            src={badge.image_url}
+            alt={badge.name}
+            className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
+            onError={(e) => {
+              e.currentTarget.style.display = 'none';
+            }}
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            <Award size={80} className="text-gray-400" />
+          </div>
+        )}
+
+        {/* GG Coin Badge */}
+        <div className="absolute top-2 right-2 bg-yellow-400 text-white px-2 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+          <div className="w-4 h-4 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center">
+            <span className="text-white text-[10px] font-bold">GG</span>
+          </div>
+          <span>+1</span>
+        </div>
+      </div>
+
+      {/* Badge Info */}
+      <div className="p-4">
+        <div className="flex items-start justify-between mb-2">
+          <h3 className="font-bold text-lg text-gray-900">{badge.name}</h3>
+          <span className={`px-2 py-1 rounded-full text-xs font-semibold capitalize ${getTierColor(badge.tier)}`}>
+            {badge.tier}
+          </span>
+        </div>
+        <p className="text-sm text-gray-600 mb-4 line-clamp-2">{badge.description}</p>
+
+        {/* Unlock Requirement */}
+        {badge.unlockRequirement && (
+          <div className="mb-3 text-xs text-gray-500 italic">
+            🔓 {badge.unlockRequirement}
+          </div>
+        )}
+
+        {/* Price and Purchase */}
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-xs text-gray-500">Price</p>
+            <div className="flex items-center gap-2">
+              <p className="text-lg font-bold text-green-600">{badge.priceGGCoins} GG</p>
+              <span className="text-xs text-gray-500">or</span>
+              <p className="text-lg font-bold text-gray-700">KES {BADGE_PRICE_KES}</p>
+            </div>
+          </div>
+          <button
+            onClick={() => onPurchaseClick(badge)}
+            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium text-sm"
+          >
+            Purchase
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export const BadgeMarketplace: React.FC<BadgeMarketplaceProps> = ({
   userId,
@@ -164,54 +357,12 @@ export const BadgeMarketplace: React.FC<BadgeMarketplaceProps> = ({
       {/* Badge Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {filteredBadges.map((badge) => (
-          <div
+          <BadgeCard
             key={badge.id}
-            className="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden group"
-          >
-            {/* Badge Image */}
-            <div className="relative aspect-square bg-gradient-to-br from-green-50 to-blue-50 p-6">
-              <img
-                src={badge.image_url}
-                alt={badge.name}
-                className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
-                onError={(e) => {
-                  e.currentTarget.src = 'https://via.placeholder.com/200?text=Badge';
-                }}
-              />
-              {/* GG Coin Badge */}
-              <div className="absolute top-2 right-2 bg-yellow-400 text-white px-2 py-1 rounded-full text-xs font-bold flex items-center gap-1">
-                <div className="w-4 h-4 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center">
-                  <span className="text-white text-[10px] font-bold">GG</span>
-                </div>
-                <span>+1</span>
-              </div>
-            </div>
-
-            {/* Badge Info */}
-            <div className="p-4">
-              <div className="flex items-start justify-between mb-2">
-                <h3 className="font-bold text-lg text-gray-900">{badge.name}</h3>
-                <span className={`px-2 py-1 rounded-full text-xs font-semibold capitalize ${getTierColor(badge.tier)}`}>
-                  {badge.tier}
-                </span>
-              </div>
-              <p className="text-sm text-gray-600 mb-4 line-clamp-2">{badge.description}</p>
-
-              {/* Price and Purchase */}
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-gray-500">Price</p>
-                  <p className="text-xl font-bold text-green-600">KES {BADGE_PRICE_KES}</p>
-                </div>
-                <button
-                  onClick={() => handlePurchaseClick(badge)}
-                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
-                >
-                  Purchase
-                </button>
-              </div>
-            </div>
-          </div>
+            badge={badge}
+            onPurchaseClick={handlePurchaseClick}
+            getTierColor={getTierColor}
+          />
         ))}
       </div>
 
@@ -235,7 +386,7 @@ export const BadgeMarketplace: React.FC<BadgeMarketplaceProps> = ({
             badgeType={selectedBadge.type}
             tier={selectedBadge.tier}
             badgeName={selectedBadge.name}
-            badgeImage={selectedBadge.image_url}
+            badgeImage={selectedBadge.image_url || ''}
             userId={userId}
             userEmail={userEmail}
             onSuccess={handlePurchaseSuccess}
@@ -248,7 +399,7 @@ export const BadgeMarketplace: React.FC<BadgeMarketplaceProps> = ({
               badgeName={purchasedBadge.name}
               badgeType={purchasedBadge.type}
               tier={purchasedBadge.tier}
-              badgeImage={purchasedBadge.image_url}
+              badgeImage={purchasedBadge.image_url || ''}
               transactionReference={transactionRef}
               userProfileUrl={userProfileUrl}
             />

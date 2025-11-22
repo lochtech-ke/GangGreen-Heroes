@@ -13,6 +13,14 @@ vi.mock('./supabase', () => ({
   },
 }));
 
+// Mock Antugrow Service
+vi.mock('./antugrow.service', () => ({
+  antugrowService: {
+    isConfigured: vi.fn().mockReturnValue(false),
+    registerTree: vi.fn().mockResolvedValue({ data: null, error: null }),
+  },
+}));
+
 describe('TreeService', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -601,6 +609,155 @@ describe('TreeService', () => {
 
       expect(result.error).toBeNull();
       expect(result.trees).toHaveLength(1);
+    });
+  });
+
+  describe('Antugrow Integration', () => {
+    const validTreeData: CreateTreeData = {
+      initiative_id: 'init-123',
+      species: 'Acacia',
+      planted_date: '2025-01-01',
+      location: {
+        type: 'Point',
+        coordinates: [34.8522, 0.2827],
+      },
+      planted_by: 'user-123',
+    };
+
+    describe('coordinate validation', () => {
+      it('should reject invalid latitude (> 90)', async () => {
+        const invalidData = {
+          ...validTreeData,
+          location: {
+            type: 'Point' as const,
+            coordinates: [34.8522, 95] as [number, number],
+          },
+        };
+
+        const result = await treeService.createTree(invalidData);
+
+        expect(result.error).toBeDefined();
+        expect(result.error?.message).toContain('Latitude must be between -90 and 90');
+      });
+
+      it('should reject invalid latitude (< -90)', async () => {
+        const invalidData = {
+          ...validTreeData,
+          location: {
+            type: 'Point' as const,
+            coordinates: [34.8522, -95] as [number, number],
+          },
+        };
+
+        const result = await treeService.createTree(invalidData);
+
+        expect(result.error).toBeDefined();
+        expect(result.error?.message).toContain('Latitude must be between -90 and 90');
+      });
+
+      it('should reject invalid longitude (> 180)', async () => {
+        const invalidData = {
+          ...validTreeData,
+          location: {
+            type: 'Point' as const,
+            coordinates: [185, 0.2827] as [number, number],
+          },
+        };
+
+        const result = await treeService.createTree(invalidData);
+
+        expect(result.error).toBeDefined();
+        expect(result.error?.message).toContain('Longitude must be between -180 and 180');
+      });
+
+      it('should reject invalid longitude (< -180)', async () => {
+        const invalidData = {
+          ...validTreeData,
+          location: {
+            type: 'Point' as const,
+            coordinates: [-185, 0.2827] as [number, number],
+          },
+        };
+
+        const result = await treeService.createTree(invalidData);
+
+        expect(result.error).toBeDefined();
+        expect(result.error?.message).toContain('Longitude must be between -180 and 180');
+      });
+
+      it('should accept valid coordinates', async () => {
+        const mockTree = {
+          id: 'tree-123',
+          ...validTreeData,
+          location: 'POINT(34.8522 0.2827)',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        };
+
+        const mockFrom = vi.fn().mockReturnValue({
+          insert: vi.fn().mockReturnValue({
+            select: vi.fn().mockReturnValue({
+              single: vi.fn().mockResolvedValue({
+                data: mockTree,
+                error: null,
+              }),
+            }),
+          }),
+        });
+
+        vi.mocked(supabase.from).mockImplementation(mockFrom as any);
+
+        const result = await treeService.createTree(validTreeData);
+
+        expect(result.error).toBeNull();
+        expect(result.tree).toBeDefined();
+      });
+    });
+
+    describe('registerTreesWithAntugrow', () => {
+      it('should process trees sequentially', async () => {
+        const treeIds = ['tree-1', 'tree-2', 'tree-3'];
+
+        // Mock getTree to return trees without antugrow_id
+        const mockTree = {
+          id: 'tree-1',
+          species: 'Acacia',
+          planted_date: '2025-01-01',
+          location: {
+            type: 'Point' as const,
+            coordinates: [34.8522, 0.2827] as [number, number],
+          },
+        };
+
+        const mockFrom = vi.fn().mockReturnValue({
+          select: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              single: vi.fn().mockResolvedValue({
+                data: mockTree,
+                error: null,
+              }),
+            }),
+          }),
+        });
+
+        vi.mocked(supabase.from).mockImplementation(mockFrom as any);
+
+        const result = await treeService.registerTreesWithAntugrow(treeIds);
+
+        expect(result).toHaveProperty('succeeded');
+        expect(result).toHaveProperty('failed');
+        expect(result).toHaveProperty('errors');
+        expect(Array.isArray(result.succeeded)).toBe(true);
+        expect(Array.isArray(result.failed)).toBe(true);
+      });
+
+      it('should handle empty tree list', async () => {
+        const result = await treeService.registerTreesWithAntugrow([]);
+
+        expect(result.succeeded).toHaveLength(0);
+        expect(result.failed).toHaveLength(0);
+        expect(Object.keys(result.errors)).toHaveLength(0);
+      });
     });
   });
 });

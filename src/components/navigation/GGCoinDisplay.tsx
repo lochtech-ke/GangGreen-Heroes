@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Coins } from 'lucide-react';
 import { ggCoinService } from '../../services/ggCoin.service';
+import type { GGCoinTransaction } from '../../types/ggCoin.types';
 
 interface GGCoinDisplayProps {
   userId: string;
@@ -13,12 +14,10 @@ export function GGCoinDisplay({ userId, showAnimation = true }: GGCoinDisplayPro
   const [previousBalance, setPreviousBalance] = useState<number>(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [recentTransactions, setRecentTransactions] = useState<any[]>([]);
+  const [recentTransactions, setRecentTransactions] = useState<GGCoinTransaction[]>([]);
   const [showTooltip, setShowTooltip] = useState(false);
 
   useEffect(() => {
-    let unsubscribe: (() => void) | undefined;
-
     const loadBalance = async () => {
       try {
         const currentBalance = await ggCoinService.getBalance(userId);
@@ -34,7 +33,7 @@ export function GGCoinDisplay({ userId, showAnimation = true }: GGCoinDisplayPro
     loadBalance();
 
     // Subscribe to real-time balance updates
-    unsubscribe = ggCoinService.subscribeToBalance(userId, (newBalance) => {
+    const unsubscribe = ggCoinService.subscribeToBalance(userId, (newBalance) => {
       if (newBalance !== balance) {
         setPreviousBalance(balance);
         setBalance(newBalance);
@@ -46,9 +45,7 @@ export function GGCoinDisplay({ userId, showAnimation = true }: GGCoinDisplayPro
     });
 
     return () => {
-      if (unsubscribe) {
-        unsubscribe();
-      }
+      unsubscribe();
     };
   }, [userId, balance, showAnimation]);
 
@@ -104,18 +101,18 @@ export function GGCoinDisplay({ userId, showAnimation = true }: GGCoinDisplayPro
               }`}
             >
               {balanceChange > 0 ? '+' : ''}
-              {balanceChange}
+              {ggCoinService.formatGGCoins(Math.abs(balanceChange), false)}
             </span>
           )}
         </div>
 
-        {/* Balance Display */}
+        {/* Balance Display with Decimal Precision */}
         <span
           className={`text-sm font-bold transition-all duration-300 ${
             isAnimating ? 'scale-110 text-green-600' : 'text-yellow-800'
           }`}
         >
-          {balance.toLocaleString()}
+          {ggCoinService.formatGGCoins(balance, true)}
         </span>
       </Link>
 
@@ -128,7 +125,10 @@ export function GGCoinDisplay({ userId, showAnimation = true }: GGCoinDisplayPro
               <h3 className="text-sm font-semibold text-gray-900">GG Coins</h3>
             </div>
             <p className="text-xs text-gray-500">
-              Your current balance: <span className="font-bold text-yellow-700">{balance.toLocaleString()}</span>
+              Your current balance: <span className="font-bold text-yellow-700">{ggCoinService.formatGGCoins(balance, true)}</span> GG Coins
+            </p>
+            <p className="text-xs text-gray-400 mt-1">
+              Earn 1 GG Coin per 200 KES spent - even small purchases count!
             </p>
           </div>
 
@@ -139,15 +139,16 @@ export function GGCoinDisplay({ userId, showAnimation = true }: GGCoinDisplayPro
                 {recentTransactions.map((transaction) => (
                   <div key={transaction.id} className="flex items-center justify-between text-xs">
                     <span className="text-gray-600 truncate flex-1">
-                      {transaction.description || transaction.type}
+                      {transaction.description || transaction.transaction_type}
                     </span>
                     <span
                       className={`font-semibold ml-2 ${
                         transaction.amount > 0 ? 'text-green-600' : 'text-red-600'
                       }`}
+                      title={`${transaction.amount > 0 ? '+' : ''}${ggCoinService.formatGGCoins(Math.abs(transaction.amount), true)} GG Coins`}
                     >
                       {transaction.amount > 0 ? '+' : ''}
-                      {transaction.amount}
+                      {ggCoinService.formatGGCoins(Math.abs(transaction.amount), true)}
                     </span>
                   </div>
                 ))}
