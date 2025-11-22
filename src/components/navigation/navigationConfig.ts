@@ -30,8 +30,8 @@ export const navigationGroups: NavGroupConfig[] = [
         description: 'Share and discover conservation stories',
       },
       {
-        to: '/forums',
-        label: 'Forums',
+        to: '/forum',
+        label: 'Forum',
         icon: 'message-square',
         description: 'Discuss with the community',
       },

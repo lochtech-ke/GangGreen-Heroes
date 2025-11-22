@@ -10,6 +10,10 @@ import type {
   DateRange,
   SavedPostRow,
 } from '../types/socialFeed.types';
+import { MOCK_SOCIAL_POSTS, sortMockPosts } from '../data/mockSocialPosts';
+
+// Use mock data in development or when database is empty
+const USE_MOCK_DATA = import.meta.env.DEV || import.meta.env.VITE_USE_MOCK_SOCIAL_DATA === 'true';
 
 /**
  * Social Feed Service
@@ -54,6 +58,71 @@ class SocialFeedService {
   }
 
   /**
+   * Get mock posts with filters and pagination
+   * Used in development mode or when database is empty
+   */
+  private getMockPosts(
+    filters: FeedFilters = {},
+    page: number = 1,
+    limit: number = 20
+  ): GetPostsResponse {
+    let filteredPosts = [...MOCK_SOCIAL_POSTS];
+
+    // Apply platform filter
+    if (filters.platform && filters.platform !== 'all') {
+      filteredPosts = filteredPosts.filter((post) => post.platform === filters.platform);
+    }
+
+    // Apply location filter
+    if (filters.location && filters.location !== 'all') {
+      filteredPosts = filteredPosts.filter((post) =>
+        post.locationTag?.toLowerCase().includes(filters.location!.toLowerCase())
+      );
+    }
+
+    // Apply search query
+    if (filters.searchQuery) {
+      const query = filters.searchQuery.toLowerCase();
+      filteredPosts = filteredPosts.filter(
+        (post) =>
+          post.caption.toLowerCase().includes(query) ||
+          post.author.name.toLowerCase().includes(query) ||
+          post.author.username.toLowerCase().includes(query)
+      );
+    }
+
+    // Apply date range filter
+    if (filters.dateRange) {
+      filteredPosts = filteredPosts.filter((post) => {
+        const postDate = new Date(post.postedAt);
+        return (
+          postDate >= filters.dateRange!.start &&
+          postDate <= filters.dateRange!.end
+        );
+      });
+    }
+
+    // Apply sorting
+    const sortBy = filters.sortBy || 'recent';
+    filteredPosts = sortMockPosts(filteredPosts, sortBy);
+
+    // Apply pagination
+    const total = filteredPosts.length;
+    const from = (page - 1) * limit;
+    const to = from + limit;
+    const paginatedPosts = filteredPosts.slice(from, to);
+    const hasMore = to < total;
+
+    console.log(`[SocialFeedService] Mock data: ${paginatedPosts.length} posts (${total} total)`);
+
+    return {
+      posts: paginatedPosts,
+      hasMore,
+      total,
+    };
+  }
+
+  /**
    * Fetch paginated posts with filters
    */
   async getPosts(
@@ -63,6 +132,12 @@ class SocialFeedService {
   ): Promise<GetPostsResponse> {
     try {
       console.log('[SocialFeedService] Fetching posts with filters:', filters);
+
+      // Use mock data in development mode
+      if (USE_MOCK_DATA) {
+        console.log('[SocialFeedService] Using mock data');
+        return this.getMockPosts(filters, page, limit);
+      }
 
       let query = supabase
         .from('social_posts')

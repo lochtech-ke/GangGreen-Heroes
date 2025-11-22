@@ -12,8 +12,10 @@ import { InitiativesPage } from './pages/InitiativesPage';
 import { TreesPage } from './pages/TreesPage';
 import { MarketplacePage } from './pages/MarketplacePage';
 import { GamificationPage } from './pages/GamificationPage';
+import { ForumPage } from './pages/ForumPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { SocialFeedPage } from './pages/SocialFeedPage';
+import { EventsPage } from './pages/EventsPage';
 import { JourneyDashboardPage } from './pages/JourneyDashboardPage';
 import {
   TermsOfServicePage,
@@ -199,6 +201,26 @@ function AppContent() {
             <ProtectedRoute>
               <Layout>
                 <GamificationPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/forum"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <ForumPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/events"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <EventsPage />
               </Layout>
             </ProtectedRoute>
           }
