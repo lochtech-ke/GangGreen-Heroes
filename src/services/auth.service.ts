@@ -148,13 +148,16 @@ class AuthService {
     try {
       console.log('[AuthService] Starting login for:', credentials.email);
 
-      // Perform health check but don't block on failure
-      const isHealthy = await checkSupabaseHealth();
-      if (!isHealthy) {
-        console.warn('[AuthService] Health check failed, proceeding anyway');
-      } else {
-        console.log('[AuthService] Health check passed');
-      }
+      // Run health check in background without blocking login
+      checkSupabaseHealth().then(isHealthy => {
+        if (!isHealthy) {
+          console.warn('[AuthService] Health check failed (background check)');
+        } else {
+          console.log('[AuthService] Health check passed (background check)');
+        }
+      }).catch(err => {
+        console.warn('[AuthService] Health check error (background check):', err);
+      });
 
       // Attempt login with retry logic
       const { data, error } = await withRetry(
@@ -276,12 +279,12 @@ class AuthService {
             `)
             .eq('id', authUser.id)
             .maybeSingle();
-          
+
           // Throw error if query failed to trigger retry
           if (response.error) {
             throw response.error;
           }
-          
+
           return response;
         },
         DEFAULT_RETRY_CONFIG,
@@ -334,16 +337,16 @@ class AuthService {
    */
   private transformUserData(data: any): User {
     console.log('[AuthService] Transforming user data:', JSON.stringify(data, null, 2));
-    
+
     // Extract profile data (Supabase returns joined data as array or object)
     let profile: UserProfile | undefined;
-    
+
     if (data.user_profiles) {
       // Handle both array and object responses
-      const profileData = Array.isArray(data.user_profiles) 
-        ? data.user_profiles[0] 
+      const profileData = Array.isArray(data.user_profiles)
+        ? data.user_profiles[0]
         : data.user_profiles;
-      
+
       if (profileData) {
         profile = {
           full_name: profileData.full_name,

@@ -30,8 +30,8 @@ export const navigationGroups: NavGroupConfig[] = [
         description: 'Share and discover conservation stories',
       },
       {
-        to: '/forums',
-        label: 'Forums',
+        to: '/forum',
+        label: 'Forum',
         icon: 'message-square',
         description: 'Discuss with the community',
       },
@@ -151,6 +151,31 @@ export const adminNavigationItems: NavItemConfig[] = [
     roles: ['admin'],
   },
 ];
+
+// Footer navigation items (Settings & Profile)
+export const footerNavigationItems: NavItemConfig[] = [
+  {
+    to: '/settings',
+    label: 'Settings',
+    icon: 'settings',
+    description: 'Manage your account settings',
+  },
+  {
+    to: '/profile',
+    label: 'Profile',
+    icon: 'user',
+    description: 'View and edit your profile',
+  },
+];
+
+/**
+ * Get footer navigation items filtered by user role
+ * @param userRole - The role of the current user
+ * @returns Array of footer navigation items
+ */
+export function getFooterItems(userRole?: UserRole): NavItemConfig[] {
+  return filterByRole(footerNavigationItems, userRole);
+}
 
 /**
  * Filter navigation items based on user role

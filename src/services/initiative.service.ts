@@ -6,7 +6,6 @@
 import { supabase } from './supabase';
 import type {
   Initiative,
-  InitiativeParticipant,
   InitiativeFilters,
   InitiativeStats,
   CreateInitiativeData,
@@ -234,8 +233,8 @@ export const getParticipants = getInitiativeParticipants;
 
 // Calculate progress for an initiative
 export async function calculateProgress(initiativeId: string) {
-  const initiative = await getInitiativeById(initiativeId);
-  if (!initiative) return null;
+  const { initiative, error } = await getInitiativeById(initiativeId);
+  if (error || !initiative) return null;
 
   const progressPercentage = initiative.target_trees > 0
     ? Math.min((initiative.trees_planted / initiative.target_trees) * 100, 100)

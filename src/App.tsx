@@ -14,8 +14,10 @@ import { CreateInitiativePage } from './pages/CreateInitiativePage';
 import { TreesPage } from './pages/TreesPage';
 import { MarketplacePage } from './pages/MarketplacePage';
 import { GamificationPage } from './pages/GamificationPage';
+import { ForumPage } from './pages/ForumPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { SocialFeedPage } from './pages/SocialFeedPage';
+import { EventsPage } from './pages/EventsPage';
 import { JourneyDashboardPage } from './pages/JourneyDashboardPage';
 import { GovernancePage } from './pages/GovernancePage';
 import { ProposalDetailPage } from './pages/ProposalDetailPage';
@@ -96,7 +98,7 @@ function AppContent() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/test-supabase" element={<SupabaseTest />} />
-        
+
         {/* Social Feed */}
         <Route
           path="/social-feed"
@@ -235,6 +237,26 @@ function AppContent() {
             <ProtectedRoute>
               <Layout>
                 <GamificationPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/forum"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <ForumPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/events"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <EventsPage />
               </Layout>
             </ProtectedRoute>
           }
