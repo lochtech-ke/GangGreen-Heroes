@@ -15,19 +15,22 @@ export function Layout({ children }: LayoutProps) {
       {/* Top Navigation */}
       <Navigation />
 
-      {/* Main Content - Add padding for fixed navigation (top and bottom on mobile) */}
-      <main className="pt-18 pb-20 md:pb-0 flex-grow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {children}
+      {/* Main Content Wrapper - Add left padding for desktop sidebar */}
+      <div className="flex-1 flex flex-col lg:pl-72">
+        {/* Main Content - Add padding for fixed navigation */}
+        <main className="pt-18 pb-20 md:pb-0 lg:pt-0 flex-1">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            {children}
+          </div>
+        </main>
+
+        {/* Bottom Navigation Bar - Mobile Only */}
+        {user && <BottomNavBar />}
+
+        {/* Footer - Hidden on mobile, shown on desktop */}
+        <div className="hidden md:block mt-auto">
+          <Footer />
         </div>
-      </main>
-
-      {/* Bottom Navigation Bar - Mobile Only */}
-      {user && <BottomNavBar />}
-
-      {/* Footer - Hidden on mobile to avoid conflict with bottom nav */}
-      <div className="hidden md:block">
-        <Footer />
       </div>
     </div>
   );
