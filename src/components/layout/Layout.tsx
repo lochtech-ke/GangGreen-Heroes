@@ -1,6 +1,5 @@
 import { ReactNode } from 'react';
 import { Navigation, BottomNavBar } from '../navigation';
-import { Footer } from './Footer';
 import { useAuthContext } from '../../contexts/AuthContext';
 
 interface LayoutProps {
@@ -26,11 +25,6 @@ export function Layout({ children }: LayoutProps) {
 
         {/* Bottom Navigation Bar - Mobile Only */}
         {user && <BottomNavBar />}
-
-        {/* Footer - Hidden on mobile, shown on desktop */}
-        <div className="hidden md:block mt-auto">
-          <Footer />
-        </div>
       </div>
     </div>
   );
