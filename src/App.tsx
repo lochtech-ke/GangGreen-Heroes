@@ -90,7 +90,7 @@ function AppContent() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/test-supabase" element={<SupabaseTest />} />
-        
+
         {/* Social Feed */}
         <Route
           path="/social-feed"
