@@ -58,5 +58,22 @@
     "typescript": "^5.2.2",
     "vite": "^6.0.0",
     "vitest": "^4.0.8"
-  }
+  },
+  "description": "A comprehensive digital platform designed to catalyze a carbon-negative Africa by connecting stakeholders in environmental conservation, carbon credit markets, and sustainable development.",
+  "main": "hardhat.config.js",
+  "directories": {
+    "doc": "docs",
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lochtech-ke/GangGreen-Heroes.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lochtech-ke/GangGreen-Heroes/issues"
+  },
+  "homepage": "https://github.com/lochtech-ke/GangGreen-Heroes#readme"
 }
