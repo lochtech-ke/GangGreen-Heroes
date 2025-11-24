@@ -1,7 +1,8 @@
 {
-  "name": "ganggreen-platform",
+  "name": "ganggreen-track3-wmh2025",
+  "displayName": "#GangGreen Platform - GangGreen_Track3_WMH2025",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -11,7 +12,10 @@
     "format": "prettier --write \"src/**/*.{ts,tsx,css}\"",
     "test": "vitest --run",
     "test:watch": "vitest",
-    "test:coverage": "vitest --coverage"
+    "test:coverage": "vitest --coverage",
+    "submission:validate": "node scripts/validate-submission.js",
+    "submission:package": "node scripts/package-submission.js",
+    "submission:checklist": "node scripts/submission-checklist.js"
   },
   "dependencies": {
     "@pixi/react": "^7.1.2",
