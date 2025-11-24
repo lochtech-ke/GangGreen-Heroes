@@ -11,8 +11,6 @@ import { ProfilePage } from './pages/ProfilePage';
 import InitiativesPage from './pages/InitiativesPage';
 import { InitiativeDetailsPage } from './pages/InitiativeDetailsPage';
 import { CreateInitiativePage } from './pages/CreateInitiativePage';
-import { TreesPage } from './pages/TreesPage';
-import { MarketplacePage } from './pages/MarketplacePage';
 import { GamificationPage } from './pages/GamificationPage';
 import { ForumPage } from './pages/ForumPage';
 import { SettingsPage } from './pages/SettingsPage';
@@ -35,6 +33,9 @@ import { ChatWidget } from './components/chatbot';
 import { Layout } from './components/layout';
 import { SupabaseTest } from './components/auth/SupabaseTest';
 import StickmanPreloader from './components/common/StickmanPreloader';
+import { DeprecatedRouteHandler } from './components/routing';
+import { HummingbirdWelcome } from './components/badges';
+import { useHummingbirdWelcome } from './hooks/useHummingbirdWelcome';
 
 // Feature flag for chatbot (can be moved to environment variable)
 const CHATBOT_ENABLED = true;
@@ -90,8 +91,14 @@ function ChatbotWrapper() {
 }
 
 function AppContent() {
+  const { user } = useAuthContext();
+  const { showWelcome, handleComplete } = useHummingbirdWelcome(user?.id);
+
   return (
     <>
+      {/* Hummingbird Welcome Modal for New Users */}
+      <HummingbirdWelcome isOpen={showWelcome} onComplete={handleComplete} />
+      
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
@@ -211,26 +218,10 @@ function AppContent() {
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/trees"
-          element={
-            <ProtectedRoute>
-              <Layout>
-                <TreesPage />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/marketplace"
-          element={
-            <ProtectedRoute>
-              <Layout>
-                <MarketplacePage />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
+        {/* Deprecated Routes - Track 3 Redirects */}
+        <Route path="/trees" element={<DeprecatedRouteHandler />} />
+        <Route path="/marketplace" element={<DeprecatedRouteHandler />} />
+        <Route path="/carbon-credits" element={<DeprecatedRouteHandler />} />
         <Route
           path="/gamification"
           element={

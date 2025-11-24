@@ -13,6 +13,7 @@ interface BottomNavBarProps {
   unreadNotifications?: number;
 }
 
+// Track 3 Focus: Community Engagement and Sustainability
 const bottomNavItems: BottomNavItem[] = [
   {
     to: '/dashboard',
@@ -20,19 +21,19 @@ const bottomNavItems: BottomNavItem[] = [
     icon: 'home',
   },
   {
+    to: '/challenges',
+    label: 'Challenges',
+    icon: 'target',
+  },
+  {
     to: '/social-feed',
     label: 'Community',
     icon: 'users',
   },
   {
-    to: '/initiatives',
-    label: 'Conservation',
-    icon: 'tree',
-  },
-  {
-    to: '/marketplace',
-    label: 'Marketplace',
-    icon: 'shopping-bag',
+    to: '/badges',
+    label: 'Badges',
+    icon: 'award',
   },
   {
     to: '/profile',

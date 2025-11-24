@@ -108,26 +108,38 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           </span>
         </motion.h1>
 
-        {/* Mission Headline */}
+        {/* Mission Headline - Track 3 Focus */}
         <motion.h2
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2, ease: 'easeOut' }}
           className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 drop-shadow-2xl"
         >
-          Catalyzing a Carbon-Negative Africa
+          Every Small Action Counts
         </motion.h2>
 
-        {/* Subheadline */}
+        {/* Subheadline - Hummingbird Story */}
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.4 }}
-          className="text-lg sm:text-xl md:text-2xl text-white/90 mb-10 max-w-4xl mx-auto drop-shadow-lg"
+          className="text-lg sm:text-xl md:text-2xl text-white/90 mb-4 max-w-4xl mx-auto drop-shadow-lg"
         >
-          Join the movement to restore Africa's forests. Plant trees, earn NFT badges,
-          trade carbon credits, and make a real impact on climate change.
+          Join thousands making a difference through micro-actions and community engagement.
         </motion.p>
+
+        {/* Hummingbird Story Quote */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8, delay: 0.6 }}
+          className="mb-10 max-w-3xl mx-auto"
+        >
+          <p className="text-base sm:text-lg text-white/80 italic drop-shadow-lg">
+            "Like the hummingbird in Wangari Maathai's story, we do what we can to make a difference.
+            Every action, no matter how small, contributes to the greater good."
+          </p>
+        </motion.div>
 
         {/* Call-to-Action Buttons with Glass Effect */}
         <motion.div

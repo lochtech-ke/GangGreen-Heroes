@@ -18,23 +18,23 @@ export function QuickActions({ userId, userRole, maxVisible = 4 }: QuickActionsP
   const [customActionIds, setCustomActionIds] = useState<string[] | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Default quick actions
+  // Default quick actions - Track 3 Focus: Community Engagement
   const defaultActions: QuickAction[] = [
     {
-      id: 'plant-tree',
-      label: 'Plant Tree',
-      icon: 'tree',
+      id: 'share-story',
+      label: 'Share Story',
+      icon: 'edit',
       onClick: () => {
-        navigate('/initiatives');
+        navigate('/social-feed');
         setIsOpen(false);
       },
     },
     {
-      id: 'create-post',
-      label: 'Create Post',
-      icon: 'plus',
+      id: 'view-challenges',
+      label: 'View Challenges',
+      icon: 'target',
       onClick: () => {
-        navigate('/social-feed');
+        navigate('/challenges');
         setIsOpen(false);
       },
     },
@@ -48,11 +48,11 @@ export function QuickActions({ userId, userRole, maxVisible = 4 }: QuickActionsP
       },
     },
     {
-      id: 'buy-badge',
-      label: 'Buy Badge',
-      icon: 'award',
+      id: 'invite-friend',
+      label: 'Invite Friend',
+      icon: 'user-plus',
       onClick: () => {
-        navigate('/nft-badges');
+        navigate('/referrals');
         setIsOpen(false);
       },
     },

@@ -7,15 +7,16 @@ import { AchievementType } from '../../../types/badge.types';
 
 /**
  * Icon file mapping
+ * Track 3 Focus: Community Engagement and Sustainability
  */
 export const ICON_FILES: Record<AchievementType, string> = {
-  tree_planter: 'tree-planter.svg',
-  carbon_warrior: 'carbon-warrior.svg',
-  water_guardian: 'water-guardian.svg',
-  biodiversity_champion: 'biodiversity-champion.svg',
+  tree_planter: 'community-builder.svg',
+  carbon_warrior: 'social-mobilizer.svg',
+  water_guardian: 'collaboration-champion.svg',
+  biodiversity_champion: 'knowledge-sharer.svg',
   community_leader: 'community-leader.svg',
-  climate_hero: 'climate-hero.svg',
-  forest_protector: 'forest-protector.svg',
+  climate_hero: 'climate-advocate.svg',
+  forest_protector: 'initiative-champion.svg',
   green_ambassador: 'green-ambassador.svg',
 };
 

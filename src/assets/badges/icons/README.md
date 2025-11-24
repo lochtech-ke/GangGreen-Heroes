@@ -11,47 +11,55 @@ This directory contains SVG icons for all 8 achievement types in the NFT badge s
 - **Size**: Designed for 120x120px, scalable to any size
 - **Minimum Display Size**: 50x50px (per requirements)
 
-## Available Icons
+## Available Icons (Track 3: Community Engagement Focus)
 
-### 1. Tree Planter (`tree-planter.svg`)
-- **Symbol**: Stylized tree with roots and branches
-- **Represents**: Tree planting achievements
-- **Category**: Conservation
+### 1. Community Builder (`community-builder.svg`)
+- **Symbol**: Connected people forming a network
+- **Represents**: Community building and engagement achievements
+- **Category**: Community
+- **Icons**: People, hands joining, hearts, connection nodes
 
-### 2. Carbon Warrior (`carbon-warrior.svg`)
-- **Symbol**: Shield with CO2 molecule crossed out
-- **Represents**: Carbon offset achievements
-- **Category**: Impact
+### 2. Social Mobilizer (`social-mobilizer.svg`)
+- **Symbol**: Group of people with upward momentum arrow
+- **Represents**: Social mobilization and referral achievements
+- **Category**: Community
+- **Icons**: People in motion, megaphone, sharing symbols
 
-### 3. Water Guardian (`water-guardian.svg`)
-- **Symbol**: Water drop with protective hands
-- **Represents**: Water conservation achievements
-- **Category**: Conservation
+### 3. Collaboration Champion (`collaboration-champion.svg`)
+- **Symbol**: Hands joining together in unity
+- **Represents**: Collaborative initiative achievements
+- **Category**: Community
+- **Icons**: Hands, teamwork symbols, unity circles
 
-### 4. Biodiversity Champion (`biodiversity-champion.svg`)
-- **Symbol**: Multiple species silhouettes in harmony
-- **Represents**: Biodiversity support achievements
-- **Category**: Conservation
+### 4. Knowledge Sharer (`knowledge-sharer.svg`)
+- **Symbol**: Book or lightbulb with sharing arrows
+- **Represents**: Educational content and knowledge sharing
+- **Category**: Community
+- **Icons**: Book, lightbulb, speech bubbles, teaching symbols
 
 ### 5. Community Leader (`community-leader.svg`)
-- **Symbol**: Group of people forming a tree shape
+- **Symbol**: Person with community members around them
 - **Represents**: Community leadership achievements
 - **Category**: Community
+- **Icons**: Leader figure, people group, guiding star
 
-### 6. Climate Hero (`climate-hero.svg`)
-- **Symbol**: Sun and leaf with upward arrow
-- **Represents**: Climate action achievements
+### 6. Climate Advocate (`climate-advocate.svg`)
+- **Symbol**: Megaphone with climate action symbols
+- **Represents**: Climate advocacy and awareness achievements
 - **Category**: Impact
+- **Icons**: Megaphone, voice symbols, action arrows
 
-### 7. Forest Protector (`forest-protector.svg`)
-- **Symbol**: Forest silhouette within a shield
-- **Represents**: Forest protection achievements
-- **Category**: Conservation
+### 7. Initiative Champion (`initiative-champion.svg`)
+- **Symbol**: Trophy or star with initiative symbols
+- **Represents**: Initiative participation and completion
+- **Category**: Impact
+- **Icons**: Trophy, checkmark, goal symbols
 
 ### 8. Green Ambassador (`green-ambassador.svg`)
-- **Symbol**: Megaphone with leaf symbol
-- **Represents**: Environmental advocacy achievements
+- **Symbol**: Person with environmental message symbols
+- **Represents**: Environmental advocacy and outreach
 - **Category**: Community
+- **Icons**: Ambassador figure, message symbols, outreach icons
 
 ## Design Principles
 

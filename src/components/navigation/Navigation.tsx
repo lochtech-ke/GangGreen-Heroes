@@ -118,7 +118,7 @@ export function Navigation({ className = '' }: NavigationProps) {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
                   type="text"
-                  placeholder="Search initiatives, trees, achievements..."
+                  placeholder="Search initiatives, challenges, community..."
                   className="w-full pl-10 pr-4 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent bg-gray-50"
                 />
               </div>

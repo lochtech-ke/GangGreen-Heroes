@@ -6,8 +6,13 @@
 
 ## 🚀 Quick Start
 
-New to the project? Start here:
+### For Users & General Public
+1. **[Public Wiki](../wiki/README.md)** - Complete user guide and platform overview
+2. **[Quick Start Guide](../wiki/02-quick-start-guide.md)** - Get started in 5 minutes
+3. **[Platform Overview](../wiki/01-platform-overview.md)** - What #GangGreen is and how it works
+4. **[Wiki Index](../wiki/INDEX.md)** - Browse all 25 wiki pages
 
+### For Developers
 1. **[README](../README.md)** - Project overview and setup
 2. **[Development Wiki](./DEVELOPMENT_WIKI.md)** - Complete development journey
 3. **[Quick Reference](./QUICK_REFERENCE.md)** - Common commands and workflows
@@ -39,6 +44,12 @@ New to the project? Start here:
 - [Apply Migration Guide](./APPLY_MIGRATION.md) - Migration execution
 
 ### For Users
+
+#### Public Wiki (NEW!)
+- **[Public Wiki Home](../wiki/README.md)** - Complete user documentation
+- **[Quick Start Guide](../wiki/02-quick-start-guide.md)** - Get started in 5 minutes
+- **[Platform Overview](../wiki/01-platform-overview.md)** - Understanding #GangGreen
+- **[Wiki Index](../wiki/INDEX.md)** - Browse all 25 wiki pages
 
 #### User Guides
 - [User Guide](./USER_GUIDE_NOVEMBER_19_2025.md) - Platform usage guide

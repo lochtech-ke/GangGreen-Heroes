@@ -6,10 +6,15 @@ Built for **Track 3 (Community Engagement and Sustainability)** of the Wangari M
 
 ---
 
-## 📚 **NEW: Complete Documentation Wiki**
+## 📚 **Documentation**
 
-We've created comprehensive documentation for the entire development journey:
+### For Users & General Public
+- **[🌍 Public Wiki](wiki/README.md)** - Complete user guide and platform overview
+- **[🚀 Quick Start Guide](wiki/02-quick-start-guide.md)** - Get started in 5 minutes
+- **[📖 Platform Overview](wiki/01-platform-overview.md)** - What #GangGreen is and how it works
+- **[📑 Wiki Index](wiki/INDEX.md)** - Browse all 25 wiki pages
 
+### For Developers
 - **[📖 Development Wiki](docs/DEVELOPMENT_WIKI.md)** - Complete feature journey, architecture, and lessons learned
 - **[🗺️ Feature Map](docs/FEATURE_MAP.md)** - Interactive feature relationships and status dashboard
 - **[🏗️ Architecture Guide](docs/ARCHITECTURE.md)** - Deep technical dive into system design
@@ -17,6 +22,7 @@ We've created comprehensive documentation for the entire development journey:
 - **[📑 Documentation Index](docs/INDEX.md)** - Navigate all 100+ documentation files
 
 **Quick Links:**
+- New User? → [Public Wiki](wiki/README.md) + [Quick Start](wiki/02-quick-start-guide.md)
 - New Developer? → [Setup Guide](docs/SETUP_INSTRUCTIONS.md) + [Quick Reference](docs/QUICK_REFERENCE.md)
 - Want to Understand the System? → [Architecture](docs/ARCHITECTURE.md) + [Feature Map](docs/FEATURE_MAP.md)
 - Looking for Specific Features? → [Development Wiki](docs/DEVELOPMENT_WIKI.md)

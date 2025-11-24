@@ -111,6 +111,16 @@ class AuthService {
       const user = await this.getCurrentUser();
       console.log('[AuthService] User data fetched:', user);
 
+      // Step 4: Create Hummingbird badge notification
+      // The badge is automatically awarded by database trigger
+      // We just need to create the welcome notification
+      try {
+        await this.createHummingbirdWelcomeNotification(authData.user.id);
+      } catch (notifError) {
+        // Don't fail registration if notification creation fails
+        console.warn('[AuthService] Failed to create welcome notification:', notifError);
+      }
+
       const duration = performance.now() - start;
       console.log(
         `[AuthService] Registration completed in ${duration.toFixed(2)}ms`
@@ -464,6 +474,35 @@ class AuthService {
         callback(null);
       }
     });
+  }
+
+  /**
+   * Create Hummingbird welcome notification for new users
+   * Private helper method called during registration
+   */
+  private async createHummingbirdWelcomeNotification(userId: string): Promise<void> {
+    try {
+      // Check if notifications table exists and create welcome notification
+      const { error } = await supabase.from('notifications').insert({
+        user_id: userId,
+        type: 'badge_earned',
+        title: 'Welcome to #GangGreen! 🐦',
+        message: 'You\'ve earned your first badge: The Hummingbird! Like the hummingbird in Wangari Maathai\'s story, every small action counts. Start your journey today!',
+        metadata: {
+          badge_name: 'Hummingbird',
+          badge_tier: 'hummingbird',
+          is_welcome: true,
+        },
+      });
+
+      if (error) {
+        console.warn('[AuthService] Could not create Hummingbird notification:', error);
+      } else {
+        console.log('[AuthService] Hummingbird welcome notification created');
+      }
+    } catch (error) {
+      console.warn('[AuthService] Notification system not available:', error);
+    }
   }
 }
 

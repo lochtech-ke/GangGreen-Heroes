@@ -9,14 +9,27 @@ export const standaloneNavigationItems: NavItemConfig[] = [
     icon: 'home',
   },
   {
-    to: '/gamification',
-    label: 'Rewards',
+    to: '/challenges',
+    label: 'Challenges',
+    icon: 'target',
+    description: 'Complete micro-challenges and earn rewards',
+  },
+  {
+    to: '/badges',
+    label: 'My Badges',
+    icon: 'award',
+    description: 'View your badge progression and achievements',
+  },
+  {
+    to: '/leaderboard',
+    label: 'Leaderboard',
     icon: 'trophy',
-    badge: 0, // Will be updated dynamically
+    description: 'See top community contributors',
   },
 ];
 
 // Navigation groups for mega menu dropdowns
+// Track 3 Focus: Community Engagement and Sustainability
 export const navigationGroups: NavGroupConfig[] = [
   {
     id: 'community',
@@ -44,21 +57,15 @@ export const navigationGroups: NavGroupConfig[] = [
     ],
   },
   {
-    id: 'conservation',
-    label: 'Conservation',
+    id: 'initiatives',
+    label: 'Initiatives',
     icon: 'tree-pine',
     items: [
       {
         to: '/initiatives',
-        label: 'Initiatives',
+        label: 'Browse Initiatives',
         icon: 'tree-pine',
         description: 'Browse and join conservation projects',
-      },
-      {
-        to: '/trees',
-        label: 'Tree Registry',
-        icon: 'leaf',
-        description: 'Track planted trees and their impact',
       },
       {
         to: '/journey',
@@ -72,32 +79,6 @@ export const navigationGroups: NavGroupConfig[] = [
         icon: 'plus',
         description: 'Start a new conservation project',
         roles: ['organization'],
-      },
-    ],
-  },
-  {
-    id: 'marketplace',
-    label: 'Marketplace',
-    icon: 'shopping-bag',
-    items: [
-      {
-        to: '/marketplace',
-        label: 'NFT Badges',
-        icon: 'award',
-        description: 'Browse and purchase achievement badges',
-        badge: 0, // Will be updated dynamically
-      },
-      {
-        to: '/carbon-credits',
-        label: 'Carbon Credits',
-        icon: 'cloud',
-        description: 'Trade verified carbon credits (Coming Soon)',
-      },
-      {
-        to: '/donate',
-        label: 'Donate',
-        icon: 'heart',
-        description: 'Support conservation efforts',
       },
     ],
   },
