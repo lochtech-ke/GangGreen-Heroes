@@ -21,6 +21,12 @@ export const standaloneNavigationItems: NavItemConfig[] = [
     description: 'View your badge progression and achievements',
   },
   {
+    to: '/marketplace',
+    label: 'Badge Marketplace',
+    icon: 'shopping-bag',
+    description: 'Purchase NFT badges and earn GG Coins',
+  },
+  {
     to: '/leaderboard',
     label: 'Leaderboard',
     icon: 'trophy',

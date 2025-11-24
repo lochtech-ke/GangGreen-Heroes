@@ -22,6 +22,7 @@ import { GovernancePage } from './pages/GovernancePage';
 import { ProposalDetailPage } from './pages/ProposalDetailPage';
 import { PetitionDetailPage } from './pages/PetitionDetailPage';
 import BadgesPage from './pages/BadgesPage';
+import { MarketplacePage } from './pages/MarketplacePage';
 import {
   TermsOfServicePage,
   PrivacyPolicyPage,
@@ -231,9 +232,19 @@ function AppContent() {
             </ProtectedRoute>
           }
         />
+        {/* Badge Marketplace - Active for Track 3 */}
+        <Route
+          path="/marketplace"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <MarketplacePage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
         {/* Deprecated Routes - Track 3 Redirects */}
         <Route path="/trees" element={<DeprecatedRouteHandler />} />
-        <Route path="/marketplace" element={<DeprecatedRouteHandler />} />
         <Route path="/carbon-credits" element={<DeprecatedRouteHandler />} />
         <Route
           path="/gamification"

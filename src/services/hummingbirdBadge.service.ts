@@ -4,7 +4,6 @@
  */
 
 import { BadgeConfig, BadgeGenerationResult, BadgeMetadata } from '../types/badge.types';
-import { badgeSvgService } from './badgeSvg.service';
 import { getTierStyle } from '../assets/badges/styles/tierStyles';
 import { getForestTheme } from '../assets/badges/styles/forestThemes';
 import { hummingbirdBadgePerformanceService, ValidationResult } from './hummingbirdBadge.performance';
@@ -253,8 +252,12 @@ class HummingbirdBadgeService {
         generationTime: `${generationTime.toFixed(2)}ms`,
       });
       
-      // Fallback to regular badge service
-      return await badgeSvgService.generateBadge(config);
+      // Return error result instead of falling back to avoid infinite recursion
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to generate hummingbird badge',
+        metadata: config.metadata,
+      };
     }
   }
 
@@ -266,15 +269,22 @@ class HummingbirdBadgeService {
       // Try to load the hummingbird template
       let template: string;
       
-      if (typeof window !== 'undefined' && window.location) {
-        // Browser environment
-        const response = await fetch('/src/assets/badges/templates/hummingbird-template.svg');
-        if (!response.ok) {
-          throw new Error(`Failed to load hummingbird template: ${response.statusText}`);
+      if (typeof window !== 'undefined' && window.location && window.location.protocol !== 'file:') {
+        // Browser environment with network access
+        try {
+          const response = await fetch('/src/assets/badges/templates/hummingbird-template.svg');
+          if (!response.ok) {
+            console.warn(`Failed to load hummingbird template: ${response.statusText}, using fallback`);
+            template = this.getHummingbirdFallbackTemplate();
+          } else {
+            template = await response.text();
+          }
+        } catch (fetchError) {
+          console.warn('Network error loading hummingbird template, using fallback:', fetchError);
+          template = this.getHummingbirdFallbackTemplate();
         }
-        template = await response.text();
       } else {
-        // Test/Node environment - use fallback template
+        // Test/Node environment or file protocol - use fallback template
         template = this.getHummingbirdFallbackTemplate();
       }
       
@@ -477,26 +487,34 @@ class HummingbirdBadgeService {
     const tierStyle = getTierStyle(config.tier);
     const forestTheme = getForestTheme(config.forest);
     
+    // Safely access metadata properties with fallbacks
+    const metadata = config.metadata || {} as any;
+    const badgeName = metadata.badgeName || 'Hummingbird Welcome Badge';
+    const tierLevel = metadata.tierLevel?.toString() || '1';
+    const earnedDate = metadata.earnedDate ? new Date(metadata.earnedDate).toLocaleDateString() : new Date().toLocaleDateString();
+    const uniqueBadgeId = metadata.uniqueBadgeId || config.id || 'unknown';
+    const userId = metadata.userId || 'unknown';
+    
     const replacements: Record<string, string> = {
-      '{{gradientStart}}': tierStyle.gradientStart,
-      '{{primaryColor}}': tierStyle.primaryColor,
-      '{{gradientEnd}}': tierStyle.gradientEnd,
-      '{{badgeName}}': config.metadata.badgeName,
-      '{{tierLevel}}': config.metadata.tierLevel.toString(),
-      '{{forestName}}': forestTheme.name,
+      '{{gradientStart}}': tierStyle.gradientStart || '#CD7F32',
+      '{{primaryColor}}': tierStyle.primaryColor || '#CD7F32',
+      '{{gradientEnd}}': tierStyle.gradientEnd || '#8B4513',
+      '{{badgeName}}': badgeName,
+      '{{tierLevel}}': tierLevel,
+      '{{forestName}}': forestTheme.name || 'Forest',
       '{{achievementType}}': 'welcome_badge',
       '{{achievementName}}': 'Hummingbird Welcome',
       '{{achievementCount}}': '1',
       '{{achievementUnit}}': 'Welcome',
-      '{{earnedDate}}': new Date(config.metadata.earnedDate).toLocaleDateString(),
-      '{{uniqueBadgeId}}': config.metadata.uniqueBadgeId,
-      '{{userId}}': config.metadata.userId,
-      '{{tierName}}': config.tier.charAt(0).toUpperCase() + config.tier.slice(1),
+      '{{earnedDate}}': earnedDate,
+      '{{uniqueBadgeId}}': uniqueBadgeId,
+      '{{userId}}': userId,
+      '{{tierName}}': config.tier ? config.tier.charAt(0).toUpperCase() + config.tier.slice(1) : 'Bronze',
     };
     
     let result = template;
     for (const [placeholder, value] of Object.entries(replacements)) {
-      result = result.replace(new RegExp(placeholder, 'g'), value);
+      result = result.replace(new RegExp(placeholder, 'g'), value || '');
     }
     
     return result;
@@ -509,15 +527,22 @@ class HummingbirdBadgeService {
     try {
       let content: string;
       
-      if (typeof window !== 'undefined' && window.location) {
-        // Browser environment
-        const response = await fetch(`/src/assets/badges/patterns/${forest}-pattern.svg`);
-        if (!response.ok) {
-          return this.getDefaultForestPattern();
+      if (typeof window !== 'undefined' && window.location && window.location.protocol !== 'file:') {
+        // Browser environment with network access
+        try {
+          const response = await fetch(`/src/assets/badges/patterns/${forest}-pattern.svg`);
+          if (!response.ok) {
+            console.warn(`Failed to load ${forest} pattern, using mock`);
+            content = this.getMockForestPattern(forest);
+          } else {
+            content = await response.text();
+          }
+        } catch (fetchError) {
+          console.warn(`Network error loading ${forest} pattern, using mock:`, fetchError);
+          content = this.getMockForestPattern(forest);
         }
-        content = await response.text();
       } else {
-        // Test/Node environment - use mock pattern
+        // Test/Node environment or file protocol - use mock pattern
         content = this.getMockForestPattern(forest);
       }
       
@@ -889,20 +914,32 @@ class HummingbirdBadgeService {
    * Embed hummingbird-specific metadata
    */
   private embedHummingbirdMetadata(svg: string, metadata: HummingbirdBadgeMetadata): string {
+    // Safely access metadata properties with fallbacks
+    const badgeName = metadata?.badgeName || 'Hummingbird Welcome Badge';
+    const tierLevel = metadata?.tierLevel || 1;
+    const forestName = metadata?.forestName || 'Forest';
+    const achievementType = metadata?.achievementType || 'welcome_badge';
+    const earnedDate = metadata?.earnedDate || new Date().toISOString();
+    const uniqueBadgeId = metadata?.uniqueBadgeId || 'unknown';
+    const userId = metadata?.userId || 'unknown';
+    const welcomeMessage = metadata?.welcomeMessage || 'Welcome to the #GangGreen community!';
+    const registrationDate = metadata?.registrationDate || earnedDate;
+    const platformVersion = metadata?.platformVersion || '1.0.0';
+    
     const metadataXML = `
     <metadata>
       <badge>
-        <name>${this.escapeXML(metadata.badgeName)}</name>
-        <tier>${metadata.tierLevel}</tier>
-        <forest>${this.escapeXML(metadata.forestName)}</forest>
-        <achievement>${metadata.achievementType}</achievement>
+        <name>${this.escapeXML(badgeName)}</name>
+        <tier>${tierLevel}</tier>
+        <forest>${this.escapeXML(forestName)}</forest>
+        <achievement>${achievementType}</achievement>
         <count>1</count>
-        <date>${metadata.earnedDate}</date>
-        <id>${metadata.uniqueBadgeId}</id>
-        <user>${metadata.userId}</user>
-        <welcomeMessage>${this.escapeXML(metadata.welcomeMessage)}</welcomeMessage>
-        <registrationDate>${metadata.registrationDate}</registrationDate>
-        <platformVersion>${metadata.platformVersion}</platformVersion>
+        <date>${earnedDate}</date>
+        <id>${uniqueBadgeId}</id>
+        <user>${userId}</user>
+        <welcomeMessage>${this.escapeXML(welcomeMessage)}</welcomeMessage>
+        <registrationDate>${registrationDate}</registrationDate>
+        <platformVersion>${platformVersion}</platformVersion>
       </badge>
     </metadata>
     `;
@@ -957,12 +994,16 @@ class HummingbirdBadgeService {
    * Add accessibility attributes to SVG
    */
   private addAccessibilityAttributes(svg: string, config: HummingbirdBadgeConfig): string {
-    const metadata = config.metadata as HummingbirdBadgeMetadata;
-    const tierName = config.tier.charAt(0).toUpperCase() + config.tier.slice(1);
+    const metadata = (config.metadata || {}) as HummingbirdBadgeMetadata;
+    const tierName = config.tier ? config.tier.charAt(0).toUpperCase() + config.tier.slice(1) : 'Bronze';
+    const badgeName = metadata.badgeName || 'Hummingbird Welcome Badge';
+    const forestName = metadata.forestName || 'Forest';
+    const welcomeMessage = metadata.welcomeMessage || 'Welcome to the #GangGreen community!';
+    const earnedDate = metadata.earnedDate ? new Date(metadata.earnedDate).toLocaleDateString() : new Date().toLocaleDateString();
     
     // Create accessibility content
-    const title = `${metadata.badgeName} - ${tierName} tier badge for ${metadata.forestName}`;
-    const description = `Welcome badge featuring an abstract hummingbird design. ${metadata.welcomeMessage} Earned on ${new Date(metadata.earnedDate).toLocaleDateString()}.`;
+    const title = `${badgeName} - ${tierName} tier badge for ${forestName}`;
+    const description = `Welcome badge featuring an abstract hummingbird design. ${welcomeMessage} Earned on ${earnedDate}.`;
     
     // Add accessibility attributes to the root SVG element
     const accessibleSvg = svg.replace(

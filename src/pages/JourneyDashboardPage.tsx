@@ -357,12 +357,6 @@ export function JourneyDashboardPage() {
                   View Challenges
                 </button>
                 <button
-                  onClick={() => navigate('/trees/plant')}
-                  className="w-full text-left px-4 py-2 bg-gray-50 hover:bg-gray-100 rounded-lg text-sm font-medium text-gray-700 transition-colors"
-                >
-                  Plant a Tree
-                </button>
-                <button
                   onClick={() => navigate('/petitions')}
                   className="w-full text-left px-4 py-2 bg-gray-50 hover:bg-gray-100 rounded-lg text-sm font-medium text-gray-700 transition-colors"
                 >

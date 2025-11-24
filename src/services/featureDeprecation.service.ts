@@ -17,13 +17,15 @@ class FeatureDeprecationService {
   private readonly CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
   // Deprecated features for Track 3
+  // Note: MARKETPLACE refers to carbon credits marketplace, not badge marketplace
+  // Badge marketplace (/marketplace) is active for Track 3
   private readonly deprecatedFeatures = new Set<DeprecatedFeature>([
     DeprecatedFeature.TREE_PLANTING,
     DeprecatedFeature.CARBON_CREDITS,
-    DeprecatedFeature.MARKETPLACE,
   ]);
 
   // Route redirects for deprecated features
+  // Note: /marketplace is for badge marketplace (active), /carbon-credits is deprecated
   private readonly routeRedirects: RouteRedirect[] = [
     {
       from: '/trees',
@@ -31,30 +33,27 @@ class FeatureDeprecationService {
       message: 'Tree planting features have been moved to Initiatives for Track 3',
     },
     {
-      from: '/marketplace',
-      to: '/badges',
-      message: 'Marketplace features are not available in Track 3. Check out our badge system!',
-    },
-    {
       from: '/carbon-credits',
       to: '/initiatives',
-      message: 'Carbon credit features are not available in Track 3. Explore our initiatives!',
+      message: 'Carbon credit marketplace features are not available in Track 3. Explore our initiatives!',
     },
   ];
 
   // Deprecated navigation items
+  // Note: 'marketplace' removed - badge marketplace is active for Track 3
+  // Only carbon credits marketplace is deprecated
   private readonly deprecatedNavItems = new Set<string>([
     'trees',
-    'marketplace',
     'carbon-credits',
     'carbon_credits',
   ]);
 
   // Deprecated component IDs
+  // Note: 'marketplace-listing' removed - badge marketplace components are active
+  // Only carbon credit marketplace components are deprecated
   private readonly deprecatedComponents = new Set<string>([
     'tree-planting-widget',
     'carbon-credit-marketplace',
-    'marketplace-listing',
     'tree-purchase-modal',
     'carbon-credit-purchase',
   ]);
@@ -132,8 +131,8 @@ class FeatureDeprecationService {
         return [];
 
       case 'carbon_credits':
-      case 'marketplace':
-        // Filter out carbon credit and marketplace data
+        // Filter out carbon credit marketplace data
+        // Note: Badge marketplace data is NOT filtered (it's active)
         return [];
 
       case 'initiatives':

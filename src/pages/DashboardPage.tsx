@@ -6,7 +6,7 @@
 import { useState, useEffect } from 'react';
 import { 
   Leaf, TrendingUp, Users, Trophy, 
-  MapPin, Camera, Award
+  MapPin, Award
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { dashboardService } from '../services/dashboard.service';
@@ -117,44 +117,6 @@ export function DashboardPage() {
           />
         </div>
       )}
-
-      {/* Register Tree Hero Card */}
-      <div className="relative h-64 rounded-3xl overflow-hidden shadow-xl">
-        <img
-          src="https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?w=1200&q=80"
-          alt="Register tree"
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-green-900/90 to-green-800/50">
-          <div className="h-full flex flex-col justify-center px-6 md:px-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">
-              Register Your Tree!
-            </h2>
-            <p className="text-green-50 text-base md:text-lg mb-6">
-              Tag your photo and start earning today
-            </p>
-            <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
-              <button className="px-8 py-3 bg-white text-green-900 rounded-xl font-semibold hover:bg-green-50 transition-colors">
-                Plant your tree
-              </button>
-              <div className="flex flex-wrap items-center gap-4 md:gap-6 text-white">
-                <button className="flex items-center gap-2 hover:text-green-200 transition-colors">
-                  <Camera className="w-5 h-5" />
-                  <span className="text-sm">Upload Photo</span>
-                </button>
-                <button className="flex items-center gap-2 hover:text-green-200 transition-colors">
-                  <MapPin className="w-5 h-5" />
-                  <span className="text-sm">Geo-tag Location</span>
-                </button>
-                <button className="flex items-center gap-2 hover:text-green-200 transition-colors">
-                  <Award className="w-5 h-5" />
-                  <span className="text-sm">Earn Points</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
 
       {/* For You Section */}
       <div>

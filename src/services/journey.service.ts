@@ -466,41 +466,23 @@ class JourneyService {
           break;
 
         case JourneyStage.ACTION:
-          if (progress.treesPlanted === 0) {
-            recommendations.push({
-              id: 'plant-tree',
-              type: 'tree_plant',
-              title: 'Plant Your First Tree',
-              description: 'Make a lasting impact by planting a tree',
-              priority: 1,
-              actionUrl: '/trees/plant',
-            });
-          }
           recommendations.push({
             id: 'more-challenges',
             type: 'challenge',
             title: 'Complete More Challenges',
             description: 'Keep building your impact with micro-challenges',
-            priority: 2,
+            priority: 1,
             actionUrl: '/challenges',
           });
           break;
 
         case JourneyStage.VERIFICATION:
           recommendations.push({
-            id: 'check-trees',
-            type: 'tree_plant',
-            title: 'Monitor Your Trees',
-            description: 'Check on your planted trees and upload progress photos',
-            priority: 1,
-            actionUrl: '/trees/monitor',
-          });
-          recommendations.push({
             id: 'sign-petition',
             type: 'petition',
             title: 'Support a Petition',
             description: 'Advocate for environmental policy changes',
-            priority: 2,
+            priority: 1,
             actionUrl: '/petitions',
           });
           break;
