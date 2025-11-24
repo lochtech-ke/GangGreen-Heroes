@@ -15,7 +15,8 @@ export type AchievementType =
   | 'community_leader'
   | 'climate_hero'
   | 'forest_protector'
-  | 'green_ambassador';
+  | 'green_ambassador'
+  | 'welcome_badge';
 
 export interface BadgeMetadata {
   badgeName: string;
@@ -26,6 +27,10 @@ export interface BadgeMetadata {
   earnedDate: string; // ISO 8601 format
   uniqueBadgeId: string; // UUID v4
   userId: string;
+  // Optional fields for welcome badges
+  welcomeMessage?: string;
+  registrationDate?: string;
+  platformVersion?: string;
 }
 
 export interface BadgeConfig {

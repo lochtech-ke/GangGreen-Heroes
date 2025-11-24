@@ -29,6 +29,12 @@ class BadgeSvgService {
    */
   async generateBadge(config: BadgeConfig): Promise<BadgeGenerationResult> {
     try {
+      // Check if this is a hummingbird welcome badge
+      if (config.achievement === 'welcome_badge') {
+        const { hummingbirdBadgeService } = await import('./hummingbirdBadge.service');
+        return await hummingbirdBadgeService.generateHummingbirdBadge(config as any);
+      }
+
       // Validate configuration
       const validation = validateBadgeConfig(config);
       if (!validation.valid) {
@@ -365,6 +371,31 @@ class BadgeSvgService {
     } catch (error) {
       console.error('[BadgeSvgService] Template availability check failed:', error);
       return false;
+    }
+  }
+
+  /**
+   * Generate hummingbird welcome badge with options
+   */
+  async generateHummingbirdBadge(
+    userId: string,
+    options: {
+      tier?: string;
+      forest?: string;
+      wingStyle?: 'geometric' | 'organic' | 'hybrid';
+      colorPalette?: 'vibrant' | 'subtle' | 'forest-themed';
+      animationLevel?: 'none' | 'subtle' | 'dynamic';
+    } = {}
+  ): Promise<BadgeGenerationResult> {
+    try {
+      const { generateWelcomeBadge } = await import('./hummingbirdBadge.service');
+      return await generateWelcomeBadge(userId, options);
+    } catch (error) {
+      console.error('[BadgeSvgService] Hummingbird badge generation failed:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to generate hummingbird badge',
+      };
     }
   }
 

@@ -18,6 +18,7 @@ export const ICON_FILES: Record<AchievementType, string> = {
   climate_hero: 'climate-advocate.svg',
   forest_protector: 'initiative-champion.svg',
   green_ambassador: 'green-ambassador.svg',
+  welcome_badge: 'hummingbird.svg',
 };
 
 /**

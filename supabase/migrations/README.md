@@ -23,6 +23,8 @@ This directory contains SQL migration scripts for the GangGreen platform databas
 17. **017_add_individual_user_journey_tables.sql** - Individual user journey tracking
 18. **018_update_gg_coins_to_decimal.sql** - Update GG Coins to support decimal precision (3 decimal places)
 19. **019_add_antugrow_integration_tables.sql** - Antugrow API integration (sync logs, webhooks, SMS alerts)
+20. **020_add_track3_badge_system.sql** - Track 3 badge system and community engagement
+21. **021_add_contributor_token_distribution.sql** - Contributor token distribution system with GitHub integration
 
 ## How to Execute Migrations
 

@@ -20,3 +20,12 @@ export { journeyService } from './journey.service';
 export { microChallengeService } from './microChallenge.service';
 export { referralService } from './referral.service';
 export { petitionService } from './petition.service';
+export { githubService } from './github.service';
+export { contributionAnalyzerService } from './contributionAnalyzer.service';
+export { badgeSvgService } from './badgeSvg.service';
+export { 
+  hummingbirdBadgeService, 
+  HummingbirdBadgeGenerator,
+  createHummingbirdBadgeGenerator,
+  generateWelcomeBadge 
+} from './hummingbirdBadge.service';

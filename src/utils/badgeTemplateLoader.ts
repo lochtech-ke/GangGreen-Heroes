@@ -86,6 +86,7 @@ function getAchievementUnit(achievement: string): string {
     climate_hero: 'Actions Taken',
     forest_protector: 'Hectares Protected',
     green_ambassador: 'People Reached',
+    welcome_badge: 'Welcome',
   };
   return units[achievement] || 'Achievements';
 }
@@ -166,6 +167,7 @@ export function validateBadgeConfig(config: BadgeConfig): { valid: boolean; erro
     'climate_hero',
     'forest_protector',
     'green_ambassador',
+    'welcome_badge',
   ];
   if (!validAchievements.includes(config.achievement)) {
     errors.push(`Invalid achievement: ${config.achievement}. Must be one of: ${validAchievements.join(', ')}`);

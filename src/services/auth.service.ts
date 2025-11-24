@@ -3,6 +3,7 @@ import { userCache } from './userCache';
 import { withRetry, DEFAULT_RETRY_CONFIG } from '../utils/retry';
 import { checkSupabaseHealth } from '../utils/supabaseHealth';
 import { categorizeAuthError } from '../types/authError.types';
+import { hummingbirdBadgeService } from './hummingbirdBadge.service';
 import type {
   User,
   RegisterData,
@@ -111,14 +112,24 @@ class AuthService {
       const user = await this.getCurrentUser();
       console.log('[AuthService] User data fetched:', user);
 
-      // Step 4: Create Hummingbird badge notification
-      // The badge is automatically awarded by database trigger
-      // We just need to create the welcome notification
+      // Step 4: Generate Hummingbird welcome badge
+      // The badge record is automatically created by database trigger
+      // Now we generate the actual SVG badge and create notification
       try {
+        await this.generateHummingbirdWelcomeBadge(authData.user.id, data.forest_preference || 'kakamega');
         await this.createHummingbirdWelcomeNotification(authData.user.id);
-      } catch (notifError) {
-        // Don't fail registration if notification creation fails
-        console.warn('[AuthService] Failed to create welcome notification:', notifError);
+        console.log('[AuthService] Hummingbird welcome badge and notification created successfully');
+      } catch (badgeError) {
+        // Don't fail registration if badge generation fails
+        // User can still use the platform, badge can be generated later
+        console.warn('[AuthService] Failed to generate welcome badge:', badgeError);
+        
+        // Create a fallback notification without badge details
+        try {
+          await this.createFallbackWelcomeNotification(authData.user.id);
+        } catch (fallbackError) {
+          console.warn('[AuthService] Failed to create fallback notification:', fallbackError);
+        }
       }
 
       const duration = performance.now() - start;
@@ -477,6 +488,70 @@ class AuthService {
   }
 
   /**
+   * Generate Hummingbird welcome badge for new users
+   * Private helper method called during registration
+   */
+  private async generateHummingbirdWelcomeBadge(userId: string, forestPreference: string): Promise<void> {
+    try {
+      console.log('[AuthService] Generating Hummingbird welcome badge for user:', userId);
+      
+      // Create hummingbird badge configuration
+      const config = hummingbirdBadgeService.createDefaultHummingbirdConfig(
+        userId,
+        'bronze', // New users start with bronze tier
+        forestPreference
+      );
+
+      // Generate the badge SVG
+      const result = await hummingbirdBadgeService.generateHummingbirdBadge(config);
+      
+      if (result.success && result.svg) {
+        console.log('[AuthService] Hummingbird badge generated successfully');
+        
+        // Store the generated SVG in the database
+        await this.storeHummingbirdBadgeSVG(userId, result.svg, result.metadata);
+      } else {
+        console.error('[AuthService] Failed to generate Hummingbird badge:', result);
+      }
+    } catch (error) {
+      console.error('[AuthService] Error generating Hummingbird badge:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Store the generated Hummingbird badge SVG in the database
+   * Private helper method for badge storage
+   */
+  private async storeHummingbirdBadgeSVG(userId: string, svg: string, metadata: any): Promise<void> {
+    try {
+      // Check if nft_badges table exists and store the badge
+      const { error } = await supabase.from('nft_badges').insert({
+        user_id: userId,
+        badge_name: 'Hummingbird Welcome Badge',
+        tier: 'bronze',
+        forest: metadata?.forestName || 'Kakamega Forest',
+        achievement_type: 'welcome_badge',
+        achievement_count: 1,
+        svg_content: svg,
+        metadata: {
+          ...metadata,
+          generated_at: new Date().toISOString(),
+          is_welcome_badge: true,
+        },
+      });
+
+      if (error) {
+        console.warn('[AuthService] Could not store Hummingbird badge SVG:', error);
+      } else {
+        console.log('[AuthService] Hummingbird badge SVG stored successfully');
+      }
+    } catch (error) {
+      console.warn('[AuthService] Badge storage system not available:', error);
+    }
+  }
+
+  /**
    * Create Hummingbird welcome notification for new users
    * Private helper method called during registration
    */
@@ -502,6 +577,33 @@ class AuthService {
       }
     } catch (error) {
       console.warn('[AuthService] Notification system not available:', error);
+    }
+  }
+
+  /**
+   * Create fallback welcome notification when badge generation fails
+   * Private helper method for error recovery
+   */
+  private async createFallbackWelcomeNotification(userId: string): Promise<void> {
+    try {
+      const { error } = await supabase.from('notifications').insert({
+        user_id: userId,
+        type: 'welcome',
+        title: 'Welcome to #GangGreen! 🌱',
+        message: 'Welcome to the community! Your journey toward environmental impact starts now. Explore initiatives, connect with others, and make a difference!',
+        metadata: {
+          is_welcome: true,
+          is_fallback: true,
+        },
+      });
+
+      if (error) {
+        console.warn('[AuthService] Could not create fallback notification:', error);
+      } else {
+        console.log('[AuthService] Fallback welcome notification created');
+      }
+    } catch (error) {
+      console.warn('[AuthService] Fallback notification system not available:', error);
     }
   }
 }

@@ -71,6 +71,13 @@ export const ACHIEVEMENT_CONFIGS: Record<AchievementType, AchievementConfig> = {
     iconFile: 'green-ambassador.svg',
     category: 'community',
   },
+  welcome_badge: {
+    type: 'welcome_badge',
+    displayName: 'Hummingbird Welcome',
+    description: 'Welcome to the #GangGreen community!',
+    iconFile: 'hummingbird.svg',
+    category: 'community',
+  },
 };
 
 /**

@@ -1,0 +1,92 @@
+<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Hummingbird-specific gradients -->
+    <linearGradient id="hummingbirdBodyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#20B2AA" />
+      <stop offset="50%" stop-color="#48D1CC" />
+      <stop offset="100%" stop-color="#00CED1" />
+    </linearGradient>
+    
+    <linearGradient id="hummingbirdWingGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2E8B57" />
+      <stop offset="30%" stop-color="#3CB371" />
+      <stop offset="70%" stop-color="#20B2AA" />
+      <stop offset="100%" stop-color="#48D1CC" />
+    </linearGradient>
+    
+    <radialGradient id="hummingbirdShimmer" cx="50%" cy="30%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.8)" />
+      <stop offset="50%" stop-color="rgba(255,255,255,0.4)" />
+      <stop offset="100%" stop-color="rgba(255,255,255,0)" />
+    </radialGradient>
+    
+    <!-- Drop shadow filter -->
+    <filter id="dropShadow">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
+      <feOffset dx="0" dy="1" result="offsetblur"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.3"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <g transform="translate(60, 60)">
+    <!-- Hummingbird body -->
+    <ellipse cx="0" cy="5" rx="6" ry="24" 
+             fill="url(#hummingbirdBodyGradient)" 
+             filter="url(#dropShadow)"/>
+    
+    <!-- Hummingbird head -->
+    <circle cx="0" cy="-20" r="9" 
+            fill="url(#hummingbirdBodyGradient)" 
+            filter="url(#dropShadow)"/>
+    
+    <!-- Hummingbird beak -->
+    <path d="M 0,-28 Q -1.5,-35 -6,-37 Q -1.5,-35 0,-28" 
+          fill="#FFD700" 
+          filter="url(#dropShadow)"/>
+    
+    <!-- Left wing (geometric abstract with bezier curves) -->
+    <path d="M -6,-12 C -26,-19 -34,-8 -30,4 C -26,12 -19,15 -11,11 C -7,8 -6,0 -6,-12 Z" 
+          fill="url(#hummingbirdWingGradient)" 
+          filter="url(#dropShadow)"/>
+    
+    <!-- Right wing (geometric abstract with bezier curves) -->
+    <path d="M 6,-12 C 26,-19 34,-8 30,4 C 26,12 19,15 11,11 C 7,8 6,0 6,-12 Z" 
+          fill="url(#hummingbirdWingGradient)" 
+          filter="url(#dropShadow)"/>
+    
+    <!-- Tail feathers (flowing bezier curves) -->
+    <path d="M 0,29 Q -6,38 -9,45 Q -6,42 0,35 Q 6,42 9,45 Q 6,38 0,29" 
+          fill="url(#hummingbirdWingGradient)" 
+          opacity="0.8" 
+          filter="url(#dropShadow)"/>
+    
+    <!-- Wing detail patterns (geometric elements) -->
+    <g id="wing-details" opacity="0.6">
+      <!-- Left wing geometric pattern -->
+      <path d="M -11,-8 L -19,-4 L -22,0 L -19,4 L -11,0 Z" 
+            fill="rgba(255,255,255,0.4)"/>
+      <path d="M -15,-12 L -26,-6 L -28,1 L -22,6 L -13,1 Z" 
+            fill="rgba(255,255,255,0.3)"/>
+      
+      <!-- Right wing geometric pattern -->
+      <path d="M 11,-8 L 19,-4 L 22,0 L 19,4 L 11,0 Z" 
+            fill="rgba(255,255,255,0.4)"/>
+      <path d="M 15,-12 L 26,-6 L 28,1 L 22,6 L 13,1 Z" 
+            fill="rgba(255,255,255,0.3)"/>
+    </g>
+    
+    <!-- Eye -->
+    <circle cx="-2" cy="-22" r="1.5" fill="#000000" opacity="0.8"/>
+    
+    <!-- Shimmer overlay -->
+    <ellipse cx="-4" cy="-8" rx="18" ry="28" 
+             fill="url(#hummingbirdShimmer)" 
+             opacity="0.5"/>
+  </g>
+</svg>
