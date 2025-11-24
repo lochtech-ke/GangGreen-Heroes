@@ -74,12 +74,16 @@
 - [x] 6. Implement profile creation for new Google users
 
 
+
+
+
   - Add `ensureUserProfile()` helper function to auth service
   - Extract user metadata from Google OAuth response
-  - Check if user profile exists in database
-  - Create profile with Google data if new user
-  - Handle profile creation errors gracefully
-  - _Requirements: 1.5, 2.1, 2.2, 2.3, 2.4_
+  - Check if user exists in custom `users` table
+  - **CRITICAL**: Create record in `users` table FIRST (required for foreign key)
+  - Then create record in `user_profiles` table with Google data
+  - Handle profile creation errors gracefully with proper rollback
+  - _Requirements: 1.5, 2.1, 2.2, 2.3, 2.4, 2.5_
 
 - [ ]* 6.1 Write property test for profile data extraction
   - **Property 1: Profile data extraction completeness**
@@ -88,10 +92,18 @@
   - Verify all available fields are correctly extracted
   - Verify missing optional fields don't cause errors
 
-- [ ]* 6.2 Write unit tests for profile creation
+- [ ]* 6.2 Write property test for database record creation order
+  - **Property 5: Database record creation order**
+  - **Validates: Requirements 2.4, 2.5**
+  - Generate random OAuth user data
+  - Verify `users` table record is created before `user_profiles` record
+  - Verify foreign key constraint is satisfied
+
+- [ ]* 6.3 Write unit tests for profile creation
   - Test profile creation for new users
   - Test profile retrieval for existing users
   - Test error handling for database failures
+  - Test rollback on partial failure
   - _Requirements: 1.5, 2.4, 2.5_
 
 - [x] 7. Update Auth Context to handle OAuth sessions

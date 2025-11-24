@@ -535,58 +535,86 @@ class AuthService {
 
   /**
    * Ensure user profile exists for OAuth users
-   * Creates profile with OAuth metadata if it doesn't exist
+   * Creates both users table record and profile with OAuth metadata if they don't exist
+   * CRITICAL: Must create users table record FIRST due to foreign key constraint
    */
   async ensureUserProfile(userId: string, metadata?: any): Promise<void> {
     try {
       console.log('[AuthService] Checking user profile for OAuth user:', userId);
 
-      // Check if profile exists
-      const { data: existingProfile, error: fetchError } = await supabase
-        .from('user_profiles')
+      // Check if user exists in custom users table
+      const { data: existingUser, error: userFetchError } = await supabase
+        .from('users')
         .select('id')
         .eq('id', userId)
         .maybeSingle();
 
-      if (fetchError) {
-        console.error('[AuthService] Error checking profile:', fetchError);
-        throw fetchError;
+      if (userFetchError) {
+        console.error('[AuthService] Error checking user:', userFetchError);
+        throw userFetchError;
       }
 
-      if (!existingProfile) {
+      if (!existingUser) {
+        console.log('[AuthService] Creating user record for OAuth user');
+
+        // Get auth user to extract email
+        const { data: { user: authUser } } = await supabase.auth.getUser();
+        
+        if (!authUser) {
+          throw new Error('No authenticated user found');
+        }
+
+        // STEP 1: Create user record FIRST (required for foreign key constraint)
+        const { error: userInsertError } = await supabase
+          .from('users')
+          .insert({
+            id: userId,
+            email: authUser.email || metadata?.email || '',
+            role: 'individual', // Default role for OAuth users
+            forest_preference: null, // User can set this later
+          });
+
+        if (userInsertError) {
+          console.error('[AuthService] Error creating user:', userInsertError);
+          throw userInsertError;
+        }
+
+        console.log('[AuthService] User record created successfully');
+
+        // STEP 2: Now create profile with Google data
         console.log('[AuthService] Creating profile for OAuth user');
 
         // Extract profile data from OAuth metadata
         const profileData: any = {
           id: userId,
+          full_name: metadata?.full_name || authUser.user_metadata?.full_name || authUser.email?.split('@')[0] || 'User',
         };
 
-        if (metadata) {
-          if (metadata.full_name) {
-            profileData.full_name = metadata.full_name;
-          }
-          if (metadata.avatar_url) {
-            profileData.avatar_url = metadata.avatar_url;
-          }
+        if (metadata?.avatar_url || authUser.user_metadata?.avatar_url) {
+          profileData.avatar_url = metadata?.avatar_url || authUser.user_metadata?.avatar_url;
         }
 
-        const { error: insertError } = await supabase
+        const { error: profileInsertError } = await supabase
           .from('user_profiles')
           .insert(profileData);
 
-        if (insertError) {
-          console.error('[AuthService] Error creating profile:', insertError);
-          throw insertError;
+        if (profileInsertError) {
+          console.error('[AuthService] Error creating profile:', profileInsertError);
+          
+          // Rollback: Delete the user record we just created
+          await supabase.from('users').delete().eq('id', userId);
+          console.log('[AuthService] Rolled back user record due to profile creation failure');
+          
+          throw profileInsertError;
         }
 
         console.log('[AuthService] Profile created successfully for OAuth user');
       } else {
-        console.log('[AuthService] Profile already exists for OAuth user');
+        console.log('[AuthService] User record already exists for OAuth user');
       }
     } catch (error) {
       console.error('[AuthService] Failed to ensure user profile:', error);
-      // Don't throw - allow user to continue even if profile creation fails
-      // They can complete their profile later
+      throw error; // Throw error so caller can handle it appropriately
     }
   }
 

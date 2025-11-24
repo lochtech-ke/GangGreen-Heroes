@@ -35,8 +35,9 @@ This feature adds Google OAuth authentication as a sign-in method to the #GangGr
 1. WHEN a new user authenticates with Google THEN the system SHALL extract their email address from the Google profile
 2. WHEN a new user authenticates with Google THEN the system SHALL extract their full name from the Google profile if available
 3. WHEN a new user authenticates with Google THEN the system SHALL extract their profile picture URL from the Google profile if available
-4. WHEN creating a user profile from Google data THEN the system SHALL store the profile information in the user_profiles table
-5. WHEN a user with an existing email authenticates with Google THEN the system SHALL link the Google provider to their existing account
+4. WHEN a new user authenticates with Google THEN the system SHALL create a record in the users table with the auth user ID
+5. WHEN creating a user profile from Google data THEN the system SHALL store the profile information in the user_profiles table
+6. WHEN a user with an existing email authenticates with Google THEN the system SHALL link the Google provider to their existing account
 
 ### Requirement 3
 

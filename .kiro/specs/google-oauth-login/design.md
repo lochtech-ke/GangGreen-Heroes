@@ -176,22 +176,30 @@ interface GoogleUserMetadata {
 
 ### Profile Creation Logic
 
-After successful OAuth authentication, check if user profile exists and create if needed:
+After successful OAuth authentication, check if user profile exists and create if needed. **Critical**: The database has a custom `users` table separate from Supabase's `auth.users`. The `user_profiles` table has a foreign key constraint to the custom `users` table, so we must create records in both tables:
 
 ```typescript
 async function ensureUserProfile(userId: string, metadata: GoogleUserMetadata): Promise<void> {
-  // Check if profile exists
-  const { data: existingProfile } = await supabase
-    .from('user_profiles')
+  // Check if user exists in custom users table
+  const { data: existingUser } = await supabase
+    .from('users')
     .select('id')
     .eq('id', userId)
     .single();
   
-  if (!existingProfile) {
-    // Create profile with Google data
+  if (!existingUser) {
+    // Create user record first (required for foreign key constraint)
+    await supabase.from('users').insert({
+      id: userId,
+      email: metadata.email,
+      role: 'individual', // Default role for OAuth users
+      forest_preference: null, // User can set this later
+    });
+    
+    // Then create profile with Google data
     await supabase.from('user_profiles').insert({
       id: userId,
-      full_name: metadata.full_name,
+      full_name: metadata.full_name || metadata.email.split('@')[0],
       avatar_url: metadata.avatar_url,
     });
   }
@@ -208,6 +216,10 @@ After reviewing the acceptance criteria, most of the testable requirements are s
 **Property 1: Profile data extraction completeness**
 *For any* Google OAuth response containing user metadata, all available fields (email, full_name, avatar_url) should be correctly extracted and mapped to the corresponding profile fields.
 **Validates: Requirements 2.1, 2.2, 2.3**
+
+**Property 5: Database record creation order**
+*For any* new Google OAuth user, a record must be created in the `users` table before creating a record in the `user_profiles` table to satisfy the foreign key constraint.
+**Validates: Requirements 2.4, 2.5**
 
 **Property 2: Error logging safety**
 *For any* authentication error that occurs during OAuth flow, the logged error message should not contain sensitive information (tokens, passwords, or personal identifiable information).
