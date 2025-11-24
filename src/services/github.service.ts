@@ -109,8 +109,8 @@ class GitHubService {
 
     // Default repository configuration - should be configurable via environment
     this.repositoryConfig = {
-      owner: process.env.VITE_GITHUB_REPO_OWNER || 'ganggreen-platform',
-      repo: process.env.VITE_GITHUB_REPO_NAME || 'ganggreen-platform',
+      owner: import.meta.env.VITE_GITHUB_REPO_OWNER || 'ganggreen-platform',
+      repo: import.meta.env.VITE_GITHUB_REPO_NAME || 'ganggreen-platform',
       default_branch: 'main',
       include_forks: false,
       exclude_bots: true,
@@ -829,7 +829,7 @@ class GitHubService {
   private encryptToken(token: string): string {
     // In production, use proper encryption (AES-256-GCM)
     // For now, just base64 encode (NOT SECURE)
-    return Buffer.from(token).toString('base64');
+    return btoa(token);
   }
 
 

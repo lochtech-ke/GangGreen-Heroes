@@ -6,6 +6,7 @@ import { HomePage } from './pages/HomePage';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { ResetPasswordPage } from './pages/ResetPasswordPage';
+import { AuthCallbackPage } from './pages/AuthCallbackPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { ProfilePage } from './pages/ProfilePage';
 import InitiativesPage from './pages/InitiativesPage';
@@ -20,6 +21,7 @@ import { JourneyDashboardPage } from './pages/JourneyDashboardPage';
 import { GovernancePage } from './pages/GovernancePage';
 import { ProposalDetailPage } from './pages/ProposalDetailPage';
 import { PetitionDetailPage } from './pages/PetitionDetailPage';
+import BadgesPage from './pages/BadgesPage';
 import {
   TermsOfServicePage,
   PrivacyPolicyPage,
@@ -104,6 +106,7 @@ function AppContent() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/auth/callback" element={<AuthCallbackPage />} />
         <Route path="/test-supabase" element={<SupabaseTest />} />
 
         {/* Social Feed */}
@@ -184,6 +187,16 @@ function AppContent() {
             <ProtectedRoute>
               <Layout>
                 <JourneyDashboardPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/badges"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <BadgesPage />
               </Layout>
             </ProtectedRoute>
           }

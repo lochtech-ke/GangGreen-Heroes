@@ -3,6 +3,7 @@ import { userCache } from './userCache';
 import { withRetry, DEFAULT_RETRY_CONFIG } from '../utils/retry';
 import { checkSupabaseHealth } from '../utils/supabaseHealth';
 import { categorizeAuthError } from '../types/authError.types';
+import { logAuthError } from '../utils/errorLogging';
 import { hummingbirdBadgeService } from './hummingbirdBadge.service';
 import { badgeProgressionService } from './badgeProgression.service';
 import type {
@@ -158,6 +159,48 @@ class AuthService {
       return {
         user: null,
         error: new Error(enhancedError.userMessage),
+      };
+    }
+  }
+
+  /**
+   * Sign in with Google OAuth
+   * Uses Supabase's built-in OAuth provider
+   */
+  async signInWithGoogle(): Promise<{ error: Error | null }> {
+    try {
+      console.log('[AuthService] Initiating Google OAuth sign-in...');
+
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
+        },
+      });
+
+      if (error) {
+        const enhancedError = categorizeAuthError(error);
+        logAuthError('AuthService.signInWithGoogle', error, {
+          type: enhancedError.type,
+          retryable: enhancedError.retryable,
+        });
+        return { error: new Error(enhancedError.userMessage) };
+      }
+
+      console.log('[AuthService] Google OAuth redirect initiated');
+      return { error: null };
+    } catch (error) {
+      const enhancedError = categorizeAuthError(error);
+      logAuthError('AuthService.signInWithGoogle', error, {
+        type: enhancedError.type,
+        retryable: enhancedError.retryable,
+      });
+      return {
+        error: error instanceof Error ? error : new Error('Google sign-in failed'),
       };
     }
   }
@@ -488,6 +531,63 @@ class AuthService {
         callback(null);
       }
     });
+  }
+
+  /**
+   * Ensure user profile exists for OAuth users
+   * Creates profile with OAuth metadata if it doesn't exist
+   */
+  async ensureUserProfile(userId: string, metadata?: any): Promise<void> {
+    try {
+      console.log('[AuthService] Checking user profile for OAuth user:', userId);
+
+      // Check if profile exists
+      const { data: existingProfile, error: fetchError } = await supabase
+        .from('user_profiles')
+        .select('id')
+        .eq('id', userId)
+        .maybeSingle();
+
+      if (fetchError) {
+        console.error('[AuthService] Error checking profile:', fetchError);
+        throw fetchError;
+      }
+
+      if (!existingProfile) {
+        console.log('[AuthService] Creating profile for OAuth user');
+
+        // Extract profile data from OAuth metadata
+        const profileData: any = {
+          id: userId,
+        };
+
+        if (metadata) {
+          if (metadata.full_name) {
+            profileData.full_name = metadata.full_name;
+          }
+          if (metadata.avatar_url) {
+            profileData.avatar_url = metadata.avatar_url;
+          }
+        }
+
+        const { error: insertError } = await supabase
+          .from('user_profiles')
+          .insert(profileData);
+
+        if (insertError) {
+          console.error('[AuthService] Error creating profile:', insertError);
+          throw insertError;
+        }
+
+        console.log('[AuthService] Profile created successfully for OAuth user');
+      } else {
+        console.log('[AuthService] Profile already exists for OAuth user');
+      }
+    } catch (error) {
+      console.error('[AuthService] Failed to ensure user profile:', error);
+      // Don't throw - allow user to continue even if profile creation fails
+      // They can complete their profile later
+    }
   }
 
   /**
