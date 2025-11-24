@@ -136,7 +136,7 @@ export const UserJourneyVisualization: React.FC<UserJourneyProps> = ({
       order: 2,
       color: 'purple',
       expandedDescription:
-        'Create your account in seconds with email or social authentication. Join thousands of conservation heroes.',
+        'Create your account in seconds with email or social authentication. Receive your Hummingbird welcome badge and join thousands of conservation heroes.',
     },
     {
       id: 'choose',

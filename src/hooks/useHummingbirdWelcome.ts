@@ -3,11 +3,14 @@ import { supabase } from '../services/supabase';
 
 /**
  * Hook to manage Hummingbird welcome modal display
- * Shows the welcome modal once for new users who just earned their Hummingbird badge
+ * Shows the welcome modal once for:
+ * 1. New users who just earned their Hummingbird badge (within 5 minutes)
+ * 2. Existing users who received the badge retroactively (on first login after migration)
  */
 export function useHummingbirdWelcome(userId: string | undefined) {
   const [showWelcome, setShowWelcome] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRetroactive, setIsRetroactive] = useState(false);
 
   useEffect(() => {
     if (!userId) {
@@ -53,13 +56,35 @@ export function useHummingbirdWelcome(userId: string | undefined) {
       );
 
       if (hummingbirdBadge) {
-        // Check if badge was earned recently (within last 5 minutes)
         const earnedAt = new Date(hummingbirdBadge.earned_at);
         const now = new Date();
         const minutesSinceEarned = (now.getTime() - earnedAt.getTime()) / (1000 * 60);
 
-        // Show welcome if badge was earned recently and user hasn't seen it
-        if (minutesSinceEarned < 5) {
+        // Get user registration date to detect retroactive assignment
+        const { data: userData, error: userError } = await supabase
+          .from('users')
+          .select('created_at')
+          .eq('id', userId)
+          .single();
+
+        if (userError) {
+          console.error('[useHummingbirdWelcome] Error fetching user data:', userError);
+        }
+
+        // Determine if this is a retroactive badge assignment
+        // Retroactive if: badge earned_at matches user created_at (set by migration)
+        // AND user was created more than 5 minutes ago
+        const isRetroactiveBadge = userData && 
+          Math.abs(new Date(userData.created_at).getTime() - earnedAt.getTime()) < 1000 && // Within 1 second
+          minutesSinceEarned > 5; // User created more than 5 minutes ago
+
+        if (isRetroactiveBadge) {
+          // Show welcome for existing users who received badge retroactively
+          setIsRetroactive(true);
+          setShowWelcome(true);
+        } else if (minutesSinceEarned < 5) {
+          // Show welcome for new users who just earned the badge
+          setIsRetroactive(false);
           setShowWelcome(true);
         }
       }
@@ -73,7 +98,7 @@ export function useHummingbirdWelcome(userId: string | undefined) {
 
   const handleComplete = () => {
     if (userId) {
-      // Mark welcome as shown
+      // Mark welcome as shown in localStorage
       const welcomeShownKey = `hummingbird_welcome_shown_${userId}`;
       localStorage.setItem(welcomeShownKey, 'true');
     }
@@ -83,6 +108,7 @@ export function useHummingbirdWelcome(userId: string | undefined) {
   return {
     showWelcome,
     isLoading,
+    isRetroactive,
     handleComplete,
   };
 }

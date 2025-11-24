@@ -3,11 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../contexts/AuthContext';
 import { useJourney } from '../contexts/JourneyContext';
 import { JourneyStage } from '../types/journey.types';
+import { BadgeTierIndicator } from '../components/badges/BadgeTierIndicator';
+import { useBadgeProgression } from '../hooks/useBadgeProgression';
+import { Award } from 'lucide-react';
 
 export function JourneyDashboardPage() {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuthContext();
+  const { isAuthenticated, user } = useAuthContext();
   const { progress, loading, error, currentStage, nextMilestone, recommendations } = useJourney();
+  
+  // Get badge progression data
+  const { currentBadge, nextBadge, requirementProgress, loading: badgeLoading } = useBadgeProgression(user?.id);
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -87,13 +93,23 @@ export function JourneyDashboardPage() {
                 Track your environmental impact and progress
               </p>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-6">
+              {/* Current Stage */}
               <div className="text-right">
                 <p className="text-sm text-gray-500">Current Stage</p>
                 <p className="text-lg font-semibold text-gray-900">
                   {currentStage ? getStageName(currentStage) : 'Unknown'}
                 </p>
               </div>
+              
+              {/* Badge Tier Indicator */}
+              {currentBadge && currentStage && !badgeLoading && (
+                <BadgeTierIndicator
+                  currentTier={currentBadge.tier}
+                  journeyStage={currentStage}
+                  size="md"
+                />
+              )}
             </div>
           </div>
         </div>
@@ -134,7 +150,18 @@ export function JourneyDashboardPage() {
           <div className="lg:col-span-2 space-y-6">
             {/* Impact Stats */}
             <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Your Impact</h2>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-semibold text-gray-900">Your Impact</h2>
+                {currentBadge && (
+                  <button
+                    onClick={() => navigate('/badges')}
+                    className="text-sm text-green-600 hover:text-green-700 font-medium flex items-center gap-1"
+                  >
+                    <Award className="w-4 h-4" />
+                    View Badges
+                  </button>
+                )}
+              </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="text-center">
                   <p className="text-3xl font-bold text-green-600">{progress.totalPoints}</p>
@@ -143,16 +170,31 @@ export function JourneyDashboardPage() {
                 <div className="text-center">
                   <p className="text-3xl font-bold text-green-600">{progress.treesPlanted}</p>
                   <p className="text-sm text-gray-600">Trees Planted</p>
+                  {requirementProgress.length > 0 && requirementProgress.find(r => r.requirement.type === 'actions') && (
+                    <p className="text-xs text-gray-500 mt-1">
+                      {requirementProgress.find(r => r.requirement.type === 'actions')?.current} / {requirementProgress.find(r => r.requirement.type === 'actions')?.target} for next badge
+                    </p>
+                  )}
                 </div>
                 <div className="text-center">
                   <p className="text-3xl font-bold text-green-600">
                     {progress.challengesCompleted}
                   </p>
                   <p className="text-sm text-gray-600">Challenges</p>
+                  {requirementProgress.length > 0 && requirementProgress.find(r => r.requirement.type === 'actions') && (
+                    <p className="text-xs text-gray-500 mt-1">
+                      Progress tracked in actions
+                    </p>
+                  )}
                 </div>
                 <div className="text-center">
                   <p className="text-3xl font-bold text-green-600">{progress.referralCount}</p>
                   <p className="text-sm text-gray-600">Referrals</p>
+                  {requirementProgress.length > 0 && requirementProgress.find(r => r.requirement.type === 'referrals') && (
+                    <p className="text-xs text-gray-500 mt-1">
+                      {requirementProgress.find(r => r.requirement.type === 'referrals')?.current} / {requirementProgress.find(r => r.requirement.type === 'referrals')?.target} for next badge
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
@@ -182,12 +224,38 @@ export function JourneyDashboardPage() {
             )}
 
             {/* Recommendations */}
-            {recommendations.length > 0 && (
+            {(recommendations.length > 0 || (nextBadge && requirementProgress.length > 0)) && (
               <div className="bg-white rounded-lg shadow p-6">
                 <h2 className="text-xl font-semibold text-gray-900 mb-4">
                   Recommended Actions
                 </h2>
                 <div className="space-y-3">
+                  {/* Badge Progression Recommendations */}
+                  {nextBadge && requirementProgress.length > 0 && (
+                    <div className="border-2 border-green-200 bg-green-50 rounded-lg p-4 mb-3">
+                      <div className="flex items-start gap-3">
+                        <Award className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-gray-900">
+                            Progress to {nextBadge.name} Badge
+                          </h3>
+                          <p className="text-sm text-gray-600 mt-1">
+                            Complete these actions to advance your badge tier:
+                          </p>
+                          <ul className="mt-2 space-y-1">
+                            {requirementProgress.map((req, index) => (
+                              <li key={index} className="text-sm text-gray-700">
+                                • {req.requirement.description}: {req.current} / {req.target}
+                                {req.isComplete && <span className="text-green-600 ml-1">✓</span>}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Journey Recommendations */}
                   {recommendations.map((rec) => (
                     <div
                       key={rec.id}
@@ -239,6 +307,23 @@ export function JourneyDashboardPage() {
             <div className="bg-white rounded-lg shadow p-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">Milestones</h2>
               <div className="space-y-2">
+                {/* Badge Tier Milestone */}
+                {currentBadge && (
+                  <div className="flex items-center text-sm mb-3 pb-3 border-b border-gray-200">
+                    <span className="text-green-500 mr-2">✓</span>
+                    <div className="flex-1">
+                      <span className="text-gray-700 font-medium">Earned {currentBadge.name} Badge</span>
+                      {nextBadge && (
+                        <p className="text-xs text-gray-500 mt-0.5">
+                          Next: {nextBadge.name} Badge
+                        </p>
+                      )}
+                    </div>
+                    <Award className="w-4 h-4 text-green-600" />
+                  </div>
+                )}
+                
+                {/* Journey Milestones */}
                 {progress.completedMilestones.length > 0 ? (
                   progress.completedMilestones.map((milestone) => (
                     <div key={milestone} className="flex items-center text-sm">
@@ -248,7 +333,7 @@ export function JourneyDashboardPage() {
                   ))
                 ) : (
                   <p className="text-sm text-gray-500 text-center py-2">
-                    No milestones completed yet
+                    No journey milestones completed yet
                   </p>
                 )}
               </div>
@@ -258,6 +343,13 @@ export function JourneyDashboardPage() {
             <div className="bg-white rounded-lg shadow p-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
               <div className="space-y-2">
+                <button
+                  onClick={() => navigate('/badges')}
+                  className="w-full text-left px-4 py-2 bg-green-50 hover:bg-green-100 rounded-lg text-sm font-medium text-green-700 transition-colors flex items-center gap-2"
+                >
+                  <Award className="w-4 h-4" />
+                  View Badges
+                </button>
                 <button
                   onClick={() => navigate('/challenges')}
                   className="w-full text-left px-4 py-2 bg-gray-50 hover:bg-gray-100 rounded-lg text-sm font-medium text-gray-700 transition-colors"

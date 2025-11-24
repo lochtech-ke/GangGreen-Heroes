@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Award, Info } from 'lucide-react';
+import { Award, Info, TrendingUp } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { BadgeProgressionView } from '../components/badges';
 import { HummingbirdWelcome } from '../components/badges/HummingbirdWelcome';
 import { useAuthContext } from '../contexts/AuthContext';
@@ -53,6 +54,17 @@ const BadgesPage: React.FC = () => {
 
       {/* Main Content */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Navigation Link to Journey Dashboard */}
+        <div className="mb-6">
+          <Link
+            to="/journey"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-green-50 hover:bg-green-100 text-green-700 font-medium rounded-lg transition-colors"
+          >
+            <TrendingUp className="w-4 h-4" />
+            View Journey Dashboard
+          </Link>
+        </div>
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

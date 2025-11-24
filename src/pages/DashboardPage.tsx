@@ -8,8 +8,13 @@ import {
   Leaf, TrendingUp, Users, Trophy, 
   MapPin, Camera, Award
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { dashboardService } from '../services/dashboard.service';
 import { useAuth } from '../hooks/useAuth';
+import { BadgeProgressWidget } from '../components/badges/BadgeProgressWidget';
+import { useBadgeProgression } from '../hooks/useBadgeProgression';
+import { useHummingbirdWelcome } from '../hooks/useHummingbirdWelcome';
+import { HummingbirdWelcome } from '../components/badges/HummingbirdWelcome';
 
 export function DashboardPage() {
   const { user } = useAuth();
@@ -17,6 +22,12 @@ export function DashboardPage() {
   const [forestStats, setForestStats] = useState<any[]>([]);
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  // Get badge progression data
+  const { currentBadge, loading: badgeLoading } = useBadgeProgression(user?.id);
+  
+  // Get welcome modal state for existing users
+  const { showWelcome, isRetroactive, handleComplete } = useHummingbirdWelcome(user?.id);
 
   useEffect(() => {
     loadDashboardData();
@@ -49,6 +60,9 @@ export function DashboardPage() {
   // Calculate user level based on trees planted (mock calculation)
   const userLevel = metrics ? Math.floor(metrics.total_trees_planted / 100) || 12 : 12;
   const levelProgress = metrics ? (metrics.total_trees_planted % 100) : 76;
+  
+  // Get badge tier display name for correlation with user level
+  const badgeTierDisplay = currentBadge ? currentBadge.name : 'No Badge';
 
   return (
     <div className="space-y-8">
@@ -77,8 +91,9 @@ export function DashboardPage() {
           icon={<Award className="w-6 h-6" />}
           title="Level Progress"
           value={`Level ${userLevel}`}
-          subtitle={`${levelProgress}% to Level ${userLevel + 1}`}
-          loading={loading}
+          subtitle={`${badgeTierDisplay} • ${levelProgress}% to Level ${userLevel + 1}`}
+          loading={loading || badgeLoading}
+          badgeTier={badgeTierDisplay}
         />
         <StatCard
           icon={<Trophy className="w-6 h-6" />}
@@ -86,8 +101,22 @@ export function DashboardPage() {
           value="24 Badges"
           subtitle="3 NFTs minted"
           loading={loading}
+          linkTo="/badges"
+          linkText="View Badges"
         />
       </div>
+
+      {/* Badge Progress Widget - Integrated into stats section */}
+      {user?.id && (
+        <div className="mt-6">
+          <BadgeProgressWidget 
+            userId={user.id} 
+            compact={false}
+            showProgress={true}
+            className="shadow-sm hover:shadow-md transition-shadow"
+          />
+        </div>
+      )}
 
       {/* Register Tree Hero Card */}
       <div className="relative h-64 rounded-3xl overflow-hidden shadow-xl">
@@ -144,12 +173,19 @@ export function DashboardPage() {
           <LeaderboardCard leaderboard={leaderboard} userRank={247} />
         </div>
       </div>
+
+      {/* Hummingbird Welcome Modal - Shows for new users and existing users after retroactive badge assignment */}
+      <HummingbirdWelcome
+        isOpen={showWelcome}
+        onComplete={handleComplete}
+        isRetroactive={isRetroactive}
+      />
     </div>
   );
 }
 
 // Stat Card Component
-function StatCard({ icon, title, value, subtitle, loading }: any) {
+function StatCard({ icon, title, value, subtitle, loading, badgeTier, linkTo, linkText }: any) {
   if (loading) {
     return (
       <div className="bg-white rounded-2xl p-6 shadow-sm animate-pulse">
@@ -161,14 +197,47 @@ function StatCard({ icon, title, value, subtitle, loading }: any) {
     );
   }
 
-  return (
-    <div className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
+  const CardContent = (
+    <>
       <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center text-green-700 mb-4">
         {icon}
       </div>
       <div className="text-sm text-gray-600 mb-1">{title}</div>
       <div className="text-3xl font-bold text-gray-900 mb-1">{value}</div>
-      <div className="text-xs text-green-600">{subtitle}</div>
+      <div className="text-xs text-green-600">
+        {badgeTier && (
+          <span className="inline-flex items-center gap-1">
+            <Award className="w-3 h-3" />
+            {subtitle}
+          </span>
+        )}
+        {!badgeTier && subtitle}
+      </div>
+      {linkTo && linkText && (
+        <Link 
+          to={linkTo}
+          className="mt-3 inline-flex items-center text-xs font-medium text-green-700 hover:text-green-800 transition-colors"
+        >
+          {linkText}
+          <span className="ml-1">→</span>
+        </Link>
+      )}
+    </>
+  );
+
+  if (linkTo && !linkText) {
+    return (
+      <Link to={linkTo} className="block">
+        <div className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
+          {CardContent}
+        </div>
+      </Link>
+    );
+  }
+
+  return (
+    <div className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
+      {CardContent}
     </div>
   );
 }

@@ -266,6 +266,17 @@ export const NFTBadgeShowcase: React.FC<BadgeShowcaseProps> = ({
   // Mock data for demonstration if no badges provided
   const mockBadges: FeaturedBadge[] = [
     {
+      id: 'badge-000-hummingbird-welcome',
+      name: 'Hummingbird Welcome Badge',
+      description: 'Your journey begins here! Like the hummingbird in Wangari Maathai\'s story, every small action counts.',
+      priceGGCoins: 0,
+      priceKES: 0,
+      tier: 'hummingbird',
+      forest: 'kakamega',
+      achievement: 'welcome_badge',
+      unlockRequirement: 'Awarded automatically upon registration',
+    },
+    {
       id: 'badge-001-kakamega-tree-planter',
       name: 'Kakamega Tree Planter',
       description: 'Plant your first tree in Kakamega Forest and start your conservation journey',

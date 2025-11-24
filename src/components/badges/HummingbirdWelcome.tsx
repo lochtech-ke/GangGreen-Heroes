@@ -8,14 +8,17 @@ import { useAuthContext } from '../../contexts/AuthContext';
 interface HummingbirdWelcomeProps {
   isOpen: boolean;
   onComplete: () => void;
+  isRetroactive?: boolean;
 }
 
 /**
  * Welcome modal shown when user earns their first Hummingbird badge
+ * Supports both new user registration and retroactive badge assignment
  */
 export const HummingbirdWelcome: React.FC<HummingbirdWelcomeProps> = ({
   isOpen,
   onComplete,
+  isRetroactive = false,
 }) => {
   const { user } = useAuthContext();
   const [showSharing, setShowSharing] = useState(false);
@@ -137,16 +140,78 @@ export const HummingbirdWelcome: React.FC<HummingbirdWelcomeProps> = ({
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 }}
                 >
-                  <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                    Welcome to #GangGreen!
-                  </h2>
-                  <p className="text-xl text-green-600 font-semibold mb-2">
-                    🎉 You've earned your first badge: The Hummingbird
-                  </p>
-                  <p className="text-lg text-gray-700 mb-6">
-                    Join thousands making Africa carbon-negative, one action at a time
-                  </p>
+                  {isRetroactive ? (
+                    <>
+                      <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                        Welcome Back! 🎉
+                      </h2>
+                      <p className="text-xl text-green-600 font-semibold mb-2">
+                        You've received your Hummingbird Badge!
+                      </p>
+                      <p className="text-lg text-gray-700 mb-6">
+                        We've introduced a new badge progression system, and as a valued member, you've been awarded the Hummingbird badge to start your journey
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                        Welcome to #GangGreen!
+                      </h2>
+                      <p className="text-xl text-green-600 font-semibold mb-2">
+                        🎉 You've earned your first badge: The Hummingbird
+                      </p>
+                      <p className="text-lg text-gray-700 mb-6">
+                        Join thousands making Africa carbon-negative, one action at a time
+                      </p>
+                    </>
+                  )}
                 </motion.div>
+
+                {/* Badge System Explanation for Retroactive Users */}
+                {isRetroactive && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.6 }}
+                    className="glass-green rounded-2xl p-6 mb-6 text-left"
+                  >
+                    <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                      What's New: Badge Progression System
+                    </h3>
+                    <div className="space-y-3 text-gray-700">
+                      <p>
+                        We've launched a new badge progression system to recognize and reward your environmental impact!
+                      </p>
+                      <p>
+                        As you continue your journey with #GangGreen, you'll progress through six badge tiers:
+                      </p>
+                      <div className="grid grid-cols-2 gap-2 my-3 text-sm">
+                        <div className="flex items-center gap-2 p-2 bg-white/50 rounded-lg">
+                          <span className="font-semibold text-green-600">🐦 Hummingbird</span>
+                          <span className="text-gray-500">(You are here)</span>
+                        </div>
+                        <div className="flex items-center gap-2 p-2 bg-white/30 rounded-lg">
+                          <span className="font-semibold text-amber-700">🥉 Bronze</span>
+                        </div>
+                        <div className="flex items-center gap-2 p-2 bg-white/30 rounded-lg">
+                          <span className="font-semibold text-gray-500">🥈 Silver</span>
+                        </div>
+                        <div className="flex items-center gap-2 p-2 bg-white/30 rounded-lg">
+                          <span className="font-semibold text-yellow-600">🥇 Gold</span>
+                        </div>
+                        <div className="flex items-center gap-2 p-2 bg-white/30 rounded-lg">
+                          <span className="font-semibold text-cyan-600">💎 Platinum</span>
+                        </div>
+                        <div className="flex items-center gap-2 p-2 bg-white/30 rounded-lg">
+                          <span className="font-semibold text-blue-600">💠 Diamond</span>
+                        </div>
+                      </div>
+                      <p>
+                        Your contributions, initiatives, and community engagement will help you advance through these tiers!
+                      </p>
+                    </div>
+                  </motion.div>
+                )}
 
                 {/* Hummingbird Story */}
                 <motion.div
@@ -182,34 +247,41 @@ export const HummingbirdWelcome: React.FC<HummingbirdWelcomeProps> = ({
                   className="space-y-4"
                 >
                   <p className="text-lg text-gray-700">
-                    Like the hummingbird, every small action counts. Ready to make your impact?
+                    {isRetroactive 
+                      ? "Continue making your impact and advance to the next badge tier!"
+                      : "Like the hummingbird, every small action counts. Ready to make your impact?"
+                    }
                   </p>
 
-                  {/* Platform Introduction */}
-                  <div className="glass-green rounded-xl p-4 text-left mb-4">
-                    <h4 className="font-semibold text-gray-900 mb-3">Welcome to Africa's Carbon-Negative Movement</h4>
-                    <p className="text-sm text-gray-700 mb-3">
-                      #GangGreen connects communities across Kenya's forests - from Kakamega's tropical canopy to Karura's urban oasis and Mau's highland watersheds. Together, we're reforesting Africa one tree at a time.
-                    </p>
-                    <div className="grid grid-cols-3 gap-2 text-xs">
-                      <div className="text-center p-2 bg-white/50 rounded-lg">
-                        <div className="font-semibold text-green-700">50K+</div>
-                        <div className="text-gray-600">Trees Planted</div>
-                      </div>
-                      <div className="text-center p-2 bg-white/50 rounded-lg">
-                        <div className="font-semibold text-green-700">1.2K+</div>
-                        <div className="text-gray-600">Active Members</div>
-                      </div>
-                      <div className="text-center p-2 bg-white/50 rounded-lg">
-                        <div className="font-semibold text-green-700">3</div>
-                        <div className="text-gray-600">Pilot Forests</div>
+                  {/* Platform Introduction - Only for new users */}
+                  {!isRetroactive && (
+                    <div className="glass-green rounded-xl p-4 text-left mb-4">
+                      <h4 className="font-semibold text-gray-900 mb-3">Welcome to Africa's Carbon-Negative Movement</h4>
+                      <p className="text-sm text-gray-700 mb-3">
+                        #GangGreen connects communities across Kenya's forests - from Kakamega's tropical canopy to Karura's urban oasis and Mau's highland watersheds. Together, we're reforesting Africa one tree at a time.
+                      </p>
+                      <div className="grid grid-cols-3 gap-2 text-xs">
+                        <div className="text-center p-2 bg-white/50 rounded-lg">
+                          <div className="font-semibold text-green-700">50K+</div>
+                          <div className="text-gray-600">Trees Planted</div>
+                        </div>
+                        <div className="text-center p-2 bg-white/50 rounded-lg">
+                          <div className="font-semibold text-green-700">1.2K+</div>
+                          <div className="text-gray-600">Active Members</div>
+                        </div>
+                        <div className="text-center p-2 bg-white/50 rounded-lg">
+                          <div className="font-semibold text-green-700">3</div>
+                          <div className="text-gray-600">Pilot Forests</div>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  )}
 
                   {/* Next Steps Preview */}
                   <div className="glass rounded-xl p-4 text-left">
-                    <h4 className="font-semibold text-gray-900 mb-2">Your Journey Starts Here:</h4>
+                    <h4 className="font-semibold text-gray-900 mb-2">
+                      {isRetroactive ? "How to Advance to Bronze:" : "Your Journey Starts Here:"}
+                    </h4>
                     <ul className="space-y-2 text-sm text-gray-700">
                       <li className="flex items-center gap-2">
                         <ArrowRight className="w-4 h-4 text-green-600 flex-shrink-0" />
@@ -251,7 +323,7 @@ export const HummingbirdWelcome: React.FC<HummingbirdWelcomeProps> = ({
                           onClick={onComplete}
                           className="w-full"
                         >
-                          Begin My Journey
+                          {isRetroactive ? "Continue My Journey" : "Begin My Journey"}
                         </GlassButton>
                       </>
                     ) : (

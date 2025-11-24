@@ -174,10 +174,10 @@ export const FeatureHighlights: React.FC<FeatureHighlightsProps> = ({ features }
     {
       id: 'nft-badges',
       icon: Award,
-      title: 'NFT Badges',
+      title: 'Badge Progression',
       description:
-        'Earn collectible digital badges as you achieve conservation milestones. Purchase with GG Coins or cash to showcase your impact.',
-      learnMoreUrl: '/marketplace',
+        'Start with your Hummingbird welcome badge and progress through Bronze, Silver, Gold, Platinum, and Diamond tiers as you achieve conservation milestones.',
+      learnMoreUrl: '/badges',
       accentColor: 'bg-amber-500',
       gradient: 'from-amber-500 to-orange-600',
     },
