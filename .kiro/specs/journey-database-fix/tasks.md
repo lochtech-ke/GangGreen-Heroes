@@ -164,7 +164,8 @@ This implementation plan creates the missing database infrastructure for the Ind
   - Document that database migration is now deployed
   - _Requirements: 3.4_
 
-- [ ] 5. Checkpoint - Verify journey feature is working
+- [x] 5. Checkpoint - Verify journey feature is working
+
   - Ensure all tests pass
   - Verify no 404 errors when clicking "Start my journey"
   - Confirm journey progress is being tracked correctly
