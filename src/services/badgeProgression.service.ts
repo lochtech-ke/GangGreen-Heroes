@@ -1,5 +1,6 @@
 import { supabase } from './supabase';
 import { withRetry, DEFAULT_RETRY_CONFIG } from '../utils/retry';
+import { BadgeTier } from '../types/badgeProgression.types';
 import type {
   Badge,
   BadgeProgress,
@@ -9,7 +10,6 @@ import type {
   RequirementProgress,
   BadgeRequirement,
   VariantEligibility,
-  BadgeTierRow,
 } from '../types/badgeProgression.types';
 
 /**
@@ -23,15 +23,17 @@ class BadgeProgressionService {
   async getCurrentBadge(userId: string): Promise<Badge | null> {
     try {
       const result = await withRetry(
-        () =>
-          supabase
+        async () => {
+          const response = await supabase
             .from('user_badge_progress')
             .select(`
               current_badge_id,
               badge_tiers!user_badge_progress_current_badge_id_fkey (*)
             `)
             .eq('user_id', userId)
-            .single(),
+            .single();
+          return response;
+        },
         DEFAULT_RETRY_CONFIG,
         'getCurrentBadge'
       );
@@ -65,12 +67,14 @@ class BadgeProgressionService {
       }
 
       const result = await withRetry(
-        () =>
-          supabase
+        async () => {
+          const response = await supabase
             .from('badge_tiers')
             .select('*')
             .eq('tier_order', currentBadge.tier_order + 1)
-            .single(),
+            .single();
+          return response;
+        },
         DEFAULT_RETRY_CONFIG,
         'getNextBadge'
       );
@@ -358,11 +362,13 @@ class BadgeProgressionService {
   async getAllBadges(): Promise<Badge[]> {
     try {
       const result = await withRetry(
-        () =>
-          supabase
+        async () => {
+          const response = await supabase
             .from('badge_tiers')
             .select('*')
-            .order('tier_order', { ascending: true }),
+            .order('tier_order', { ascending: true });
+          return response;
+        },
         DEFAULT_RETRY_CONFIG,
         'getAllBadges'
       );
@@ -374,7 +380,7 @@ class BadgeProgressionService {
         return [];
       }
 
-      return data.map(row => this.transformBadgeData(row));
+      return data.map((row: any) => this.transformBadgeData(row));
     } catch (error) {
       console.error('[BadgeProgressionService] Exception in getAllBadges:', error);
       return [];
@@ -575,10 +581,16 @@ class BadgeProgressionService {
       });
     }
 
+    // Map name to BadgeTier enum
+    const tierName = row.name.toLowerCase().replace(/ /g, '_');
+    const tier = Object.values(BadgeTier).includes(tierName as BadgeTier) 
+      ? (tierName as BadgeTier) 
+      : BadgeTier.HUMMINGBIRD;
+
     return {
       id: row.id,
       name: row.name,
-      tier: row.name.toLowerCase().replace(/ /g, '_') as BadgeTier,
+      tier,
       tier_order: row.tier_order,
       description: row.description,
       requirements: requirementArray,
