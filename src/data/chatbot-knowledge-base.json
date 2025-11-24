@@ -1,0 +1,226 @@
+[
+  {
+    "id": "q1",
+    "question": "What is Gang Green and how can I get involved?",
+    "answer": "Gang Green is a tech-powered, community-centric climate action platform that connects stakeholders in environmental conservation, carbon credit markets, and sustainable development across Africa. You can get involved by signing up as an individual, joining a community group, or registering your organization to create and sponsor conservation initiatives. We focus on three pilot forests in Kenya: Kakamega, Karura, and Mau forests.",
+    "category": "getting-started",
+    "keywords": ["about", "join", "get started", "involved", "what is", "gang green"],
+    "relatedQuestions": ["How do I sign up as an individual?", "How do I sign up a corporation or organization?"]
+  },
+  {
+    "id": "q2",
+    "question": "How do I sign up as an individual?",
+    "answer": "To sign up as an individual: 1) Click 'Register' on the homepage, 2) Enter your email and password, 3) Complete your profile through our friendly chatbot that will ask about your name, preferred forest, and location, 4) Start exploring initiatives and join projects that interest you. You'll earn points and badges as you participate!",
+    "category": "getting-started",
+    "keywords": ["sign up", "register", "individual", "account", "create account"],
+    "relatedQuestions": ["What is Gang Green and how can I get involved?", "How do I find and join projects?"]
+  },
+  {
+    "id": "q3",
+    "question": "How do I sign up a corporation or organization?",
+    "answer": "Organizations can register by: 1) Selecting 'Organization' during the registration process, 2) Providing your organization details including name and location, 3) Verifying your organization email, 4) Creating or sponsoring conservation initiatives. Organizations get access to employee engagement features, impact reporting, and white-label challenges.",
+    "category": "getting-started",
+    "keywords": ["organization", "corporate", "company", "business", "enterprise", "sign up"],
+    "relatedQuestions": ["What sponsorship options are available?", "How can companies engage employees?"]
+  },
+  {
+    "id": "q4",
+    "question": "What sponsorship opportunities are available?",
+    "answer": "Sponsors can support conservation through: 1) Direct project funding for tree planting initiatives, 2) Purchasing verified carbon credits, 3) Creating employee engagement challenges, 4) Adopting specific forest areas. Sponsorship includes impact reporting, brand visibility, and ESG documentation for sustainability goals.",
+    "category": "sponsorship",
+    "keywords": ["sponsor", "funding", "donate", "support", "corporate social responsibility", "csr"],
+    "relatedQuestions": ["How do I sign up a corporation or organization?", "How is project impact verified?"]
+  },
+  {
+    "id": "q5",
+    "question": "Which forests can I support?",
+    "answer": "We currently pilot in three Kenyan forests: 1) Kakamega Forest - Kenya's last remaining tropical rainforest, 2) Karura Forest - An urban forest in Nairobi, 3) Mau Forest - A critical water tower ecosystem. You can choose your preferred forest during registration or support multiple forests through different initiatives.",
+    "category": "getting-started",
+    "keywords": ["forests", "kakamega", "karura", "mau", "location", "where"],
+    "relatedQuestions": ["What is Gang Green and how can I get involved?", "How do I find and join projects?"]
+  },
+  {
+    "id": "q6",
+    "question": "How do I find and join projects?",
+    "answer": "To find projects: 1) Navigate to the 'Initiatives' page from the dashboard, 2) Browse active conservation projects by forest or type, 3) Click on any initiative to view details, location, and impact goals, 4) Click 'Join Initiative' to participate. You can track your contributions and see real-time progress updates.",
+    "category": "projects",
+    "keywords": ["find projects", "join", "initiatives", "participate", "browse"],
+    "relatedQuestions": ["How do I participate in a project?", "What types of projects are available?"]
+  },
+  {
+    "id": "q7",
+    "question": "How do I participate in a project?",
+    "answer": "After joining an initiative: 1) View project milestones and tasks, 2) Contribute by planting trees, monitoring growth, or supporting financially, 3) Upload photos and updates of your activities, 4) Track your impact through the dashboard, 5) Earn points, badges, and Green Coins for your contributions. You'll receive notifications about project updates and milestones.",
+    "category": "projects",
+    "keywords": ["participate", "contribute", "help", "volunteer", "activities"],
+    "relatedQuestions": ["How do I find and join projects?", "What are Green Coins and how do I earn them?"]
+  },
+  {
+    "id": "q8",
+    "question": "Can I see completed projects and their outcomes?",
+    "answer": "Yes! Access completed projects through: 1) The 'Past Initiatives' section on the Initiatives page, 2) View detailed impact reports showing trees planted, carbon sequestered, and area restored, 3) See photos and updates from the project timeline, 4) Download impact certificates and reports. All data is verified through our multi-layer verification system.",
+    "category": "projects",
+    "keywords": ["completed", "past", "finished", "outcomes", "results", "history"],
+    "relatedQuestions": ["How is project impact verified?", "Can I get certificates for my contributions?"]
+  },
+  {
+    "id": "q9",
+    "question": "How can community groups list their own projects?",
+    "answer": "Community groups can create initiatives by: 1) Registering as a 'Community' account type, 2) Navigating to 'Create Initiative' from the dashboard, 3) Providing project details including location, goals, and timeline, 4) Submitting for review (typically approved within 48 hours), 5) Once approved, invite members and start tracking progress. You'll get tools for member management and impact reporting.",
+    "category": "projects",
+    "keywords": ["create project", "list project", "community", "own initiative", "start project"],
+    "relatedQuestions": ["How do I sign up as an individual?", "How is project impact verified?"]
+  },
+  {
+    "id": "q10",
+    "question": "What educational tools and gamification features are available?",
+    "answer": "Gang Green offers: 1) Interactive learning modules about climate action and reforestation, 2) Gamified challenges with points and rewards, 3) Achievement badges for milestones, 4) Leaderboards to compete with friends and communities, 5) Green Coins that can be earned and redeemed, 6) Social sharing features to inspire others. The platform uses AI to personalize your learning journey.",
+    "category": "education",
+    "keywords": ["education", "learning", "gamification", "challenges", "training", "courses"],
+    "relatedQuestions": ["What are Green Coins and how do I earn them?", "How does AI personalize my experience?"]
+  },
+  {
+    "id": "q11",
+    "question": "How does AI personalize my experience?",
+    "answer": "Our AI-powered features include: 1) Personalized project recommendations based on your interests and location, 2) Antugrow AI for tree health monitoring and growth tracking, 3) Smart notifications about relevant opportunities, 4) Customized learning paths based on your engagement level, 5) Predictive analytics for project success. The AI learns from your interactions to improve suggestions over time.",
+    "category": "education",
+    "keywords": ["ai", "artificial intelligence", "personalization", "smart", "recommendations"],
+    "relatedQuestions": ["What educational tools and gamification features are available?", "How is tree health monitored?"]
+  },
+  {
+    "id": "q12",
+    "question": "What are Green Coins and how do I earn them?",
+    "answer": "Green Coins are our platform currency earned through: 1) Planting and monitoring trees, 2) Completing challenges and quests, 3) Referring friends, 4) Consistent engagement, 5) Achieving milestones. Use Green Coins to: unlock premium features, redeem rewards, support other projects, or convert to carbon credits. Check your balance on the dashboard.",
+    "category": "gamification",
+    "keywords": ["green coins", "points", "rewards", "earn", "currency", "tokens"],
+    "relatedQuestions": ["What educational tools and gamification features are available?", "How do I participate in a project?"]
+  },
+  {
+    "id": "q13",
+    "question": "How do I join or create a local community group?",
+    "answer": "To join communities: 1) Browse the 'Communities' section to find groups in your area or forest, 2) Request to join existing groups, 3) To create a group: select 'Create Community' and invite members, 4) Organize local events and initiatives, 5) Collaborate on projects and share resources. Community features include group chat, event planning, and collective impact tracking.",
+    "category": "community",
+    "keywords": ["community", "group", "local", "join group", "create group", "team"],
+    "relatedQuestions": ["How can community groups list their own projects?", "How do I find and join projects?"]
+  },
+  {
+    "id": "q14",
+    "question": "Can schools and youth groups participate?",
+    "answer": "Absolutely! Schools and youth groups can: 1) Register with special youth-focused features, 2) Access educational curriculum aligned with climate action, 3) Create student-led initiatives, 4) Participate in youth challenges and competitions, 5) Track class or club impact collectively. We offer special support and resources for educational institutions.",
+    "category": "community",
+    "keywords": ["schools", "youth", "students", "children", "education", "kids"],
+    "relatedQuestions": ["What educational tools and gamification features are available?", "How do I join or create a local community group?"]
+  },
+  {
+    "id": "q15",
+    "question": "How can I engage others and spread awareness?",
+    "answer": "Spread the word through: 1) Social sharing features to post your impact on social media, 2) Referral program that rewards you and your friends, 3) Social action kits with shareable content, 4) Host community events through the platform, 5) Create challenges for your network. Every referral helps grow our climate action community!",
+    "category": "community",
+    "keywords": ["share", "referral", "invite", "spread", "awareness", "social media"],
+    "relatedQuestions": ["What are Green Coins and how do I earn them?", "How do I join or create a local community group?"]
+  },
+  {
+    "id": "q16",
+    "question": "How is project impact verified and tracked?",
+    "answer": "We use multi-layer verification: 1) GPS-tagged tree planting with photo documentation, 2) Antugrow AI for continuous tree health monitoring, 3) Satellite imagery analysis for area coverage, 4) Third-party audits for carbon credit certification, 5) Blockchain records for transparency. All data is accessible in real-time through your dashboard with detailed reports.",
+    "category": "verification",
+    "keywords": ["verification", "tracking", "proof", "validate", "transparency", "trust"],
+    "relatedQuestions": ["Can I see completed projects and their outcomes?", "How does AI personalize my experience?"]
+  },
+  {
+    "id": "q17",
+    "question": "How do I access project progress reports?",
+    "answer": "Access reports through: 1) Your dashboard showing all initiatives you're part of, 2) Individual project pages with detailed metrics, 3) Monthly email summaries of your impact, 4) Downloadable PDF reports with photos and data, 5) Real-time notifications for major milestones. Reports include trees planted, survival rates, carbon sequestered, and community engagement metrics.",
+    "category": "verification",
+    "keywords": ["reports", "progress", "updates", "status", "metrics", "data"],
+    "relatedQuestions": ["How is project impact verified and tracked?", "Can I see completed projects and their outcomes?"]
+  },
+  {
+    "id": "q18",
+    "question": "Can I export and share my impact data?",
+    "answer": "Yes! Export your data: 1) Download impact certificates in PDF format, 2) Export CSV data for your records, 3) Generate shareable impact cards for social media, 4) Access API for integration with your systems (organizations), 5) Create custom reports for ESG compliance. All exports include verified data with timestamps and verification details.",
+    "category": "verification",
+    "keywords": ["export", "download", "share", "certificate", "data", "report"],
+    "relatedQuestions": ["How do I access project progress reports?", "How is project impact verified and tracked?"]
+  },
+  {
+    "id": "q19",
+    "question": "What sponsorship tiers and benefits are available for corporations?",
+    "answer": "Corporate sponsorship tiers include: 1) Bronze: Support specific projects with basic reporting, 2) Silver: Multiple projects + employee engagement tools, 3) Gold: Forest adoption + white-label challenges + priority support, 4) Platinum: Custom programs + dedicated account manager + advanced analytics. All tiers include ESG reporting, tax documentation, and impact certificates.",
+    "category": "sponsorship",
+    "keywords": ["corporate", "sponsorship", "tiers", "benefits", "packages", "pricing"],
+    "relatedQuestions": ["What sponsorship opportunities are available?", "How can companies engage employees?"]
+  },
+  {
+    "id": "q20",
+    "question": "How can companies engage employees in climate action?",
+    "answer": "Employee engagement features: 1) Create company-wide challenges and competitions, 2) White-label platform with your branding, 3) Team leaderboards and recognition, 4) Volunteer day coordination, 5) Impact dashboards for corporate reporting, 6) Integration with HR systems. Track employee participation and collective company impact in real-time.",
+    "category": "sponsorship",
+    "keywords": ["employee", "engagement", "corporate", "team", "company", "workplace"],
+    "relatedQuestions": ["What sponsorship tiers and benefits are available for corporations?", "What educational tools and gamification features are available?"]
+  },
+  {
+    "id": "q21",
+    "question": "How do NGOs and educational institutions become partners?",
+    "answer": "Partnership process: 1) Submit partnership application through 'Become a Partner' page, 2) Provide organization details and mission alignment, 3) Review and approval (typically 5-7 days), 4) Onboarding session with our team, 5) Access partner portal with special features. Partners get priority support, co-branding opportunities, and resource sharing.",
+    "category": "sponsorship",
+    "keywords": ["partner", "ngo", "partnership", "collaborate", "institution", "nonprofit"],
+    "relatedQuestions": ["How do I sign up a corporation or organization?", "How can community groups list their own projects?"]
+  },
+  {
+    "id": "q22",
+    "question": "How can I see upcoming projects and register interest?",
+    "answer": "View upcoming projects: 1) Check the 'Pipeline' tab on the Initiatives page, 2) Filter by forest, type, or start date, 3) Click 'Register Interest' to get notified when projects launch, 4) Set preferences for automatic notifications, 5) Join waitlists for popular initiatives. You'll receive email alerts when projects you're interested in become active.",
+    "category": "projects",
+    "keywords": ["upcoming", "future", "pipeline", "planned", "coming soon", "register interest"],
+    "relatedQuestions": ["How do I find and join projects?", "How do I participate in a project?"]
+  },
+  {
+    "id": "q23",
+    "question": "Where can I review past project outcomes and reports?",
+    "answer": "Access historical data: 1) Navigate to 'Past Initiatives' section, 2) Browse by forest, year, or impact type, 3) View detailed outcome reports with photos and metrics, 4) Download archived reports and certificates, 5) See long-term impact tracking for older projects. All historical data is preserved and accessible for transparency.",
+    "category": "projects",
+    "keywords": ["past", "history", "archive", "old projects", "previous", "historical"],
+    "relatedQuestions": ["Can I see completed projects and their outcomes?", "How do I access project progress reports?"]
+  },
+  {
+    "id": "q24",
+    "question": "How is my personal data protected?",
+    "answer": "We protect your data through: 1) End-to-end encryption for sensitive information, 2) GDPR and data protection compliance, 3) Secure authentication with Supabase, 4) No selling of personal data to third parties, 5) Regular security audits. You control your data: view, export, or delete it anytime from settings. Read our full Privacy Policy for details.",
+    "category": "support",
+    "keywords": ["privacy", "data protection", "security", "gdpr", "personal information"],
+    "relatedQuestions": ["How do I sign up as an individual?", "Can I export and share my impact data?"]
+  },
+  {
+    "id": "q25",
+    "question": "I'm having trouble logging in, what should I do?",
+    "answer": "Login troubleshooting: 1) Verify your email and password are correct, 2) Try 'Forgot Password' to reset, 3) Check your email for verification link if newly registered, 4) Clear browser cache and cookies, 5) Try a different browser or device. Still having issues? Contact support at support@ganggreen.org with your registered email.",
+    "category": "support",
+    "keywords": ["login", "password", "access", "sign in", "trouble", "can't login"],
+    "relatedQuestions": ["How do I sign up as an individual?", "How do I contact support?"]
+  },
+  {
+    "id": "q26",
+    "question": "My badges or rewards aren't showing up, what should I do?",
+    "answer": "If rewards are missing: 1) Refresh your dashboard (rewards update every few minutes), 2) Check 'Achievements' page for pending verifications, 3) Ensure you completed all requirements for the badge, 4) Wait 24 hours for blockchain NFT badges to mint, 5) If still missing after 48 hours, contact support with details of the activity. We'll investigate and credit any missing rewards.",
+    "category": "support",
+    "keywords": ["badges", "rewards", "missing", "not showing", "achievements", "points"],
+    "relatedQuestions": ["What are Green Coins and how do I earn them?", "How do I contact support?"]
+  },
+  {
+    "id": "q27",
+    "question": "How do I report bugs or provide feedback?",
+    "answer": "We value your feedback! 1) Use the 'Feedback' button in the app footer, 2) Email bugs@ganggreen.org with details and screenshots, 3) Join our community forum to discuss suggestions, 4) Report critical issues through the support chat, 5) Participate in user surveys sent via email. Bug reporters earn bonus Green Coins as thanks!",
+    "category": "support",
+    "keywords": ["bug", "feedback", "report", "issue", "problem", "suggestion"],
+    "relatedQuestions": ["How do I contact support?", "What are Green Coins and how do I earn them?"]
+  },
+  {
+    "id": "q28",
+    "question": "How do I contact support?",
+    "answer": "Reach our support team: 1) Use this chatbot for instant answers, 2) Email support@ganggreen.org (response within 24 hours), 3) Live chat during business hours (9 AM - 5 PM EAT), 4) Submit a support ticket through your dashboard, 5) Call +254-XXX-XXXX for urgent issues. Include your registered email and details for faster resolution.",
+    "category": "support",
+    "keywords": ["support", "contact", "help", "assistance", "customer service", "reach out"],
+    "relatedQuestions": ["I'm having trouble logging in, what should I do?", "How do I report bugs or provide feedback?"]
+  }
+]

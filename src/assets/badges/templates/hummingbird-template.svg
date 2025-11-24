@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Placeholders for gradients will be inserted here -->
+  </defs>
+  
+  <!-- Background circle with glassmorphism effect -->
+  <circle cx="200" cy="200" r="180" fill="url(#tierGradient)" filter="url(#glassEffect)" opacity="0.9"/>
+  
+  <!-- Forest theme elements -->
+  <g id="forest-theme" opacity="0.2">
+    <!-- Forest pattern content will be inserted here -->
+  </g>
+  
+  <!-- Hummingbird silhouette -->
+  <g transform="translate(200, 200)" filter="url(#tierGlow)">
+    <!-- Hummingbird body -->
+    <ellipse cx="0" cy="0" rx="8" ry="25" fill="url(#hummingbirdBodyGradient)"/>
+    
+    <!-- Hummingbird wings -->
+    <path d="M -6,-12 C -26,-19 -34,-8 -30,4 C -26,12 -19,15 -11,11 C -7,8 -6,0 -6,-12 Z" 
+          fill="url(#hummingbirdWingGradient)" opacity="0.8">
+      <animateTransform attributeName="transform" type="rotate" 
+                        values="0 -6 0;-15 -6 0;0 -6 0" dur="0.3s" repeatCount="indefinite"/>
+    </path>
+    <path d="M 6,-12 C 26,-19 34,-8 30,4 C 26,12 19,15 11,11 C 7,8 6,0 6,-12 Z" 
+          fill="url(#hummingbirdWingGradient)" opacity="0.8">
+      <animateTransform attributeName="transform" type="rotate" 
+                        values="0 6 0;15 6 0;0 6 0" dur="0.3s" repeatCount="indefinite"/>
+    </path>
+    
+    <!-- Hummingbird beak -->
+    <path d="M 0,-25 L 2,-35 L 0,-25 L -2,-35 Z" fill="url(#hummingbirdBodyGradient)"/>
+    
+    <!-- Shimmer effect -->
+    <ellipse cx="-3" cy="-8" rx="4" ry="8" fill="url(#hummingbirdShimmer)" opacity="0.6"/>
+  </g>
+  
+  <!-- Badge text -->
+  <text x="200" y="350" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="{{primaryColor}}">
+    {{badgeName}}
+  </text>
+  <text x="200" y="370" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="{{primaryColor}}" opacity="0.8">
+    {{tierName}} • {{forestName}}
+  </text>
+  
+  <!-- Border -->
+  <circle cx="200" cy="200" r="180" fill="none" stroke="url(#tierBorderGradient)" stroke-width="4" filter="url(#dropShadow)"/>
+</svg>

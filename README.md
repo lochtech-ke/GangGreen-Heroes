@@ -1,2 +1,195 @@
-# GangGreen-Heroes
-Africa's Premier Community-Powered Platform for Climate Action
+# #GangGreen Platform
+
+A comprehensive digital platform designed to catalyze a carbon-negative Africa by connecting stakeholders in environmental conservation, carbon credit markets, and sustainable development.
+
+**Team:** GangGreen  
+**Track:** Track 3 (Community Engagement and Sustainability)  
+**Hackathon:** Wangari Maathai Hackathon 2025  
+**Submission ID:** GangGreen_Track3_WMH2025
+
+## 🌳 Mission
+
+Facilitate tree planting initiatives, carbon credit trading, community engagement, and transparent monitoring of environmental impact across African regions, with a focus on Technology for Forest Conservation.
+
+## 🌲 Pilot Forests
+
+1. **Kakamega Forest** - Primary pilot site (Kenya's last tropical rainforest)
+2. **Karura Forest** - Urban conservation area (Nairobi)
+3. **Mau Forest** - Critical water tower ecosystem (Rift Valley)
+
+## ✨ Key Features
+
+- **Dual Authentication** - Email/password + Web3 wallet support
+- **Initiative Management** - Create and manage tree planting projects
+- **AI-Powered Monitoring** - Antugrow API integration for tree health tracking
+- **Interactive Maps** - Leaflet.js with geospatial features
+- **Payment Integration** - Paystack for secure transactions
+- **Gamification** - GG Coins, NFT badges, and leaderboards (coming soon)
+- **Social Features** - Community feed and engagement (coming soon)
+
+## 🚧 Current Status
+
+**Phase:** Sprint 4 - Onboarding Chatbot + Performance Optimization  
+**Progress:** 45% Complete (13.5 of 30 major tasks)  
+**Status:** ✅ Ahead of Schedule
+
+### Recently Completed
+- ✅ Authentication system with dual login methods
+- ✅ Initiative management with geospatial support
+- ✅ Tree registry with AI monitoring
+- ✅ Paystack payment integration
+- ✅ Comprehensive testing infrastructure
+
+### In Development
+- 🚧 Onboarding chatbot with AI assistance
+- 🚧 Enhanced authentication testing
+- 📋 Carbon credit marketplace UI
+- 📋 Web3 features and NFT badges
+
+*For detailed progress, see [Project Status Report](docs/PROJECT_STATUS.md)*
+
+## 🚀 Getting Started
+
+### For Users
+1. **Visit the Platform**: [https://gg.lochtech.africa](https://gg.lochtech.africa)
+2. **Follow the Guide**: [Quick Start Guide](wiki/02-quick-start-guide.md)
+3. **Learn the Basics**: [Platform Overview](wiki/01-platform-overview.md)
+
+### For Developers
+1. **Read the Setup**: [Technical Guide](docs/TECHNICAL_GUIDE_NOVEMBER_19_2025.md)
+2. **Understand Architecture**: [Architecture Guide](docs/ARCHITECTURE.md)
+3. **Check Requirements**: Node.js 18+, Git, Supabase account
+
+### Quick Setup
+```bash
+# Clone and install
+git clone https://github.com/yourusername/ganggreen-platform.git
+cd ganggreen-platform
+npm install
+
+# Configure environment
+cp .env.example .env
+# Edit .env with your credentials
+
+# Start development
+npm run dev
+```
+
+*For detailed setup instructions, see [Technical Guide](docs/TECHNICAL_GUIDE_NOVEMBER_19_2025.md)*
+
+## 🛠️ Technology Stack
+
+- **Frontend**: React 18+ with TypeScript, Vite, Tailwind CSS
+- **Backend**: Supabase (PostgreSQL, Auth, Storage, Real-time)
+- **Maps**: Leaflet.js with PostGIS for geospatial features
+- **Blockchain**: Ethereum/Polygon with Solidity smart contracts
+- **AI Integration**: Antugrow API for tree monitoring
+- **Payments**: Paystack integration
+- **Testing**: Vitest with Testing Library
+
+*For complete technical details, see [Technical Guide](docs/TECHNICAL_GUIDE_NOVEMBER_19_2025.md)*
+
+## 📁 Project Structure
+
+```
+ganggreen-platform/
+├── src/                 # Source code
+│   ├── components/      # React components (auth, initiatives, trees, etc.)
+│   ├── services/        # Business logic and API clients
+│   ├── pages/           # Page components
+│   ├── types/           # TypeScript type definitions
+│   └── utils/           # Utility functions
+├── wiki/                # User documentation
+├── docs/                # Technical documentation
+├── supabase/            # Database migrations and configuration
+└── .kiro/               # AI specifications and steering
+```
+
+*For detailed structure, see [Technical Guide](docs/TECHNICAL_GUIDE_NOVEMBER_19_2025.md)*
+
+## 📖 API & Development
+
+### Authentication
+- Dual authentication: Email/password + Web3 wallet
+- Role-based access control (admin, organization, community, individual)
+- Session management with real-time updates
+
+### Key Services
+- **Authentication Service**: User registration, login, role management
+- **Initiative Service**: CRUD operations for tree planting projects
+- **Tree Service**: Registry and monitoring with AI integration
+- **Antugrow Service**: AI-powered tree health analysis
+
+### TypeScript Support
+Fully typed with comprehensive interfaces for:
+- User profiles and authentication
+- Initiative management and geospatial data
+- Tree registry and monitoring
+- Payment processing
+
+*For complete API documentation, see [Technical Guide](docs/TECHNICAL_GUIDE_NOVEMBER_19_2025.md)*nitiative, error } = await initiativeService.getInitiative(initiativeId);
+
+## 🧪 Testing & Quality
+
+- **Framework**: Vitest with Testing Library
+- **Coverage**: ~60% (target: 80%)
+- **Tests**: 25+ tests, 100% pass rate
+- **Performance**: < 5 seconds execution time
+
+### Test Categories
+- Unit tests for services and utilities
+- Component tests for React components
+- Integration tests for API interactions
+
+*For testing details, see [Technical Guide](docs/TECHNICAL_GUIDE_NOVEMBER_19_2025.md)*
+
+## 👥 Target Users
+
+- **Organizations** - Create and manage conservation initiatives
+- **Community Members** - Participate in local forest conservation activities  
+- **Individuals** - Support conservation through donations and tree planting
+- **Administrators** - Oversee platform operations and verify carbon credits
+
+*Learn more about user roles in the [User Wiki](wiki/README.md)*
+
+## 🤝 Contributing
+
+We welcome contributions! See our [Technical Guide](docs/TECHNICAL_GUIDE_NOVEMBER_19_2025.md) for development setup and guidelines.
+
+## 📄 License
+
+MIT License - Copyright (c) 2025 Loch Tech Solutions
+
+## � LAcknowledgments
+
+- Powered by Antugrow API for AI-driven tree monitoring
+- Supported by Supabase for backend infrastructure
+- Inspired by Wangari Maathai's environmental legacy
+
+## 🏆 Wangari Maathai Hackathon 2025
+
+**Track 3: Community Engagement and Sustainability**
+
+### Submission Details
+- **Team:** GangGreen
+- **Submission ID:** GangGreen_Track3_WMH2025
+- **Platform Status:** Production-ready with comprehensive documentation
+- **Live Demo:** [https://gg.lochtech.africa](https://gg.lochtech.africa)
+
+### Track 3 Alignment
+✅ **Community Engagement** - Micro-actions, social features, gamification  
+✅ **Sustainability Impact** - Tree planting, AI monitoring, blockchain verification  
+✅ **Innovation** - Hummingbird approach, Web3 integration  
+✅ **Scalability** - Cloud infrastructure, pan-African vision
+
+*For complete submission details, see [Track 3 Submission](docs/TRACK_3_SUBMISSION.md)*
+
+## 📞 Support
+
+- **User Questions**: [User Wiki](wiki/README.md) → [FAQ](wiki/22-faq.md)
+- **Technical Issues**: [Technical Guide](docs/TECHNICAL_GUIDE_NOVEMBER_19_2025.md)
+- **General Support**: Open an issue in this repository
+
+---
+
+**#GangGreen** - Growing a carbon-negative Africa, one tree at a time 🌍🌳
