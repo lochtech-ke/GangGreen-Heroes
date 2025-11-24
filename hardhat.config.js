@@ -1,0 +1,47 @@
+require("@nomicfoundation/hardhat-toolbox");
+require("dotenv").config();
+
+/** @type import('hardhat/config').HardhatUserConfig */
+module.exports = {
+  solidity: {
+    version: "0.8.19",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 200,
+      },
+    },
+  },
+  networks: {
+    // Polygon Mumbai Testnet
+    mumbai: {
+      url: process.env.POLYGON_MUMBAI_RPC_URL || "https://rpc-mumbai.maticvigil.com",
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+      chainId: 80001,
+      gasPrice: 20000000000, // 20 gwei
+    },
+    // Polygon Mainnet
+    polygon: {
+      url: process.env.POLYGON_MAINNET_RPC_URL || "https://polygon-rpc.com",
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+      chainId: 137,
+      gasPrice: 50000000000, // 50 gwei
+    },
+    // Local Hardhat Network
+    hardhat: {
+      chainId: 31337,
+    },
+  },
+  etherscan: {
+    apiKey: {
+      polygonMumbai: process.env.POLYGONSCAN_API_KEY || "",
+      polygon: process.env.POLYGONSCAN_API_KEY || "",
+    },
+  },
+  paths: {
+    sources: "./src/contracts",
+    tests: "./test/contracts",
+    cache: "./cache",
+    artifacts: "./artifacts",
+  },
+};

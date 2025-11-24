@@ -1,0 +1,56 @@
+<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+  <title>Forest Protector Achievement</title>
+  <desc>Forest silhouette within a shield representing forest protection</desc>
+  
+  <!-- Shield outline -->
+  <path d="M 60 15 L 90 28 L 90 60 Q 90 82 60 100 Q 30 82 30 60 L 30 28 Z" 
+        fill="none" stroke="white" stroke-width="4" stroke-linejoin="round"/>
+  
+  <!-- Inner shield border -->
+  <path d="M 60 22 L 85 33 L 85 60 Q 85 78 60 94 Q 35 78 35 60 L 35 33 Z" 
+        fill="none" stroke="white" stroke-width="2" opacity="0.4"/>
+  
+  <!-- Forest silhouette inside shield -->
+  <g opacity="0.95">
+    <!-- Tall tree (left) -->
+    <g transform="translate(45, 70)">
+      <rect x="-1.5" y="-15" width="3" height="15" fill="white"/>
+      <path d="M 0 -25 L -6 -15 L -4 -15 L -8 -8 L -5 -8 L -9 0 L 9 0 L 5 -8 L 8 -8 L 4 -15 L 6 -15 Z" 
+            fill="white"/>
+    </g>
+    
+    <!-- Medium tree (center) -->
+    <g transform="translate(60, 72)">
+      <rect x="-1.5" y="-12" width="3" height="12" fill="white"/>
+      <path d="M 0 -20 L -5 -12 L -3 -12 L -6 -6 L -4 -6 L -7 0 L 7 0 L 4 -6 L 6 -6 L 3 -12 L 5 -12 Z" 
+            fill="white"/>
+    </g>
+    
+    <!-- Tall tree (right) -->
+    <g transform="translate(75, 70)">
+      <rect x="-1.5" y="-15" width="3" height="15" fill="white"/>
+      <path d="M 0 -25 L -6 -15 L -4 -15 L -8 -8 L -5 -8 L -9 0 L 9 0 L 5 -8 L 8 -8 L 4 -15 L 6 -15 Z" 
+            fill="white"/>
+    </g>
+    
+    <!-- Small bush (left front) -->
+    <circle cx="40" cy="72" r="4" fill="white"/>
+    <circle cx="37" cy="74" r="3" fill="white"/>
+    <circle cx="43" cy="74" r="3" fill="white"/>
+    
+    <!-- Small bush (right front) -->
+    <circle cx="80" cy="72" r="4" fill="white"/>
+    <circle cx="77" cy="74" r="3" fill="white"/>
+    <circle cx="83" cy="74" r="3" fill="white"/>
+    
+    <!-- Ground line -->
+    <line x1="35" y1="78" x2="85" y2="78" stroke="white" stroke-width="2" opacity="0.6"/>
+  </g>
+  
+  <!-- Shield emblem (top) -->
+  <circle cx="60" cy="38" r="5" fill="none" stroke="white" stroke-width="2.5"/>
+  <path d="M 60 33 L 60 28" stroke="white" stroke-width="2" stroke-linecap="round"/>
+  
+  <!-- Shadow effect -->
+  <ellipse cx="60" cy="102" rx="25" ry="3" fill="white" opacity="0.2"/>
+</svg>

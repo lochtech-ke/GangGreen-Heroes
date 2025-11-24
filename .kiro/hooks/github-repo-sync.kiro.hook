@@ -1,0 +1,30 @@
+{
+  "enabled": true,
+  "name": "GitHub Repository & Wiki Sync",
+  "description": "Automatically updates the public GitHub repository https://github.com/lochtech-ke/GangGreen-Heroes and syncs documentation to the wiki when project files are modified",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "README.md",
+      "docs/**/*.md",
+      "wiki/**/*.md",
+      "src/**/*.tsx",
+      "src/**/*.ts",
+      "package.json"
+    ],
+    "excludePatterns": [
+      ".env",
+      ".env.*",
+      "**/*.env",
+      "**/secrets/**",
+      "**/*secret*",
+      "**/*key*",
+      "**/config/production.*"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "A file has been modified in the GangGreen Heroes project. Please:\n\n1. Review the changes and determine if they should be synced to the public repository at https://github.com/lochtech-ke/GangGreen-Heroes\n2. If documentation files (README.md, docs/, wiki/) were changed, prepare updates for the GitHub wiki\n3. Generate appropriate commit messages and update summaries\n4. Identify any new features, bug fixes, or documentation improvements that should be highlighted\n5. **CRITICAL SECURITY**: Ensure NO sensitive information is included in public updates. Exclude:\n   - API keys (Supabase, Antugrow, Mapbox, Paystack, OpenAI, Strapi, social media tokens)\n   - Database URLs and connection strings\n   - Secret keys and private tokens\n   - Environment variables with sensitive values\n   - Private configuration files (.env, secrets)\n   - Internal deployment scripts with credentials\n   - Any authentication tokens or passwords\n6. Create a summary of changes suitable for public repository and wiki updates\n7. Replace any sensitive values with placeholder text like '[API_KEY]' or '[SECRET]' in public documentation\n\nFocus on maintaining the public repository as a showcase of the GangGreen Heroes platform while keeping the wiki updated with latest documentation and guides. NEVER expose production credentials or sensitive configuration data."
+  }
+}

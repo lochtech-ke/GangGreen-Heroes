@@ -1,0 +1,60 @@
+<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+  <title>Climate Hero Achievement</title>
+  <desc>Sun and leaf with upward arrow representing climate action</desc>
+  
+  <!-- Sun rays -->
+  <g transform="translate(60, 45)">
+    <!-- Top ray -->
+    <line x1="0" y1="-25" x2="0" y2="-18" stroke="white" stroke-width="3" stroke-linecap="round"/>
+    <!-- Top-right ray -->
+    <line x1="18" y1="-18" x2="13" y2="-13" stroke="white" stroke-width="3" stroke-linecap="round"/>
+    <!-- Right ray -->
+    <line x1="25" y1="0" x2="18" y2="0" stroke="white" stroke-width="3" stroke-linecap="round"/>
+    <!-- Bottom-right ray -->
+    <line x1="18" y1="18" x2="13" y2="13" stroke="white" stroke-width="3" stroke-linecap="round"/>
+    <!-- Bottom ray -->
+    <line x1="0" y1="25" x2="0" y2="18" stroke="white" stroke-width="3" stroke-linecap="round"/>
+    <!-- Bottom-left ray -->
+    <line x1="-18" y1="18" x2="-13" y2="13" stroke="white" stroke-width="3" stroke-linecap="round"/>
+    <!-- Left ray -->
+    <line x1="-25" y1="0" x2="-18" y2="0" stroke="white" stroke-width="3" stroke-linecap="round"/>
+    <!-- Top-left ray -->
+    <line x1="-18" y1="-18" x2="-13" y2="-13" stroke="white" stroke-width="3" stroke-linecap="round"/>
+    
+    <!-- Sun circle -->
+    <circle cx="0" cy="0" r="12" fill="none" stroke="white" stroke-width="4"/>
+    <circle cx="0" cy="0" r="8" fill="none" stroke="white" stroke-width="2" opacity="0.5"/>
+  </g>
+  
+  <!-- Leaf -->
+  <g transform="translate(40, 75)">
+    <!-- Leaf shape -->
+    <path d="M 0 0 Q -8 -12 -10 -20 Q -8 -12 0 0 Q 8 -12 10 -20 Q 8 -12 0 0" 
+          fill="none" stroke="white" stroke-width="4" stroke-linejoin="round"/>
+    <!-- Leaf vein -->
+    <line x1="0" y1="0" x2="0" y2="-20" stroke="white" stroke-width="2" opacity="0.6"/>
+    <!-- Side veins -->
+    <path d="M 0 -8 L -4 -12" fill="none" stroke="white" stroke-width="1.5" opacity="0.5"/>
+    <path d="M 0 -8 L 4 -12" fill="none" stroke="white" stroke-width="1.5" opacity="0.5"/>
+    <path d="M 0 -14 L -5 -17" fill="none" stroke="white" stroke-width="1.5" opacity="0.5"/>
+    <path d="M 0 -14 L 5 -17" fill="none" stroke="white" stroke-width="1.5" opacity="0.5"/>
+  </g>
+  
+  <!-- Upward arrow (growth/progress) -->
+  <g transform="translate(80, 75)">
+    <!-- Arrow shaft -->
+    <line x1="0" y1="5" x2="0" y2="-15" stroke="white" stroke-width="4" stroke-linecap="round"/>
+    <!-- Arrow head -->
+    <path d="M -8 -8 L 0 -15 L 8 -8" 
+          fill="none" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Arrow base -->
+    <line x1="-6" y1="5" x2="6" y2="5" stroke="white" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  
+  <!-- Connection arc (showing relationship) -->
+  <path d="M 50 70 Q 60 60 70 70" 
+        fill="none" stroke="white" stroke-width="2" opacity="0.4" stroke-dasharray="3,3"/>
+  
+  <!-- Shadow effect -->
+  <ellipse cx="60" cy="95" rx="35" ry="3" fill="white" opacity="0.2"/>
+</svg>

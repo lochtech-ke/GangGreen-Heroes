@@ -1,0 +1,127 @@
+<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <!-- Gradients will be inserted here -->
+    <linearGradient id="tierGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="{{gradientStart}}" />
+      <stop offset="50%" stop-color="{{primaryColor}}" />
+      <stop offset="100%" stop-color="{{gradientEnd}}" />
+    </linearGradient>
+    
+    <!-- Glassmorphism filter -->
+    <filter id="glassEffect">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur"/>
+      <feColorMatrix in="blur" type="matrix" 
+        values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.2 0" result="glass"/>
+      <feBlend in="SourceGraphic" in2="glass" mode="normal"/>
+    </filter>
+    
+    <!-- Shine effect -->
+    <radialGradient id="shineGradient" cx="30%" cy="30%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.8)" />
+      <stop offset="100%" stop-color="rgba(255,255,255,0)" />
+    </radialGradient>
+    
+    <!-- Patterns will be inserted here -->
+  </defs>
+  
+  <metadata>
+    <badge>
+      <name>{{badgeName}}</name>
+      <tier>{{tierLevel}}</tier>
+      <forest>{{forestName}}</forest>
+      <achievement>{{achievementType}}</achievement>
+      <count>{{achievementCount}}</count>
+      <date>{{earnedDate}}</date>
+      <id>{{uniqueBadgeId}}</id>
+      <user>{{userId}}</user>
+    </badge>
+  </metadata>
+  
+  <!-- Background layer -->
+  <g id="background">
+    <rect width="400" height="400" fill="url(#tierGradient)" rx="20"/>
+  </g>
+  
+  <!-- Forest pattern overlay -->
+  <g id="forest-theme" opacity="0.2">
+    <!-- Forest-specific pattern will be inserted here -->
+  </g>
+  
+  <!-- Glass effect layer -->
+  <g id="glass-effect" filter="url(#glassEffect)">
+    <rect x="20" y="20" width="360" height="360" 
+          fill="rgba(255,255,255,0.15)" 
+          stroke="rgba(255,255,255,0.3)" 
+          stroke-width="2" 
+          rx="15"/>
+  </g>
+  
+  <!-- Metallic border -->
+  <g id="border">
+    <rect x="10" y="10" width="380" height="380" 
+          fill="none" 
+          stroke="url(#tierGradient)" 
+          stroke-width="8" 
+          rx="20"/>
+    <rect x="15" y="15" width="370" height="370" 
+          fill="none" 
+          stroke="rgba(255,255,255,0.5)" 
+          stroke-width="2" 
+          rx="18"/>
+  </g>
+  
+  <!-- Achievement icon -->
+  <g id="achievement-icon" transform="translate(200, 180)">
+    <!-- Icon backdrop circle -->
+    <circle r="70" fill="rgba(255,255,255,0.3)" filter="url(#glassEffect)"/>
+    <!-- Icon will be inserted here -->
+  </g>
+  
+  <!-- Text content -->
+  <g id="text-content">
+    <!-- Achievement name -->
+    <text x="200" y="290" 
+          text-anchor="middle" 
+          font-family="Arial, sans-serif" 
+          font-size="24" 
+          font-weight="bold" 
+          fill="#FFFFFF" 
+          filter="drop-shadow(0 2px 4px rgba(0,0,0,0.3))">
+      {{achievementName}}
+    </text>
+    
+    <!-- Achievement count -->
+    <text x="200" y="320" 
+          text-anchor="middle" 
+          font-family="Arial, sans-serif" 
+          font-size="18" 
+          fill="#FFFFFF" 
+          opacity="0.9">
+      {{achievementCount}} {{achievementUnit}}
+    </text>
+    
+    <!-- Footer -->
+    <g id="footer" transform="translate(200, 360)">
+      <text x="-80" y="0" 
+            font-family="Arial, sans-serif" 
+            font-size="14" 
+            fill="#FFFFFF" 
+            opacity="0.8">
+        #GangGreen
+      </text>
+      <text x="80" y="0" 
+            text-anchor="end" 
+            font-family="Arial, sans-serif" 
+            font-size="14" 
+            fill="#FFFFFF" 
+            opacity="0.8">
+        {{tierName}} Badge
+      </text>
+    </g>
+  </g>
+  
+  <!-- Shine overlay -->
+  <ellipse cx="120" cy="120" rx="80" ry="60" 
+           fill="url(#shineGradient)" 
+           opacity="0.3"/>
+</svg>
