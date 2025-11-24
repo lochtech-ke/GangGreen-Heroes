@@ -3,6 +3,7 @@ import { BadgePurchaseModal } from './BadgePurchaseModal';
 import { BadgePurchaseConfirmation } from './BadgePurchaseConfirmation';
 import { BADGE_PRICE_KES } from '../../types/badgePurchase.types';
 import { BadgeSvgService } from '../../services/badgeSvg.service';
+import { hummingbirdBadgeService } from '../../services/hummingbirdBadge.service';
 import type { BadgeTier, ForestType, AchievementType } from '../../types/badge.types';
 import { Award } from 'lucide-react';
 
@@ -27,6 +28,17 @@ interface BadgeMarketplaceProps {
 
 // Comprehensive badge catalog matching homepage showcase
 const AVAILABLE_BADGES: Badge[] = [
+  {
+    id: 'badge-000-hummingbird-welcome',
+    name: 'Hummingbird Welcome Badge',
+    type: 'welcome_badge',
+    tier: 'hummingbird',
+    forest: 'kakamega',
+    description: 'Your first badge! Like the hummingbird in Wangari Maathai\'s story, every small action counts. Welcome to the #GangGreen community!',
+    rarity_score: 5,
+    unlockRequirement: 'Complete registration',
+    priceGGCoins: 0, // Free welcome badge
+  },
   {
     id: 'badge-001-kakamega-tree-planter',
     name: 'Kakamega Tree Planter',
@@ -133,24 +145,37 @@ const BadgeCard: React.FC<{
       setHasError(false);
 
       try {
-        const badgeService = new BadgeSvgService();
-        const result = await badgeService.generateBadge({
-          id: badge.id,
-          tier: badge.tier,
-          forest: badge.forest,
-          achievement: badge.type,
-          metadata: {
-            badgeName: badge.name,
-            tierLevel: ['bronze', 'silver', 'gold', 'platinum', 'diamond'].indexOf(badge.tier) + 1,
-            forestName: badge.forest,
-            achievementType: badge.type,
-            achievementCount: 0,
-            earnedDate: new Date().toISOString(),
-            uniqueBadgeId: badge.id,
-            userId: 'marketplace-preview',
-          },
-          animated: badge.tier === 'diamond',
-        });
+        let result;
+
+        // Handle hummingbird badge generation
+        if (badge.tier === 'hummingbird' && badge.type === 'welcome_badge') {
+          const config = hummingbirdBadgeService.createDefaultHummingbirdConfig(
+            'marketplace-preview',
+            'bronze',
+            badge.forest
+          );
+          result = await hummingbirdBadgeService.generateHummingbirdBadge(config);
+        } else {
+          // Handle regular badge generation
+          const badgeService = new BadgeSvgService();
+          result = await badgeService.generateBadge({
+            id: badge.id,
+            tier: badge.tier,
+            forest: badge.forest,
+            achievement: badge.type,
+            metadata: {
+              badgeName: badge.name,
+              tierLevel: ['hummingbird', 'bronze', 'silver', 'gold', 'platinum', 'diamond'].indexOf(badge.tier),
+              forestName: badge.forest,
+              achievementType: badge.type,
+              achievementCount: 0,
+              earnedDate: new Date().toISOString(),
+              uniqueBadgeId: badge.id,
+              userId: 'marketplace-preview',
+            },
+            animated: badge.tier === 'diamond',
+          });
+        }
 
         if (result.success && result.svg) {
           setBadgeSvg(result.svg);
@@ -234,18 +259,31 @@ const BadgeCard: React.FC<{
         <div className="flex items-center justify-between">
           <div>
             <p className="text-xs text-gray-500">Price</p>
-            <div className="flex items-center gap-2">
-              <p className="text-lg font-bold text-green-600">{badge.priceGGCoins} GG</p>
-              <span className="text-xs text-gray-500">or</span>
-              <p className="text-lg font-bold text-gray-700">KES {BADGE_PRICE_KES}</p>
-            </div>
+            {badge.priceGGCoins === 0 ? (
+              <div className="flex items-center gap-2">
+                <p className="text-lg font-bold text-teal-600">FREE</p>
+                <span className="text-xs text-teal-500">Welcome Badge</span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <p className="text-lg font-bold text-green-600">{badge.priceGGCoins} GG</p>
+                <span className="text-xs text-gray-500">or</span>
+                <p className="text-lg font-bold text-gray-700">KES {BADGE_PRICE_KES}</p>
+              </div>
+            )}
           </div>
-          <button
-            onClick={() => onPurchaseClick(badge)}
-            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium text-sm"
-          >
-            Purchase
-          </button>
+          {badge.priceGGCoins === 0 ? (
+            <div className="px-4 py-2 bg-teal-100 text-teal-700 rounded-lg font-medium text-sm">
+              Earned on Join
+            </div>
+          ) : (
+            <button
+              onClick={() => onPurchaseClick(badge)}
+              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium text-sm"
+            >
+              Purchase
+            </button>
+          )}
         </div>
       </div>
     </div>
@@ -289,6 +327,7 @@ export const BadgeMarketplace: React.FC<BadgeMarketplaceProps> = ({
 
   const getTierColor = (tier: string) => {
     switch (tier) {
+      case 'hummingbird': return 'text-teal-600 bg-teal-100';
       case 'bronze': return 'text-orange-600 bg-orange-100';
       case 'silver': return 'text-gray-600 bg-gray-100';
       case 'gold': return 'text-yellow-600 bg-yellow-100';
@@ -329,6 +368,7 @@ export const BadgeMarketplace: React.FC<BadgeMarketplaceProps> = ({
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
           >
             <option value="all">All Tiers</option>
+            <option value="hummingbird">🐦 Hummingbird</option>
             <option value="bronze">Bronze</option>
             <option value="silver">Silver</option>
             <option value="gold">Gold</option>

@@ -12,13 +12,15 @@ export type GGCoinTransactionType =
   | 'purchase_reward'
   | 'referral_bonus'
   | 'achievement_reward'
-  | 'admin_adjustment';
+  | 'admin_adjustment'
+  | 'hero_daily_reward';
 
 export type GGCoinReferenceType =
   | 'badge_purchase'
   | 'referral'
   | 'achievement'
   | 'admin'
+  | 'hero_reward'
   | 'other';
 
 export interface GGCoinTransaction {

@@ -9,3 +9,5 @@ export { RequirementsList } from './RequirementsList';
 export { NextBadgePreview } from './NextBadgePreview';
 export { BadgeTimeline } from './BadgeTimeline';
 export { HummingbirdWelcome } from './HummingbirdWelcome';
+export { HeroBadgeMarketplace } from './HeroBadgeMarketplace';
+export { HeroBenefitsDisplay } from './HeroBenefitsDisplay';

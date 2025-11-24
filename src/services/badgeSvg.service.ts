@@ -35,6 +35,11 @@ class BadgeSvgService {
         return await hummingbirdBadgeService.generateHummingbirdBadge(config as any);
       }
 
+      // Check if this is a Hero badge
+      if (config.tier === 'hero' || config.achievement === 'ganggreen_hero') {
+        return await this.generateHeroBadge(config);
+      }
+
       // Validate configuration
       const validation = validateBadgeConfig(config);
       if (!validation.valid) {
@@ -248,8 +253,18 @@ class BadgeSvgService {
    */
   async exportBadge(
     config: BadgeConfig,
-    options: BadgeExportOptions = { format: 'svg' }
+    options: BadgeExportOptions & {
+      includeAccessibility?: boolean;
+      socialMediaOptimized?: boolean;
+      wcagCompliant?: boolean;
+    } = { format: 'svg' }
   ): Promise<Blob> {
+    // Check if this is a hummingbird badge and use specialized export
+    if (config.achievement === 'welcome_badge') {
+      const { hummingbirdBadgeService } = await import('./hummingbirdBadge.service');
+      return await hummingbirdBadgeService.exportHummingbirdBadge(config as any, options);
+    }
+
     const result = await this.generateBadge(config);
 
     if (!result.success || !result.svg) {
@@ -263,6 +278,23 @@ class BadgeSvgService {
 
     // Return SVG as blob
     return new Blob([result.svg], { type: 'image/svg+xml;charset=utf-8' });
+  }
+
+  /**
+   * Export Hero badge for social sharing
+   */
+  async exportHeroBadgeForSharing(
+    config: BadgeConfig,
+    platform: 'twitter' | 'facebook' | 'instagram' | 'linkedin' = 'twitter'
+  ): Promise<Blob> {
+    const size = this.getSizeForPlatform(platform);
+    
+    return await this.exportBadge(config, {
+      format: 'png',
+      size,
+      platform,
+      socialMediaOptimized: true,
+    });
   }
 
   /**
@@ -395,6 +427,163 @@ class BadgeSvgService {
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Failed to generate hummingbird badge',
+      };
+    }
+  }
+
+  /**
+   * Generate Hero badge SVG with unique styling
+   */
+  private async generateHeroBadge(config: BadgeConfig): Promise<BadgeGenerationResult> {
+    try {
+      console.log('[BadgeSvgService] Generating Hero badge:', {
+        badgeId: config.id,
+        tier: config.tier,
+      });
+
+      const badgeName = config.metadata?.badgeName || 'GangGreen Hero';
+      const userName = config.metadata?.userName || 'Hero';
+      const purchaseDate = config.metadata?.purchaseDate 
+        ? new Date(config.metadata.purchaseDate).toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: 'short', 
+            day: 'numeric' 
+          })
+        : new Date().toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: 'short', 
+            day: 'numeric' 
+          });
+
+      const svg = `
+<svg viewBox="${BADGE_VIEWBOX}" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Hero Gradient -->
+    <linearGradient id="hero-gradient-${config.id}" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#FFA500;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FF8C00;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Hero Glow -->
+    <filter id="hero-glow-${config.id}">
+      <feGaussianBlur stdDeviation="8" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <!-- Hero Shadow -->
+    <filter id="hero-shadow-${config.id}">
+      <feDropShadow dx="0" dy="6" stdDeviation="12" flood-color="#FF8C00" flood-opacity="0.5"/>
+    </filter>
+    
+    <!-- Radial Gradient for Background -->
+    <radialGradient id="hero-bg-${config.id}" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#1a1a1a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0a0a0a;stop-opacity:1" />
+    </radialGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="500" height="500" fill="url(#hero-bg-${config.id})"/>
+  
+  <!-- Outer Ring with Glow -->
+  <circle cx="250" cy="250" r="230" fill="none" stroke="url(#hero-gradient-${config.id})" 
+          stroke-width="6" filter="url(#hero-glow-${config.id})" opacity="0.8"/>
+  
+  <!-- Main Badge Circle -->
+  <circle cx="250" cy="250" r="200" fill="url(#hero-gradient-${config.id})" 
+          filter="url(#hero-shadow-${config.id})"/>
+  
+  <!-- Inner Circle -->
+  <circle cx="250" cy="250" r="170" fill="none" stroke="white" stroke-width="3" opacity="0.4"/>
+  
+  <!-- Hero Crown Icon -->
+  <g transform="translate(250, 200)">
+    <path d="M0,-60 L15,-30 L45,-35 L25,-10 L30,20 L0,0 L-30,20 L-25,-10 L-45,-35 L-15,-30 Z" 
+          fill="white" opacity="0.95" filter="url(#hero-glow-${config.id})"/>
+    <circle cx="0" cy="-60" r="8" fill="white" opacity="0.95"/>
+    <circle cx="45" cy="-35" r="6" fill="white" opacity="0.95"/>
+    <circle cx="-45" cy="-35" r="6" fill="white" opacity="0.95"/>
+  </g>
+  
+  <!-- Hero Text -->
+  <text x="250" y="300" text-anchor="middle" font-family="Arial, sans-serif" 
+        font-size="42" font-weight="bold" fill="white" opacity="0.95">
+    HERO
+  </text>
+  
+  <!-- Badge Name -->
+  <text x="250" y="340" text-anchor="middle" font-family="Arial, sans-serif" 
+        font-size="24" fill="white" opacity="0.85">
+    ${badgeName}
+  </text>
+  
+  <!-- User Name -->
+  <text x="250" y="380" text-anchor="middle" font-family="Arial, sans-serif" 
+        font-size="18" fill="white" opacity="0.7">
+    ${userName}
+  </text>
+  
+  <!-- Purchase Date -->
+  <text x="250" y="410" text-anchor="middle" font-family="Arial, sans-serif" 
+        font-size="14" fill="white" opacity="0.6">
+    ${purchaseDate}
+  </text>
+  
+  <!-- Decorative Stars -->
+  <g opacity="0.6">
+    <circle cx="100" cy="100" r="3" fill="white"/>
+    <circle cx="400" cy="120" r="2" fill="white"/>
+    <circle cx="380" cy="380" r="3" fill="white"/>
+    <circle cx="120" cy="400" r="2" fill="white"/>
+    <circle cx="450" cy="250" r="2" fill="white"/>
+    <circle cx="50" cy="250" r="2" fill="white"/>
+  </g>
+  
+  <!-- Metadata -->
+  <metadata>
+    <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+             xmlns:dc="http://purl.org/dc/elements/1.1/">
+      <rdf:Description>
+        <dc:title>${badgeName}</dc:title>
+        <dc:creator>GangGreen Platform</dc:creator>
+        <dc:description>GangGreen Hero Badge - Premium supporter badge with exclusive benefits</dc:description>
+        <dc:date>${purchaseDate}</dc:date>
+        <dc:type>NFT Badge</dc:type>
+        <dc:format>image/svg+xml</dc:format>
+      </rdf:Description>
+    </rdf:RDF>
+  </metadata>
+</svg>
+      `.trim();
+
+      console.log('[BadgeSvgService] Hero badge generated successfully:', {
+        badgeId: config.id,
+        userName,
+        purchaseDate,
+      });
+
+      return {
+        success: true,
+        svg,
+        metadata: {
+          ...config.metadata,
+          badgeType: 'ganggreen_hero',
+          generatedAt: new Date().toISOString(),
+        },
+      };
+    } catch (error) {
+      console.error('[BadgeSvgService] Hero badge generation failed:', {
+        badgeId: config.id,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+      
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to generate Hero badge',
       };
     }
   }

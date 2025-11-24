@@ -408,6 +408,111 @@ class BadgeProgressionService {
     }
   }
 
+  /**
+   * Initialize badge progression for a new user
+   * Sets up the hummingbird welcome badge as the starting badge
+   */
+  async initializeUserBadgeProgression(userId: string): Promise<boolean> {
+    try {
+      console.log('[BadgeProgressionService] Initializing badge progression for user:', userId);
+
+      // Get or create the hummingbird badge tier
+      let hummingbirdBadge = await this.getHummingbirdBadge();
+      
+      if (!hummingbirdBadge) {
+        // Create hummingbird badge tier if it doesn't exist
+        hummingbirdBadge = await this.createHummingbirdBadgeTier();
+      }
+
+      if (!hummingbirdBadge) {
+        console.error('[BadgeProgressionService] Failed to get or create hummingbird badge');
+        return false;
+      }
+
+      // Initialize user badge progress with hummingbird badge
+      const { error: progressError } = await supabase
+        .from('user_badge_progress')
+        .insert({
+          user_id: userId,
+          current_badge_id: hummingbirdBadge.id,
+          actions_completed: 0,
+          social_posts_created: 0,
+          initiatives_joined: 0,
+          initiatives_created: 0,
+          referrals_made: 0,
+          social_engagement_score: 0,
+          last_updated: new Date().toISOString(),
+        });
+
+      if (progressError && !progressError.message.includes('duplicate')) {
+        console.error('[BadgeProgressionService] Error initializing user progress:', progressError);
+        return false;
+      }
+
+      // Award the hummingbird badge
+      await this.awardBadge(userId, hummingbirdBadge.id);
+
+      console.log('[BadgeProgressionService] User badge progression initialized successfully');
+      return true;
+    } catch (error) {
+      console.error('[BadgeProgressionService] Exception in initializeUserBadgeProgression:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Get the hummingbird welcome badge
+   */
+  async getHummingbirdBadge(): Promise<Badge | null> {
+    try {
+      const { data, error } = await supabase
+        .from('badge_tiers')
+        .select('*')
+        .eq('name', 'Hummingbird')
+        .single();
+
+      if (error || !data) {
+        return null;
+      }
+
+      return this.transformBadgeData(data);
+    } catch (error) {
+      console.error('[BadgeProgressionService] Exception in getHummingbirdBadge:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Create the hummingbird badge tier if it doesn't exist
+   */
+  async createHummingbirdBadgeTier(): Promise<Badge | null> {
+    try {
+      console.log('[BadgeProgressionService] Creating hummingbird badge tier');
+
+      const { data, error } = await supabase
+        .from('badge_tiers')
+        .insert({
+          name: 'Hummingbird',
+          tier_order: 0,
+          description: 'Welcome to #GangGreen! Like the hummingbird in Wangari Maathai\'s story, every small action counts. Your journey begins here!',
+          requirements: {}, // No requirements for welcome badge
+          icon_url: '/assets/badges/hummingbird-icon.svg',
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.error('[BadgeProgressionService] Error creating hummingbird badge tier:', error);
+        return null;
+      }
+
+      return this.transformBadgeData(data);
+    } catch (error) {
+      console.error('[BadgeProgressionService] Exception in createHummingbirdBadgeTier:', error);
+      return null;
+    }
+  }
+
   // ============================================================================
   // PRIVATE HELPER METHODS
   // ============================================================================

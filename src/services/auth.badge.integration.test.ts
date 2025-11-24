@@ -83,7 +83,7 @@ describe('AuthService - Hummingbird Badge Integration', () => {
     vi.mocked(hummingbirdBadgeService.generateHummingbirdBadge).mockResolvedValue({
       success: true,
       svg: '<svg>mock hummingbird badge</svg>',
-      metadata: mockBadgeConfig.metadata,
+      metadata: mockBadgeConfig.metadata as any,
     });
 
     // Test registration

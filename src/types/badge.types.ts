@@ -3,7 +3,7 @@
  * Defines interfaces and types for the badge generation system
  */
 
-export type BadgeTier = 'bronze' | 'silver' | 'gold' | 'platinum' | 'diamond';
+export type BadgeTier = 'hummingbird' | 'bronze' | 'silver' | 'gold' | 'platinum' | 'diamond' | 'hero';
 
 export type ForestType = 'kakamega' | 'karura' | 'mau';
 
@@ -16,7 +16,8 @@ export type AchievementType =
   | 'climate_hero'
   | 'forest_protector'
   | 'green_ambassador'
-  | 'welcome_badge';
+  | 'welcome_badge'
+  | 'ganggreen_hero';
 
 export interface BadgeMetadata {
   badgeName: string;
@@ -31,6 +32,11 @@ export interface BadgeMetadata {
   welcomeMessage?: string;
   registrationDate?: string;
   platformVersion?: string;
+  // Optional fields for Hero badges
+  userName?: string;
+  purchaseDate?: string;
+  badgeType?: string;
+  generatedAt?: string;
 }
 
 export interface BadgeConfig {
@@ -129,7 +135,10 @@ export interface SVGTemplate {
 export interface BadgeExportOptions {
   format: 'svg' | 'png';
   size?: number; // For PNG export
-  platform?: 'twitter' | 'facebook' | 'instagram' | 'linkedin';
+  platform?: 'twitter' | 'facebook' | 'instagram' | 'linkedin' | 'twitter-profile' | 'facebook-profile' | 'instagram-story';
+  includeAccessibility?: boolean; // Add ARIA labels and accessibility attributes
+  socialMediaOptimized?: boolean; // Optimize colors and contrast for social sharing
+  wcagCompliant?: boolean; // Ensure WCAG AA color contrast compliance
 }
 
 export interface BadgeGenerationResult {

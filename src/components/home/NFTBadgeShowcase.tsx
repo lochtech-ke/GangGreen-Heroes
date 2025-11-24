@@ -27,6 +27,12 @@ interface BadgeShowcaseProps {
 
 // Tier configuration matching SVG badge system
 const tierConfig = {
+  hummingbird: {
+    gradient: 'from-teal-400 to-teal-600',
+    glow: 'shadow-teal-400/50',
+    border: 'border-teal-400/30',
+    bg: 'bg-teal-400/10',
+  },
   bronze: {
     gradient: 'from-orange-700 to-orange-900',
     glow: 'shadow-orange-700/50',
@@ -56,6 +62,12 @@ const tierConfig = {
     glow: 'shadow-cyan-400/50',
     border: 'border-cyan-400/30',
     bg: 'bg-cyan-400/10',
+  },
+  hero: {
+    gradient: 'from-yellow-300 to-orange-500',
+    glow: 'shadow-yellow-400/50',
+    border: 'border-yellow-400/30',
+    bg: 'bg-yellow-400/10',
   },
 };
 

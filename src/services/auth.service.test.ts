@@ -91,7 +91,7 @@ describe('AuthService', () => {
       vi.mocked(hummingbirdBadgeService.generateHummingbirdBadge).mockResolvedValue({
         success: true,
         svg: '<svg>mock badge</svg>',
-        metadata: mockBadgeConfig.metadata,
+        metadata: mockBadgeConfig.metadata as any,
       });
 
       const result = await authService.register({

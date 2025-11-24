@@ -5,6 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { badgePurchaseService } from '../../services/badgePurchase.service';
+import { supabase } from '../../services/supabase';
 import { BadgePurchase } from '../../types/badgePurchase.types';
 import { GlassCard } from '../common/GlassCard';
 import { Loader2, Award, Download, Share2 } from 'lucide-react';
@@ -27,18 +28,66 @@ export const BadgeGallery: React.FC<BadgeGalleryProps> = ({ userId, limit = 50 }
   const loadBadges = async () => {
     try {
       setLoading(true);
-      const purchases = await badgePurchaseService.getUserPurchases(userId, limit);
+      
+      // Load both purchased badges and welcome badges
+      const [purchases, welcomeBadges] = await Promise.all([
+        badgePurchaseService.getUserPurchases(userId, limit),
+        loadWelcomeBadges(userId)
+      ]);
       
       // Filter only successful purchases with badge SVG
       const completedBadges = purchases.filter(
         (p) => p.payment_status === 'success' && p.badge_svg
       );
       
-      setBadges(completedBadges);
+      // Combine purchased badges with welcome badges
+      const allBadges = [...welcomeBadges, ...completedBadges];
+      
+      setBadges(allBadges);
     } catch (error) {
       console.error('Error loading badges:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadWelcomeBadges = async (userId: string): Promise<BadgePurchase[]> => {
+    try {
+      // Check if user has a hummingbird welcome badge
+      const { data: nftBadges, error } = await supabase
+        .from('nft_badges')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('achievement_type', 'welcome_badge');
+
+      if (error || !nftBadges || nftBadges.length === 0) {
+        return [];
+      }
+
+      // Transform NFT badges to BadgePurchase format for display
+      return nftBadges.map((badge: any) => ({
+        id: badge.id,
+        user_id: badge.user_id,
+        badge_type: badge.badge_name || 'Hummingbird Welcome Badge',
+        tier: badge.tier || 'hummingbird',
+        forest: badge.forest || 'kakamega',
+        payment_status: 'success' as const,
+        badge_svg: badge.svg_content,
+        gg_coins_awarded: 1,
+        amount_kes: 0, // Welcome badges are free
+        paystack_reference: 'welcome-badge',
+        gg_coins_credited: true,
+        created_at: badge.created_at,
+        updated_at: badge.created_at,
+        completed_at: badge.created_at,
+        badge_metadata: {
+          ...badge.metadata,
+          is_welcome_badge: true,
+        },
+      }));
+    } catch (error) {
+      console.error('Error loading welcome badges:', error);
+      return [];
     }
   };
 
@@ -90,7 +139,7 @@ export const BadgeGallery: React.FC<BadgeGalleryProps> = ({ userId, limit = 50 }
       <div className="flex items-center gap-4">
         <span className="text-sm font-medium text-gray-700">Filter by tier:</span>
         <div className="flex gap-2">
-          {['all', 'bronze', 'silver', 'gold', 'platinum', 'diamond'].map((tier) => (
+          {['all', 'hummingbird', 'bronze', 'silver', 'gold', 'platinum', 'diamond'].map((tier) => (
             <button
               key={tier}
               onClick={() => setFilterTier(tier)}
@@ -100,7 +149,7 @@ export const BadgeGallery: React.FC<BadgeGalleryProps> = ({ userId, limit = 50 }
                   : 'bg-white/50 text-gray-700 hover:bg-white/70'
               }`}
             >
-              {tier.charAt(0).toUpperCase() + tier.slice(1)}
+              {tier === 'hummingbird' ? '🐦 Hummingbird' : tier.charAt(0).toUpperCase() + tier.slice(1)}
             </button>
           ))}
         </div>
@@ -258,6 +307,7 @@ const BadgeDetailModal: React.FC<BadgeDetailModalProps> = ({ badge, onClose }) =
  */
 function getTierColor(tier: string): string {
   const colors: Record<string, string> = {
+    hummingbird: 'bg-teal-100 text-teal-800',
     bronze: 'bg-orange-100 text-orange-800',
     silver: 'bg-gray-100 text-gray-800',
     gold: 'bg-yellow-100 text-yellow-800',

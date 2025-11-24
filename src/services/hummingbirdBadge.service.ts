@@ -7,6 +7,7 @@ import { BadgeConfig, BadgeGenerationResult, BadgeMetadata } from '../types/badg
 import { badgeSvgService } from './badgeSvg.service';
 import { getTierStyle } from '../assets/badges/styles/tierStyles';
 import { getForestTheme } from '../assets/badges/styles/forestThemes';
+import { hummingbirdBadgePerformanceService, ValidationResult } from './hummingbirdBadge.performance';
 
 export interface HummingbirdBadgeConfig extends Omit<BadgeConfig, 'achievement'> {
   achievement: 'welcome_badge';
@@ -120,9 +121,61 @@ class HummingbirdBadgeGenerator {
  */
 class HummingbirdBadgeService {
   /**
-   * Generate hummingbird welcome badge
+   * Export hummingbird badge with accessibility and social media optimization
+   */
+  async exportHummingbirdBadge(
+    config: HummingbirdBadgeConfig,
+    options: {
+      format: 'svg' | 'png';
+      size?: number;
+      platform?: string;
+      includeAccessibility?: boolean;
+      socialMediaOptimized?: boolean;
+      wcagCompliant?: boolean;
+    } = { format: 'svg' }
+  ): Promise<Blob> {
+    // Generate the badge first
+    const result = await this.generateHummingbirdBadge(config);
+    
+    if (!result.success || !result.svg) {
+      throw new Error(result.error || 'Failed to generate hummingbird badge');
+    }
+
+    let svg = result.svg;
+
+    // Add accessibility features if requested
+    if (options.includeAccessibility !== false) {
+      svg = this.addAccessibilityAttributes(svg, config);
+    }
+
+    // Ensure WCAG compliance if requested
+    if (options.wcagCompliant !== false) {
+      svg = await this.ensureWCAGCompliance(svg, config);
+    }
+
+    // Add social media optimization if requested
+    if (options.socialMediaOptimized) {
+      svg = this.optimizeForSocialMedia(svg, options.platform);
+    }
+
+    // Add hover states and animations for engagement
+    svg = this.addInteractiveFeatures(svg, config);
+
+    if (options.format === 'png') {
+      const size = this.getSizeForPlatform(options.platform, options.size);
+      return await this.exportToPng(svg, size);
+    }
+
+    // Return SVG as blob
+    return new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
+  }
+
+  /**
+   * Generate hummingbird welcome badge with performance optimization
    */
   async generateHummingbirdBadge(config: HummingbirdBadgeConfig): Promise<BadgeGenerationResult> {
+    const startTime = performance.now();
+    
     try {
       // Load hummingbird-specific template
       const template = await this.loadHummingbirdTemplate(config);
@@ -160,13 +213,30 @@ class HummingbirdBadgeService {
       // Embed metadata
       svg = this.embedHummingbirdMetadata(svg, config.metadata as HummingbirdBadgeMetadata);
       
+      const endTime = performance.now();
+      const generationTime = endTime - startTime;
+      
+      // Log performance metrics
+      const svgSize = new Blob([svg]).size;
       console.log('[HummingbirdBadgeService] Hummingbird badge generated successfully:', {
         badgeId: config.id,
         tier: config.tier,
         forest: config.forest,
         wingStyle: config.wingStyle,
         colorPalette: config.colorPalette,
+        generationTime: `${generationTime.toFixed(2)}ms`,
+        svgSize: `${(svgSize / 1024).toFixed(2)}KB`,
+        meetsPerformanceRequirements: generationTime <= 100 && svgSize <= 50 * 1024,
       });
+
+      // Validate performance requirements
+      if (generationTime > 100) {
+        console.warn(`[HummingbirdBadgeService] Generation time ${generationTime.toFixed(2)}ms exceeds 100ms requirement`);
+      }
+      
+      if (svgSize > 50 * 1024) {
+        console.warn(`[HummingbirdBadgeService] SVG size ${(svgSize / 1024).toFixed(2)}KB exceeds 50KB requirement`);
+      }
 
       return {
         success: true,
@@ -174,9 +244,13 @@ class HummingbirdBadgeService {
         metadata: config.metadata,
       };
     } catch (error) {
+      const endTime = performance.now();
+      const generationTime = endTime - startTime;
+      
       console.error('[HummingbirdBadgeService] Error generating hummingbird badge:', {
         badgeId: config.id,
         error: error instanceof Error ? error.message : 'Unknown error',
+        generationTime: `${generationTime.toFixed(2)}ms`,
       });
       
       // Fallback to regular badge service
@@ -189,11 +263,20 @@ class HummingbirdBadgeService {
    */
   private async loadHummingbirdTemplate(config: HummingbirdBadgeConfig): Promise<string> {
     try {
-      const response = await fetch('/src/assets/badges/templates/hummingbird-template.svg');
-      if (!response.ok) {
-        throw new Error(`Failed to load hummingbird template: ${response.statusText}`);
+      // Try to load the hummingbird template
+      let template: string;
+      
+      if (typeof window !== 'undefined' && window.location) {
+        // Browser environment
+        const response = await fetch('/src/assets/badges/templates/hummingbird-template.svg');
+        if (!response.ok) {
+          throw new Error(`Failed to load hummingbird template: ${response.statusText}`);
+        }
+        template = await response.text();
+      } else {
+        // Test/Node environment - use fallback template
+        template = this.getHummingbirdFallbackTemplate();
       }
-      let template = await response.text();
       
       // Apply wing style modifications
       template = this.applyWingStyleToTemplate(template, config.wingStyle || 'hybrid');
@@ -201,10 +284,79 @@ class HummingbirdBadgeService {
       return template;
     } catch (error) {
       console.error('Error loading hummingbird template:', error);
-      // Fallback to base template
-      const response = await fetch('/src/assets/badges/templates/base-template.svg');
-      return await response.text();
+      // Use fallback template
+      return this.getHummingbirdFallbackTemplate();
     }
+  }
+
+  /**
+   * Get fallback hummingbird template for testing/offline use
+   */
+  private getHummingbirdFallbackTemplate(): string {
+    return `
+<svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Placeholder for gradients and filters -->
+  </defs>
+  
+  <!-- Background circle with glassmorphism -->
+  <circle cx="250" cy="250" r="220" fill="url(#tierGradient)" filter="url(#glassEffect)"/>
+  
+  <!-- Forest theme layer -->
+  <g id="forest-theme" opacity="0.2">
+    <!-- Forest pattern will be inserted here -->
+  </g>
+  
+  <!-- Hummingbird body -->
+  <g id="hummingbird-body" transform="translate(250, 250)">
+    <!-- Hummingbird body path -->
+    <ellipse cx="0" cy="0" rx="8" ry="20" fill="url(#hummingbirdBodyGradient)"/>
+    
+    <!-- Hummingbird head -->
+    <circle cx="0" cy="-18" r="6" fill="url(#hummingbirdBodyGradient)"/>
+    
+    <!-- Hummingbird beak -->
+    <path d="M 0,-24 L 2,-30 L 0,-32 L -2,-30 Z" fill="url(#hummingbirdBodyGradient)"/>
+    
+    <!-- Hummingbird wings -->
+    <g id="hummingbird-wings">
+      <!-- Left wing -->
+      <path d="M -6,-12 C -26,-19 -34,-8 -30,4 C -26,12 -19,15 -11,11 C -7,8 -6,0 -6,-12 Z" 
+            fill="url(#hummingbirdWingGradient)" opacity="0.9"/>
+      
+      <!-- Right wing -->
+      <path d="M 6,-12 C 26,-19 34,-8 30,4 C 26,12 19,15 11,11 C 7,8 6,0 6,-12 Z" 
+            fill="url(#hummingbirdWingGradient)" opacity="0.9"/>
+    </g>
+    
+    <!-- Hummingbird tail -->
+    <path d="M 0,20 L -4,35 L 0,38 L 4,35 Z" fill="url(#hummingbirdBodyGradient)"/>
+    
+    <!-- Shimmer effect -->
+    <ellipse cx="0" cy="-5" rx="12" ry="18" fill="url(#hummingbirdShimmer)" opacity="0.6"/>
+  </g>
+  
+  <!-- Tier border -->
+  <circle cx="250" cy="250" r="220" fill="none" stroke="url(#tierBorderGradient)" 
+          stroke-width="8" filter="url(#tierGlow)"/>
+  
+  <!-- Badge text -->
+  <text x="250" y="420" text-anchor="middle" font-family="Arial, sans-serif" 
+        font-size="24" font-weight="bold" fill="white" filter="url(#dropShadow)">
+    {{tierName}} {{forestName}}
+  </text>
+  
+  <text x="250" y="450" text-anchor="middle" font-family="Arial, sans-serif" 
+        font-size="18" fill="white" opacity="0.9">
+    {{achievementName}}
+  </text>
+  
+  <!-- Animations for subtle movement -->
+  <animateTransform attributeName="transform" attributeType="XML" type="rotate"
+                    values="0 250 250; 2 250 250; 0 250 250; -2 250 250; 0 250 250"
+                    dur="3s" repeatCount="indefinite"/>
+</svg>
+    `.trim();
   }
 
   /**
@@ -355,11 +507,19 @@ class HummingbirdBadgeService {
    */
   private async getForestPatternContent(forest: string): Promise<string> {
     try {
-      const response = await fetch(`/src/assets/badges/patterns/${forest}-pattern.svg`);
-      if (!response.ok) {
-        return this.getDefaultForestPattern();
+      let content: string;
+      
+      if (typeof window !== 'undefined' && window.location) {
+        // Browser environment
+        const response = await fetch(`/src/assets/badges/patterns/${forest}-pattern.svg`);
+        if (!response.ok) {
+          return this.getDefaultForestPattern();
+        }
+        content = await response.text();
+      } else {
+        // Test/Node environment - use mock pattern
+        content = this.getMockForestPattern(forest);
       }
-      const content = await response.text();
       
       // Extract and adapt forest-specific elements for hummingbird badge
       return this.adaptForestPatternForHummingbird(content, forest);
@@ -370,9 +530,40 @@ class HummingbirdBadgeService {
   }
 
   /**
+   * Get mock forest pattern for testing
+   */
+  private getMockForestPattern(forest: string): string {
+    const patterns: Record<string, string> = {
+      kakamega: `
+        <g>
+          <circle cx="100" cy="100" r="20" fill="#2D5016" opacity="0.3"/>
+          <circle cx="300" cy="150" r="25" fill="#228B22" opacity="0.3"/>
+          <path d="M 50 50 Q 60 70 50 90" stroke="#32CD32" stroke-width="2" fill="none"/>
+        </g>
+      `,
+      karura: `
+        <g>
+          <rect x="80" y="80" width="15" height="30" fill="#2D5016" opacity="0.3"/>
+          <rect x="320" y="120" width="12" height="25" fill="#228B22" opacity="0.3"/>
+          <circle cx="200" cy="300" r="18" fill="#32CD32" opacity="0.2"/>
+        </g>
+      `,
+      mau: `
+        <g>
+          <path d="M 0 350 L 100 320 L 200 340 L 300 315 L 400 335" stroke="#2D5016" stroke-width="3" fill="none"/>
+          <ellipse cx="150" cy="280" rx="30" ry="8" fill="#87CEEB" opacity="0.3"/>
+          <path d="M 70 330 L 65 320 L 75 320 Z" fill="#228B22"/>
+        </g>
+      `,
+    };
+    
+    return patterns[forest] || patterns.kakamega;
+  }
+
+  /**
    * Adapt forest pattern elements specifically for hummingbird badge
    */
-  private adaptForestPatternForHummingbird(svgContent: string, forest: string): string {
+  private adaptForestPatternForHummingbird(_svgContent: string, forest: string): string {
     const forestTheme = getForestTheme(forest as any);
     
     switch (forest) {
@@ -502,7 +693,11 @@ class HummingbirdBadgeService {
   /**
    * Get color palette based on configuration
    */
-  private getColorPalette(palette: string, forest: string) {
+  private getColorPalette(palette: string, forest: string): {
+    body: { start: string; middle: string; end: string };
+    wings: { start: string; middle1: string; middle2: string; end: string };
+    shimmer: { intensity: number };
+  } {
     const forestTheme = getForestTheme(forest as any);
     
     switch (palette) {
@@ -532,7 +727,15 @@ class HummingbirdBadgeService {
   /**
    * Get tier-specific visual effects
    */
-  private getTierSpecificEffects(tier: any) {
+  private getTierSpecificEffects(tier: string): {
+    glassBlur: number;
+    glassOpacity: number;
+    glowRadius: number;
+    shadowBlur: number;
+    shadowOffset: number;
+    shadowOpacity: number;
+    additionalFilters: string;
+  } {
     const effects = {
       bronze: {
         glassBlur: 8,
@@ -623,7 +826,7 @@ class HummingbirdBadgeService {
       },
     };
     
-    return effects[tier] || effects.bronze;
+    return effects[tier as keyof typeof effects] || effects.bronze;
   }
 
   /**
@@ -751,6 +954,475 @@ class HummingbirdBadgeService {
   }
 
   /**
+   * Add accessibility attributes to SVG
+   */
+  private addAccessibilityAttributes(svg: string, config: HummingbirdBadgeConfig): string {
+    const metadata = config.metadata as HummingbirdBadgeMetadata;
+    const tierName = config.tier.charAt(0).toUpperCase() + config.tier.slice(1);
+    
+    // Create accessibility content
+    const title = `${metadata.badgeName} - ${tierName} tier badge for ${metadata.forestName}`;
+    const description = `Welcome badge featuring an abstract hummingbird design. ${metadata.welcomeMessage} Earned on ${new Date(metadata.earnedDate).toLocaleDateString()}.`;
+    
+    // Add accessibility attributes to the root SVG element
+    const accessibleSvg = svg.replace(
+      /<svg([^>]*)>/,
+      `<svg$1 role="img" aria-labelledby="badge-title-${config.id}" aria-describedby="badge-desc-${config.id}">`
+    );
+
+    // Add title and description elements
+    const accessibilityElements = `
+      <title id="badge-title-${config.id}">${this.escapeXML(title)}</title>
+      <desc id="badge-desc-${config.id}">${this.escapeXML(description)}</desc>
+    `;
+
+    // Insert accessibility elements after the opening svg tag and metadata
+    return accessibleSvg.replace(
+      /(<svg[^>]*>)(\s*<metadata>[\s\S]*?<\/metadata>)?/,
+      `$1$2${accessibilityElements}`
+    );
+  }
+
+  /**
+   * Ensure WCAG AA color contrast compliance
+   */
+  private async ensureWCAGCompliance(svg: string, _config: HummingbirdBadgeConfig): Promise<string> {
+    // Extract colors from SVG and check contrast ratios
+    const colorPairs = this.extractColorPairs(svg);
+    let compliantSvg = svg;
+
+    for (const pair of colorPairs) {
+      const contrastRatio = this.calculateContrastRatio(pair.foreground, pair.background);
+      
+      // WCAG AA requires 4.5:1 for normal text, 3:1 for large text
+      const requiredRatio = pair.isLargeText ? 3.0 : 4.5;
+      
+      if (contrastRatio < requiredRatio) {
+        // Adjust colors to meet contrast requirements
+        const adjustedColor = this.adjustColorForContrast(pair.foreground, pair.background, requiredRatio);
+        compliantSvg = compliantSvg.replace(
+          new RegExp(pair.foreground, 'g'),
+          adjustedColor
+        );
+        
+        console.log(`[HummingbirdBadgeService] Adjusted color for WCAG compliance: ${pair.foreground} -> ${adjustedColor}`);
+      }
+    }
+
+    return compliantSvg;
+  }
+
+  /**
+   * Optimize SVG for social media platforms
+   */
+  private optimizeForSocialMedia(svg: string, platform?: string): string {
+    let optimizedSvg = svg;
+
+    // Platform-specific optimizations
+    switch (platform) {
+      case 'twitter':
+        // Twitter prefers high contrast and bold elements
+        optimizedSvg = this.enhanceContrast(optimizedSvg, 1.2);
+        optimizedSvg = this.increaseBorderWidth(optimizedSvg, 1.5);
+        break;
+      case 'facebook':
+        // Facebook works well with vibrant colors
+        optimizedSvg = this.enhanceVibrance(optimizedSvg, 1.1);
+        break;
+      case 'instagram':
+        // Instagram benefits from square format optimization
+        optimizedSvg = this.optimizeForSquareFormat(optimizedSvg);
+        break;
+      case 'linkedin':
+        // LinkedIn prefers professional, subtle styling
+        optimizedSvg = this.applyProfessionalStyling(optimizedSvg);
+        break;
+    }
+
+    // Add social media metadata
+    optimizedSvg = this.addSocialMediaMetadata(optimizedSvg, platform);
+
+    return optimizedSvg;
+  }
+
+  /**
+   * Add interactive features (hover states and animations)
+   */
+  private addInteractiveFeatures(svg: string, config: HummingbirdBadgeConfig): string {
+    if (config.animationLevel === 'none') {
+      return svg;
+    }
+
+    const interactiveCSS = `
+      <style>
+        <![CDATA[
+          .hummingbird-badge {
+            transition: all 0.3s ease;
+          }
+          
+          .hummingbird-badge:hover {
+            transform: scale(1.05);
+            filter: brightness(1.1);
+          }
+          
+          .hummingbird-wings {
+            transform-origin: center;
+            animation: wingFlutter 2s ease-in-out infinite;
+          }
+          
+          .hummingbird-badge:hover .hummingbird-wings {
+            animation-duration: 0.5s;
+          }
+          
+          .hummingbird-shimmer {
+            opacity: 0.6;
+            animation: shimmer 3s ease-in-out infinite;
+          }
+          
+          @keyframes wingFlutter {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(2deg); }
+            75% { transform: rotate(-2deg); }
+          }
+          
+          @keyframes shimmer {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+          }
+          
+          .tier-glow {
+            filter: drop-shadow(0 0 8px currentColor);
+            animation: tierPulse 4s ease-in-out infinite;
+          }
+          
+          @keyframes tierPulse {
+            0%, 100% { filter: drop-shadow(0 0 8px currentColor); }
+            50% { filter: drop-shadow(0 0 12px currentColor); }
+          }
+        ]]>
+      </style>
+    `;
+
+    // Add CSS to the SVG
+    let interactiveSvg = svg.replace(
+      /<defs>/,
+      `<defs>${interactiveCSS}`
+    );
+
+    // Add CSS classes to relevant elements
+    interactiveSvg = interactiveSvg.replace(
+      /<g id="hummingbird-body"/g,
+      '<g id="hummingbird-body" class="hummingbird-badge"'
+    );
+
+    interactiveSvg = interactiveSvg.replace(
+      /<g id="hummingbird-wings"/g,
+      '<g id="hummingbird-wings" class="hummingbird-wings"'
+    );
+
+    interactiveSvg = interactiveSvg.replace(
+      /id="hummingbirdShimmer"/g,
+      'id="hummingbirdShimmer" class="hummingbird-shimmer"'
+    );
+
+    interactiveSvg = interactiveSvg.replace(
+      /id="tierGlow"/g,
+      'id="tierGlow" class="tier-glow"'
+    );
+
+    return interactiveSvg;
+  }
+
+  /**
+   * Export SVG to PNG with specified size
+   */
+  private async exportToPng(svgString: string, size: number): Promise<Blob> {
+    return new Promise((resolve, reject) => {
+      try {
+        // Create canvas
+        const canvas = document.createElement('canvas');
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext('2d');
+
+        if (!ctx) {
+          throw new Error('Could not get canvas context');
+        }
+
+        // Set high-quality rendering
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+
+        // Create image from SVG
+        const img = new Image();
+        const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+        const url = URL.createObjectURL(svgBlob);
+
+        img.onload = () => {
+          // Fill with transparent background
+          ctx.clearRect(0, 0, size, size);
+          
+          // Draw image on canvas
+          ctx.drawImage(img, 0, 0, size, size);
+
+          // Convert to PNG blob with high quality
+          canvas.toBlob(
+            (blob) => {
+              URL.revokeObjectURL(url);
+              if (blob) {
+                resolve(blob);
+              } else {
+                reject(new Error('Failed to create PNG blob'));
+              }
+            },
+            'image/png',
+            1.0
+          );
+        };
+
+        img.onerror = () => {
+          URL.revokeObjectURL(url);
+          reject(new Error('Failed to load SVG image'));
+        };
+
+        img.src = url;
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+  /**
+   * Get appropriate size for social media platform
+   */
+  private getSizeForPlatform(platform?: string, customSize?: number): number {
+    if (customSize) return customSize;
+
+    const sizes: Record<string, number> = {
+      twitter: 1200,
+      facebook: 1200,
+      instagram: 1080,
+      linkedin: 1200,
+      'twitter-profile': 400,
+      'facebook-profile': 400,
+      'instagram-story': 1080,
+    };
+
+    return platform ? sizes[platform] || 1200 : 1200;
+  }
+
+  /**
+   * Extract color pairs from SVG for contrast checking
+   */
+  private extractColorPairs(svg: string): Array<{
+    foreground: string;
+    background: string;
+    isLargeText: boolean;
+  }> {
+    const pairs: Array<{ foreground: string; background: string; isLargeText: boolean }> = [];
+    
+    // Extract text elements and their backgrounds
+    const textMatches = svg.match(/<text[^>]*>[\s\S]*?<\/text>/g) || [];
+    
+    for (const textMatch of textMatches) {
+      const fillMatch = textMatch.match(/fill="([^"]+)"/);
+      const fontSizeMatch = textMatch.match(/font-size="(\d+)"/);
+      
+      if (fillMatch) {
+        const foreground = fillMatch[1];
+        const fontSize = fontSizeMatch ? parseInt(fontSizeMatch[1], 10) : 16;
+        const isLargeText = fontSize >= 18;
+        
+        // For now, assume white background for contrast checking
+        // In a more sophisticated implementation, we'd extract the actual background
+        pairs.push({
+          foreground,
+          background: '#FFFFFF',
+          isLargeText,
+        });
+      }
+    }
+
+    return pairs;
+  }
+
+  /**
+   * Calculate contrast ratio between two colors
+   */
+  private calculateContrastRatio(color1: string, color2: string): number {
+    const luminance1 = this.getLuminance(color1);
+    const luminance2 = this.getLuminance(color2);
+    
+    const lighter = Math.max(luminance1, luminance2);
+    const darker = Math.min(luminance1, luminance2);
+    
+    return (lighter + 0.05) / (darker + 0.05);
+  }
+
+  /**
+   * Get relative luminance of a color
+   */
+  private getLuminance(color: string): number {
+    const rgb = this.hexToRgb(color);
+    if (!rgb) return 0;
+
+    const [r, g, b] = [rgb.r, rgb.g, rgb.b].map(c => {
+      c = c / 255;
+      return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+    });
+
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  }
+
+  /**
+   * Convert hex color to RGB
+   */
+  private hexToRgb(hex: string): { r: number; g: number; b: number } | null {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+      r: parseInt(result[1], 16),
+      g: parseInt(result[2], 16),
+      b: parseInt(result[3], 16)
+    } : null;
+  }
+
+  /**
+   * Adjust color to meet contrast requirements
+   */
+  private adjustColorForContrast(foreground: string, background: string, targetRatio: number): string {
+    const fgRgb = this.hexToRgb(foreground);
+    
+    if (!fgRgb) return foreground;
+
+    // Try darkening or lightening the foreground color
+    let adjustedColor = foreground;
+    let bestRatio = this.calculateContrastRatio(foreground, background);
+
+    // Try different adjustments
+    for (let adjustment = 0.1; adjustment <= 1; adjustment += 0.1) {
+      // Try darkening
+      const darkerColor = this.adjustBrightness(foreground, -adjustment);
+      const darkerRatio = this.calculateContrastRatio(darkerColor, background);
+      
+      if (darkerRatio >= targetRatio && darkerRatio > bestRatio) {
+        adjustedColor = darkerColor;
+        bestRatio = darkerRatio;
+      }
+
+      // Try lightening
+      const lighterColor = this.adjustBrightness(foreground, adjustment);
+      const lighterRatio = this.calculateContrastRatio(lighterColor, background);
+      
+      if (lighterRatio >= targetRatio && lighterRatio > bestRatio) {
+        adjustedColor = lighterColor;
+        bestRatio = lighterRatio;
+      }
+
+      // If we've met the target, stop
+      if (bestRatio >= targetRatio) break;
+    }
+
+    return adjustedColor;
+  }
+
+  /**
+   * Adjust brightness of a hex color
+   */
+  private adjustBrightness(hex: string, factor: number): string {
+    const rgb = this.hexToRgb(hex);
+    if (!rgb) return hex;
+
+    const adjust = (value: number) => {
+      if (factor > 0) {
+        // Lighten
+        return Math.min(255, Math.round(value + (255 - value) * factor));
+      } else {
+        // Darken
+        return Math.max(0, Math.round(value * (1 + factor)));
+      }
+    };
+
+    const r = adjust(rgb.r).toString(16).padStart(2, '0');
+    const g = adjust(rgb.g).toString(16).padStart(2, '0');
+    const b = adjust(rgb.b).toString(16).padStart(2, '0');
+
+    return `#${r}${g}${b}`;
+  }
+
+  /**
+   * Enhance contrast of SVG elements
+   */
+  private enhanceContrast(svg: string, factor: number): string {
+    // Increase stroke widths and adjust opacity for better contrast
+    return svg
+      .replace(/stroke-width="([^"]+)"/g, (_match, width) => {
+        const newWidth = parseFloat(width) * factor;
+        return `stroke-width="${newWidth}"`;
+      })
+      .replace(/opacity="0\.([^"]+)"/g, (_match, decimal) => {
+        const newOpacity = Math.min(1, parseFloat(`0.${decimal}`) * factor);
+        return `opacity="${newOpacity}"`;
+      });
+  }
+
+  /**
+   * Increase border width for better visibility
+   */
+  private increaseBorderWidth(svg: string, factor: number): string {
+    return svg.replace(/stroke-width="([^"]+)"/g, (_match, width) => {
+      const newWidth = parseFloat(width) * factor;
+      return `stroke-width="${newWidth}"`;
+    });
+  }
+
+  /**
+   * Enhance color vibrance
+   */
+  private enhanceVibrance(svg: string, _factor: number): string {
+    // This is a simplified implementation - in practice, you'd parse and adjust HSL values
+    return svg.replace(/stop-color="([^"]+)"/g, (match) => {
+      // For now, just return the original color
+      // A full implementation would convert to HSL, increase saturation, and convert back
+      return match;
+    });
+  }
+
+  /**
+   * Optimize for square format (Instagram)
+   */
+  private optimizeForSquareFormat(svg: string): string {
+    // Ensure the badge fits well in a square format
+    return svg.replace(/viewBox="([^"]+)"/, 'viewBox="0 0 500 500"');
+  }
+
+  /**
+   * Apply professional styling for LinkedIn
+   */
+  private applyProfessionalStyling(svg: string): string {
+    // Reduce animation intensity and use more subtle colors
+    return svg
+      .replace(/animation-duration: 0\.5s/g, 'animation-duration: 1s')
+      .replace(/opacity: 1/g, 'opacity: 0.8');
+  }
+
+  /**
+   * Add social media metadata to SVG
+   */
+  private addSocialMediaMetadata(svg: string, platform?: string): string {
+    const socialMetadata = `
+      <metadata>
+        <social>
+          <platform>${platform || 'general'}</platform>
+          <optimized>true</optimized>
+          <hashtags>#GangGreen #WelcomeBadge #CommunityEngagement</hashtags>
+        </social>
+      </metadata>
+    `;
+
+    return svg.replace(/<metadata>/, `<metadata>${socialMetadata}`);
+  }
+
+  /**
    * Validate hummingbird badge configuration
    */
   validateHummingbirdConfig(config: HummingbirdBadgeConfig): { valid: boolean; errors: string[] } {
@@ -777,6 +1449,211 @@ class HummingbirdBadgeService {
       errors,
     };
   }
+
+  /**
+   * Generate optimized hummingbird badge with performance validation
+   */
+  async generateOptimizedHummingbirdBadge(config: HummingbirdBadgeConfig): Promise<{
+    result: BadgeGenerationResult;
+    validation: ValidationResult;
+  }> {
+    try {
+      // Use performance service for optimized generation
+      const optimizedResult = await hummingbirdBadgePerformanceService.optimizeGeneration(config);
+      
+      // Validate the result
+      const validation = await hummingbirdBadgePerformanceService.validateHummingbirdBadge(
+        config,
+        optimizedResult.svg
+      );
+
+      return {
+        result: {
+          success: true,
+          svg: optimizedResult.svg,
+          metadata: config.metadata,
+        },
+        validation,
+      };
+    } catch (error) {
+      console.error('[HummingbirdBadgeService] Optimized generation failed:', error);
+      
+      // Fallback to regular generation
+      const fallbackResult = await this.generateHummingbirdBadge(config);
+      const validation = await hummingbirdBadgePerformanceService.validateHummingbirdBadge(
+        config,
+        fallbackResult.svg
+      );
+
+      return {
+        result: fallbackResult,
+        validation,
+      };
+    }
+  }
+
+  /**
+   * Validate performance requirements for existing badge
+   */
+  async validatePerformanceRequirements(
+    config: HummingbirdBadgeConfig,
+    svg?: string
+  ): Promise<ValidationResult> {
+    return await hummingbirdBadgePerformanceService.validateHummingbirdBadge(config, svg);
+  }
+
+  /**
+   * Test vector scalability across size range
+   */
+  async testVectorScalability(svg: string): Promise<boolean> {
+    try {
+      const testSizes = [50, 100, 200, 400, 800, 1200];
+      
+      for (const size of testSizes) {
+        const canvas = document.createElement('canvas');
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext('2d');
+        
+        if (!ctx) continue;
+
+        const img = new Image();
+        const svgBlob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
+        const url = URL.createObjectURL(svgBlob);
+
+        const renderTest = new Promise<boolean>((resolve) => {
+          img.onload = () => {
+            try {
+              ctx.drawImage(img, 0, 0, size, size);
+              URL.revokeObjectURL(url);
+              resolve(true);
+            } catch (error) {
+              URL.revokeObjectURL(url);
+              resolve(false);
+            }
+          };
+
+          img.onerror = () => {
+            URL.revokeObjectURL(url);
+            resolve(false);
+          };
+
+          setTimeout(() => {
+            URL.revokeObjectURL(url);
+            resolve(false);
+          }, 1000);
+        });
+
+        img.src = url;
+        
+        const renderSuccess = await renderTest;
+        if (!renderSuccess) {
+          console.warn(`[HummingbirdBadgeService] Scalability test failed at ${size}px`);
+          return false;
+        }
+      }
+
+      return true;
+    } catch (error) {
+      console.error('[HummingbirdBadgeService] Scalability test error:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Test background contrast compatibility
+   */
+  async testBackgroundCompatibility(svg: string): Promise<boolean> {
+    const testBackgrounds = [
+      '#FFFFFF', '#000000', '#808080', '#FF0000', 
+      '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF'
+    ];
+
+    for (const backgroundColor of testBackgrounds) {
+      const contrastTest = await this.testSingleBackgroundContrast(svg, backgroundColor);
+      if (!contrastTest) {
+        console.warn(`[HummingbirdBadgeService] Contrast test failed for background: ${backgroundColor}`);
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  /**
+   * Test contrast against a single background color
+   */
+  private async testSingleBackgroundContrast(svg: string, backgroundColor: string): Promise<boolean> {
+    try {
+      const canvas = document.createElement('canvas');
+      canvas.width = 400;
+      canvas.height = 400;
+      const ctx = canvas.getContext('2d');
+      
+      if (!ctx) return false;
+
+      ctx.fillStyle = backgroundColor;
+      ctx.fillRect(0, 0, 400, 400);
+
+      const img = new Image();
+      const svgBlob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
+      const url = URL.createObjectURL(svgBlob);
+
+      const contrastTest = new Promise<boolean>((resolve) => {
+        img.onload = () => {
+          try {
+            ctx.drawImage(img, 0, 0, 400, 400);
+            
+            const imageData = ctx.getImageData(0, 0, 400, 400);
+            const pixels = imageData.data;
+            
+            let hasContrast = false;
+            const bgRgb = this.hexToRgb(backgroundColor);
+            
+            if (bgRgb) {
+              for (let i = 0; i < pixels.length; i += 4) {
+                const r = pixels[i];
+                const g = pixels[i + 1];
+                const b = pixels[i + 2];
+                const a = pixels[i + 3];
+                
+                if (a < 128) continue;
+                
+                const colorDiff = Math.abs(r - bgRgb.r) + Math.abs(g - bgRgb.g) + Math.abs(b - bgRgb.b);
+                if (colorDiff > 100) {
+                  hasContrast = true;
+                  break;
+                }
+              }
+            }
+            
+            URL.revokeObjectURL(url);
+            resolve(hasContrast);
+          } catch (error) {
+            URL.revokeObjectURL(url);
+            resolve(false);
+          }
+        };
+
+        img.onerror = () => {
+          URL.revokeObjectURL(url);
+          resolve(false);
+        };
+
+        setTimeout(() => {
+          URL.revokeObjectURL(url);
+          resolve(false);
+        }, 1000);
+      });
+
+      img.src = url;
+      return await contrastTest;
+    } catch (error) {
+      console.error('[HummingbirdBadgeService] Background contrast test error:', error);
+      return false;
+    }
+  }
+
 }
 
 // Export singleton instance
@@ -793,7 +1670,7 @@ export function createHummingbirdBadgeGenerator(config: HummingbirdBadgeConfig):
 }
 
 /**
- * Quick generation function for common use cases
+ * Quick generation function for common use cases with performance optimization
  */
 export async function generateWelcomeBadge(
   userId: string,
@@ -803,6 +1680,7 @@ export async function generateWelcomeBadge(
     wingStyle?: 'geometric' | 'organic' | 'hybrid';
     colorPalette?: 'vibrant' | 'subtle' | 'forest-themed';
     animationLevel?: 'none' | 'subtle' | 'dynamic';
+    optimized?: boolean;
   } = {}
 ): Promise<BadgeGenerationResult> {
   const config = hummingbirdBadgeService.createDefaultHummingbirdConfig(
@@ -815,6 +1693,152 @@ export async function generateWelcomeBadge(
   if (options.colorPalette) config.colorPalette = options.colorPalette;
   if (options.animationLevel) config.animationLevel = options.animationLevel;
   
+  // Use optimized generation by default
+  if (options.optimized !== false) {
+    try {
+      const optimizedResult = await hummingbirdBadgeService.generateOptimizedHummingbirdBadge(config);
+      
+      if (optimizedResult.validation.isValid) {
+        return optimizedResult.result;
+      } else {
+        console.warn('[generateWelcomeBadge] Optimized generation validation failed, using fallback:', 
+          optimizedResult.validation.errors);
+      }
+    } catch (error) {
+      console.warn('[generateWelcomeBadge] Optimized generation failed, using fallback:', error);
+    }
+  }
+  
+  // Fallback to regular generation
   const generator = new HummingbirdBadgeGenerator(config);
   return await generator.generate();
+}
+
+/**
+ * Generate social media ready hummingbird badge
+ */
+export async function generateSocialMediaBadge(
+  userId: string,
+  platform: 'twitter' | 'facebook' | 'instagram' | 'linkedin',
+  options: {
+    tier?: string;
+    forest?: string;
+    format?: 'svg' | 'png';
+  } = {}
+): Promise<Blob> {
+  const config = hummingbirdBadgeService.createDefaultHummingbirdConfig(
+    userId,
+    options.tier,
+    options.forest
+  );
+
+  // Optimize for social media
+  config.colorPalette = 'vibrant';
+  config.animationLevel = platform === 'instagram' ? 'dynamic' : 'subtle';
+
+  return await hummingbirdBadgeService.exportHummingbirdBadge(config, {
+    format: options.format || 'png',
+    platform,
+    socialMediaOptimized: true,
+    wcagCompliant: true,
+    includeAccessibility: true,
+  });
+}
+
+/**
+ * Get social media sharing text for hummingbird badge
+ */
+export function getSocialMediaText(
+  platform: 'twitter' | 'facebook' | 'instagram' | 'linkedin',
+  _userDisplayName?: string
+): string {
+  const baseText = `Just joined the #GangGreen community and earned my Hummingbird Welcome Badge! 🌱✨`;
+  const hashtags = '#GangGreen #CommunityEngagement #Sustainability #WangariMaathai';
+  const callToAction = 'Join us in making Africa carbon-negative!';
+
+  switch (platform) {
+    case 'twitter':
+      return `${baseText} ${callToAction} ${hashtags}`;
+    case 'facebook':
+      return `${baseText}\n\n${callToAction}\n\n${hashtags}`;
+    case 'instagram':
+      return `${baseText}\n\n${callToAction}\n\n${hashtags} #NewMember #WelcomeBadge`;
+    case 'linkedin':
+      return `Excited to announce that I've joined the #GangGreen platform! Just received my Hummingbird Welcome Badge as I begin my journey in community-driven environmental action.\n\n${callToAction}\n\n${hashtags} #ProfessionalDevelopment #EnvironmentalAction`;
+    default:
+      return `${baseText} ${callToAction} ${hashtags}`;
+  }
+}
+
+/**
+ * Validate performance requirements for hummingbird badge
+ */
+export async function validateHummingbirdPerformance(
+  config?: HummingbirdBadgeConfig,
+  svg?: string
+): Promise<ValidationResult> {
+  if (!config) {
+    config = hummingbirdBadgeService.createDefaultHummingbirdConfig('validation-test');
+  }
+  
+  return await hummingbirdBadgePerformanceService.validateHummingbirdBadge(config, svg);
+}
+
+/**
+ * Validate badge for accessibility compliance
+ */
+export async function validateBadgeAccessibility(svgString: string): Promise<{
+  compliant: boolean;
+  issues: string[];
+  suggestions: string[];
+}> {
+  const issues: string[] = [];
+  const suggestions: string[] = [];
+
+  // Check for accessibility attributes
+  if (!svgString.includes('role="img"')) {
+    issues.push('Missing role="img" attribute');
+    suggestions.push('Add role="img" to the root SVG element');
+  }
+
+  if (!svgString.includes('aria-labelledby')) {
+    issues.push('Missing aria-labelledby attribute');
+    suggestions.push('Add aria-labelledby pointing to a title element');
+  }
+
+  if (!svgString.includes('<title')) {
+    issues.push('Missing title element');
+    suggestions.push('Add a descriptive title element for screen readers');
+  }
+
+  if (!svgString.includes('<desc')) {
+    issues.push('Missing description element');
+    suggestions.push('Add a desc element with detailed badge information');
+  }
+
+  // Check for color contrast (simplified check)
+  const textElements = svgString.match(/<text[^>]*fill="([^"]+)"[^>]*>/g) || [];
+  if (textElements.length > 0) {
+    // This is a simplified check - in practice, you'd analyze the actual background colors
+    const hasLowContrastText = textElements.some(text => {
+      const colorMatch = text.match(/fill="([^"]+)"/);
+      if (colorMatch) {
+        const color = colorMatch[1].toLowerCase();
+        // Check for potentially low contrast colors
+        return color.includes('gray') || color.includes('silver') || color === '#999999';
+      }
+      return false;
+    });
+
+    if (hasLowContrastText) {
+      issues.push('Potentially low contrast text detected');
+      suggestions.push('Ensure all text meets WCAG AA contrast requirements (4.5:1 for normal text)');
+    }
+  }
+
+  return {
+    compliant: issues.length === 0,
+    issues,
+    suggestions,
+  };
 }

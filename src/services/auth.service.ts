@@ -4,6 +4,7 @@ import { withRetry, DEFAULT_RETRY_CONFIG } from '../utils/retry';
 import { checkSupabaseHealth } from '../utils/supabaseHealth';
 import { categorizeAuthError } from '../types/authError.types';
 import { hummingbirdBadgeService } from './hummingbirdBadge.service';
+import { badgeProgressionService } from './badgeProgression.service';
 import type {
   User,
   RegisterData,
@@ -112,10 +113,12 @@ class AuthService {
       const user = await this.getCurrentUser();
       console.log('[AuthService] User data fetched:', user);
 
-      // Step 4: Generate Hummingbird welcome badge
-      // The badge record is automatically created by database trigger
-      // Now we generate the actual SVG badge and create notification
+      // Step 4: Initialize badge progression and generate Hummingbird welcome badge
       try {
+        // Initialize badge progression system
+        await badgeProgressionService.initializeUserBadgeProgression(authData.user.id);
+        
+        // Generate the actual SVG badge and create notification
         await this.generateHummingbirdWelcomeBadge(authData.user.id, data.forest_preference || 'kakamega');
         await this.createHummingbirdWelcomeNotification(authData.user.id);
         console.log('[AuthService] Hummingbird welcome badge and notification created successfully');

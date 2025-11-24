@@ -78,6 +78,13 @@ export const ACHIEVEMENT_CONFIGS: Record<AchievementType, AchievementConfig> = {
     iconFile: 'hummingbird.svg',
     category: 'community',
   },
+  ganggreen_hero: {
+    type: 'ganggreen_hero',
+    displayName: 'GangGreen Hero',
+    description: 'Premium supporter with exclusive benefits and daily rewards',
+    iconFile: 'hero-crown.svg',
+    category: 'impact',
+  },
 };
 
 /**

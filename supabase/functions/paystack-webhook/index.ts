@@ -146,18 +146,61 @@ async function handleBadgePurchasePayment(
     console.error('Failed to mark coins as credited:', markError);
   }
 
+  // Check if this is a Hero badge purchase and grant Hero status
+  if (purchase.is_hero_badge && purchase.badge_type === 'ganggreen_hero') {
+    console.log(`Granting Hero status for purchase ${purchase.id}`);
+    
+    // Check if user already has Hero status
+    const { data: existingHolder } = await supabase
+      .from('hero_badge_holders')
+      .select('id')
+      .eq('user_id', purchase.user_id)
+      .single();
+
+    if (!existingHolder) {
+      // Grant Hero status
+      const { error: heroError } = await supabase
+        .from('hero_badge_holders')
+        .insert({
+          user_id: purchase.user_id,
+          badge_purchase_id: purchase.id,
+          purchase_date: purchase.completed_at || new Date().toISOString(),
+          status: 'active',
+        });
+
+      if (heroError) {
+        console.error('Failed to grant Hero status:', heroError);
+      } else {
+        console.log(`Hero status granted to user ${purchase.user_id}`);
+        
+        // Mark Hero benefits as activated
+        await supabase
+          .from('badge_purchases')
+          .update({ hero_benefits_activated: true })
+          .eq('id', purchase.id);
+      }
+    } else {
+      console.log(`User ${purchase.user_id} already has Hero status`);
+    }
+  }
+
   // Create notification
+  const notificationMessage = purchase.is_hero_badge
+    ? `You earned ${purchase.gg_coins_awarded} GG Coin and unlocked Hero status! 🦸`
+    : `You earned ${purchase.gg_coins_awarded} GG Coin for purchasing a ${purchase.tier} tier badge.`;
+
   const { error: notifError } = await supabase.from('notifications').insert({
     user_id: purchase.user_id,
     type: 'badge_purchase',
-    title: 'Badge Purchase Successful! 🎉',
-    message: `You earned ${purchase.gg_coins_awarded} GG Coin for purchasing a ${purchase.tier} tier badge.`,
+    title: purchase.is_hero_badge ? 'Hero Badge Unlocked! 🦸' : 'Badge Purchase Successful! 🎉',
+    message: notificationMessage,
     metadata: {
       purchase_id: purchase.id,
       badge_type: purchase.badge_type,
       tier: purchase.tier,
       gg_coins_earned: purchase.gg_coins_awarded,
       paystack_reference: reference,
+      is_hero_badge: purchase.is_hero_badge || false,
     },
     read: false,
     created_at: new Date().toISOString(),

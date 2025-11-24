@@ -6,6 +6,13 @@
 import { TierStyle, BadgeTier } from '../../../types/badge.types';
 
 export const TIER_STYLES: Record<BadgeTier, TierStyle> = {
+  hummingbird: {
+    primaryColor: '#20B2AA',
+    gradientStart: '#48D1CC',
+    gradientEnd: '#2E8B57',
+    borderStyle: 'nature-shimmer',
+    glowIntensity: 0.6,
+  },
   bronze: {
     primaryColor: '#CD7F32',
     gradientStart: '#CD7F32',
@@ -41,6 +48,13 @@ export const TIER_STYLES: Record<BadgeTier, TierStyle> = {
     borderStyle: 'prismatic-sparkle',
     glowIntensity: 1.0,
   },
+  hero: {
+    primaryColor: '#FFD700',
+    gradientStart: '#FFD700',
+    gradientEnd: '#FF8C00',
+    borderStyle: 'hero-glow',
+    glowIntensity: 1.2,
+  },
 };
 
 /**
@@ -62,11 +76,13 @@ export function getTierDisplayName(tier: BadgeTier): string {
  */
 export function getTierLevel(tier: BadgeTier): number {
   const levels: Record<BadgeTier, number> = {
+    hummingbird: 0,
     bronze: 1,
     silver: 2,
     gold: 3,
     platinum: 4,
     diamond: 5,
+    hero: 6,
   };
   return levels[tier];
 }

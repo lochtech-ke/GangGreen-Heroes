@@ -19,6 +19,7 @@ export const ICON_FILES: Record<AchievementType, string> = {
   forest_protector: 'initiative-champion.svg',
   green_ambassador: 'green-ambassador.svg',
   welcome_badge: 'hummingbird.svg',
+  ganggreen_hero: 'hero-crown.svg',
 };
 
 /**

@@ -203,3 +203,73 @@ export type {
   ContributionAnalyzerError,
   ContributionAnalyzerErrorCode,
 } from './contributionAnalyzer.types';
+export type {
+  HeroBadgeConfig,
+  HeroBadgeHolder,
+  HeroBadgePurchaseParams,
+  HeroBadgePurchaseResult,
+  HeroStatusResult,
+  GrantHeroStatusParams,
+  SuspendHeroStatusParams,
+  ReinstateHeroStatusParams,
+  HeroBadgeOperationResult,
+  GetHeroHoldersResult,
+  HeroBadgeConfigRow,
+  HeroBadgeHolderRow,
+} from './heroBadge.types';
+
+export {
+  HERO_BADGE_TYPE,
+  HERO_BADGE_TIER,
+  DEFAULT_HERO_PRICE_KES,
+  DEFAULT_DAILY_REWARD,
+  DEFAULT_INITIATIVE_MULTIPLIER,
+  DEFAULT_MARKETPLACE_DISCOUNT,
+  DEFAULT_CONTENT_PRIORITY_BOOST,
+  isHeroBadgeConfig,
+  isHeroBadgeHolder,
+} from './heroBadge.types';
+
+export type {
+  HeroBenefits,
+  BenefitType,
+  BenefitUsageParams,
+  BenefitUsageRecord,
+  BenefitUsageAnalytics,
+  RewardMultiplierParams,
+  FeeDiscountParams,
+  ContentPriorityParams,
+  HeroBenefitsOperationResult,
+  BenefitAnalyticsResult,
+  BenefitUsageRow,
+} from './heroBenefit.types';
+
+export {
+  DEFAULT_HERO_BENEFITS,
+  isBenefitUsageRecord,
+  isBenefitUsageAnalytics,
+} from './heroBenefit.types';
+
+export type {
+  DailyRewardConfig,
+  RewardDistributionResult,
+  UserRewardCalculation,
+  HeroDailyReward,
+  DistributeRewardsParams,
+  RewardHistoryParams,
+  RewardHistoryResult,
+  RewardAnalytics,
+  FailedRewardDistribution,
+  RewardDistributionStatus,
+  UserActivityLevel,
+  HeroDailyRewardRow,
+  HeroRewardOperationResult,
+  RewardRetryConfig,
+} from './heroReward.types';
+
+export {
+  DEFAULT_DAILY_REWARD_CONFIG,
+  DEFAULT_RETRY_CONFIG,
+  isHeroDailyReward,
+  isRewardDistributionResult,
+} from './heroReward.types';

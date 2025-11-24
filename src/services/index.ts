@@ -29,3 +29,8 @@ export {
   createHummingbirdBadgeGenerator,
   generateWelcomeBadge 
 } from './hummingbirdBadge.service';
+export { gangGreenHeroBadgeService } from './gangGreenHeroBadge.service';
+export { heroBadgeIntegrationService } from './heroBadgeIntegration.service';
+export { heroRewardEngineService } from './heroRewardEngine.service';
+export { heroRewardSchedulerService } from './heroRewardScheduler.service';
+export { heroBenefitsService } from './heroBenefits.service';
