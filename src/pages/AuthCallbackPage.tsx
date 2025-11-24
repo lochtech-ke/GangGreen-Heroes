@@ -17,9 +17,58 @@ export function AuthCallbackPage() {
     const handleCallback = async () => {
       try {
         console.log('[AuthCallbackPage] Processing OAuth callback...');
+        console.log('[AuthCallbackPage] Full URL:', window.location.href);
+        console.log('[AuthCallbackPage] Hash:', window.location.hash);
+        console.log('[AuthCallbackPage] Search:', window.location.search);
 
-        // Supabase automatically handles the OAuth callback
-        // We just need to check the session and redirect
+        // Check for OAuth errors in URL params
+        const searchParams = new URLSearchParams(window.location.search);
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        
+        const oauthError = searchParams.get('error') || hashParams.get('error');
+        const errorDescription = searchParams.get('error_description') || hashParams.get('error_description');
+        
+        if (oauthError) {
+          console.error('[AuthCallbackPage] OAuth error from provider:', oauthError, errorDescription);
+          setError(errorDescription || 'Authentication failed. Please try again.');
+          setIsLoading(false);
+          return;
+        }
+
+        // Check if we have OAuth tokens in the URL hash
+        const accessToken = hashParams.get('access_token');
+        const refreshToken = hashParams.get('refresh_token');
+        const code = searchParams.get('code');
+
+        console.log('[AuthCallbackPage] OAuth tokens present:', { 
+          hasAccessToken: !!accessToken, 
+          hasRefreshToken: !!refreshToken,
+          hasCode: !!code
+        });
+
+        // If we have an authorization code, exchange it for a session (PKCE flow)
+        if (code) {
+          console.log('[AuthCallbackPage] Exchanging authorization code for session...');
+          const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+          
+          if (exchangeError) {
+            console.error('[AuthCallbackPage] Code exchange error:', exchangeError);
+            setError(exchangeError.message);
+            setIsLoading(false);
+            return;
+          }
+          
+          console.log('[AuthCallbackPage] Code exchange successful:', !!data.session);
+        }
+
+        // If we have tokens in the URL hash, Supabase will automatically exchange them
+        // We need to wait a moment for the auth state to update
+        if (accessToken) {
+          console.log('[AuthCallbackPage] Waiting for auth state to update...');
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+
+        // Now check the session
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 
         if (sessionError) {
@@ -32,20 +81,30 @@ export function AuthCallbackPage() {
         if (session) {
           console.log('[AuthCallbackPage] Session found, user authenticated');
 
-          // Ensure user profile exists for OAuth users
-          // Extract metadata from the user object
-          const user = session.user;
-          const metadata = {
-            full_name: user.user_metadata?.full_name || user.user_metadata?.name,
-            avatar_url: user.user_metadata?.avatar_url || user.user_metadata?.picture,
-          };
+          try {
+            // Ensure user profile exists for OAuth users
+            // Extract metadata from the user object
+            const user = session.user;
+            const metadata = {
+              full_name: user.user_metadata?.full_name || user.user_metadata?.name,
+              avatar_url: user.user_metadata?.avatar_url || user.user_metadata?.picture,
+            };
 
-          // Create profile if needed
-          await authService.ensureUserProfile(user.id, metadata);
+            console.log('[AuthCallbackPage] User metadata:', metadata);
 
-          // Successful authentication, redirect to dashboard
-          console.log('[AuthCallbackPage] Redirecting to dashboard');
-          navigate('/dashboard', { replace: true });
+            // Create profile if needed
+            await authService.ensureUserProfile(user.id, metadata);
+
+            // Successful authentication, redirect to dashboard
+            console.log('[AuthCallbackPage] Redirecting to dashboard');
+            navigate('/dashboard', { replace: true });
+          } catch (profileError) {
+            console.error('[AuthCallbackPage] Profile creation error:', profileError);
+            // Even if profile creation fails, let user through
+            // They can complete profile later
+            console.log('[AuthCallbackPage] Continuing to dashboard despite profile error');
+            navigate('/dashboard', { replace: true });
+          }
         } else {
           // No session, redirect to login
           console.log('[AuthCallbackPage] No session found, redirecting to login');

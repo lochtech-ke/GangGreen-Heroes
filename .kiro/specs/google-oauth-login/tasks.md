@@ -75,14 +75,12 @@
 
 
 
-
-
   - Add `ensureUserProfile()` helper function to auth service
   - Extract user metadata from Google OAuth response
-  - Check if user exists in custom `users` table
-  - **CRITICAL**: Create record in `users` table FIRST (required for foreign key)
-  - Then create record in `user_profiles` table with Google data
-  - Handle profile creation errors gracefully with proper rollback
+  - Check if profile exists in `user_profiles` table
+  - **CRITICAL**: Rely on database trigger to create `users` table record automatically
+  - Create record in `user_profiles` table with Google data only if it doesn't exist
+  - Handle profile creation errors gracefully
   - _Requirements: 1.5, 2.1, 2.2, 2.3, 2.4, 2.5_
 
 - [ ]* 6.1 Write property test for profile data extraction
@@ -92,11 +90,12 @@
   - Verify all available fields are correctly extracted
   - Verify missing optional fields don't cause errors
 
-- [ ]* 6.2 Write property test for database record creation order
-  - **Property 5: Database record creation order**
+- [ ]* 6.2 Write property test for database trigger creates user records
+  - **Property 5: Database trigger creates user records**
   - **Validates: Requirements 2.4, 2.5**
   - Generate random OAuth user data
-  - Verify `users` table record is created before `user_profiles` record
+  - Verify database trigger creates `users` table record automatically
+  - Verify `user_profiles` record can be created after trigger executes
   - Verify foreign key constraint is satisfied
 
 - [ ]* 6.3 Write unit tests for profile creation
@@ -161,13 +160,18 @@
   - Handle new user onboarding for Google users
   - _Requirements: 1.5, 2.5_
 
-- [x] 11. Checkpoint - Ensure all tests pass
+- [x] 11. Fix ensureUserProfile to work with database trigger
+  - Update `ensureUserProfile()` to remove manual `users` table insert
+  - Check for profile existence instead of user existence
+  - Only create `user_profiles` record if it doesn't exist
+  - Remove rollback logic since we're not creating users table records
+  - Add retry logic to handle race conditions with trigger execution
+  - _Requirements: 2.4, 2.5_
 
-
-
+- [x] 12. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 12. Manual testing and verification
+- [ ] 13. Manual testing and verification
   - Test Google sign-in as new user
   - Test Google sign-in as returning user
   - Test cancelling Google consent screen

@@ -176,27 +176,20 @@ interface GoogleUserMetadata {
 
 ### Profile Creation Logic
 
-After successful OAuth authentication, check if user profile exists and create if needed. **Critical**: The database has a custom `users` table separate from Supabase's `auth.users`. The `user_profiles` table has a foreign key constraint to the custom `users` table, so we must create records in both tables:
+After successful OAuth authentication, check if user profile exists and create if needed. **Critical**: The database has a custom `users` table separate from Supabase's `auth.users`. A database trigger (`handle_new_user()`) automatically creates records in the `users` table when OAuth users are created in `auth.users`, so we only need to create the profile:
 
 ```typescript
 async function ensureUserProfile(userId: string, metadata: GoogleUserMetadata): Promise<void> {
-  // Check if user exists in custom users table
-  const { data: existingUser } = await supabase
-    .from('users')
+  // Check if profile exists in user_profiles table
+  const { data: existingProfile } = await supabase
+    .from('user_profiles')
     .select('id')
     .eq('id', userId)
-    .single();
+    .maybeSingle();
   
-  if (!existingUser) {
-    // Create user record first (required for foreign key constraint)
-    await supabase.from('users').insert({
-      id: userId,
-      email: metadata.email,
-      role: 'individual', // Default role for OAuth users
-      forest_preference: null, // User can set this later
-    });
-    
-    // Then create profile with Google data
+  if (!existingProfile) {
+    // The users table record is automatically created by database trigger
+    // We only need to create the profile with Google data
     await supabase.from('user_profiles').insert({
       id: userId,
       full_name: metadata.full_name || metadata.email.split('@')[0],
@@ -205,6 +198,12 @@ async function ensureUserProfile(userId: string, metadata: GoogleUserMetadata): 
   }
 }
 ```
+
+**Note**: The `handle_new_user()` database trigger (migration 011) automatically creates the `users` table record when a new user signs up via OAuth. This approach:
+- Bypasses RLS policy issues during OAuth signup
+- Uses `SECURITY DEFINER` to execute with elevated privileges
+- Extracts role and forest_preference from user metadata
+- Handles conflicts gracefully with `ON CONFLICT DO NOTHING`
 
 ## Corr
 ectness Properties
@@ -217,8 +216,8 @@ After reviewing the acceptance criteria, most of the testable requirements are s
 *For any* Google OAuth response containing user metadata, all available fields (email, full_name, avatar_url) should be correctly extracted and mapped to the corresponding profile fields.
 **Validates: Requirements 2.1, 2.2, 2.3**
 
-**Property 5: Database record creation order**
-*For any* new Google OAuth user, a record must be created in the `users` table before creating a record in the `user_profiles` table to satisfy the foreign key constraint.
+**Property 5: Database trigger creates user records**
+*For any* new Google OAuth user, the database trigger must automatically create a record in the `users` table before the application creates a record in the `user_profiles` table to satisfy the foreign key constraint.
 **Validates: Requirements 2.4, 2.5**
 
 **Property 2: Error logging safety**

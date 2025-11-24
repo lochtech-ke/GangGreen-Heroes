@@ -535,82 +535,143 @@ class AuthService {
 
   /**
    * Ensure user profile exists for OAuth users
-   * Creates both users table record and profile with OAuth metadata if they don't exist
-   * CRITICAL: Must create users table record FIRST due to foreign key constraint
+   * Note: The users table record is automatically created by database trigger (handle_new_user)
+   * This function creates both the users record (if trigger failed) and user_profiles record
    */
   async ensureUserProfile(userId: string, metadata?: any): Promise<void> {
     try {
-      console.log('[AuthService] Checking user profile for OAuth user:', userId);
+      console.log('[AuthService] Ensuring user profile for OAuth user:', userId);
 
-      // Check if user exists in custom users table
+      // Get auth user to extract metadata
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      
+      if (!authUser) {
+        throw new Error('No authenticated user found');
+      }
+
+      // Extract profile data from OAuth metadata
+      const fullName = metadata?.full_name || 
+                      authUser.user_metadata?.full_name || 
+                      authUser.user_metadata?.name ||
+                      authUser.email?.split('@')[0] || 
+                      'User';
+      
+      const avatarUrl = metadata?.avatar_url || 
+                       authUser.user_metadata?.avatar_url || 
+                       authUser.user_metadata?.picture;
+
+      console.log('[AuthService] Extracted OAuth metadata:', { fullName, avatarUrl });
+
+      // Step 1: Ensure user record exists in users table
+      // The trigger should handle this, but we'll check and create if needed
       const { data: existingUser, error: userFetchError } = await supabase
         .from('users')
-        .select('id')
+        .select('id, role, forest_preference')
         .eq('id', userId)
         .maybeSingle();
 
-      if (userFetchError) {
-        console.error('[AuthService] Error checking user:', userFetchError);
+      if (userFetchError && userFetchError.code !== 'PGRST116') {
+        console.error('[AuthService] Error checking user record:', userFetchError);
         throw userFetchError;
       }
 
       if (!existingUser) {
-        console.log('[AuthService] Creating user record for OAuth user');
-
-        // Get auth user to extract email
-        const { data: { user: authUser } } = await supabase.auth.getUser();
+        console.warn('[AuthService] User record not found - database trigger may have failed or not been deployed');
+        console.warn('[AuthService] Please deploy migration 023_fix_oauth_trigger_for_google.sql');
         
-        if (!authUser) {
-          throw new Error('No authenticated user found');
-        }
-
-        // STEP 1: Create user record FIRST (required for foreign key constraint)
+        // Try to create user record manually if trigger failed
+        // Note: This may fail due to RLS policies or cascading triggers
         const { error: userInsertError } = await supabase
           .from('users')
           .insert({
             id: userId,
-            email: authUser.email || metadata?.email || '',
+            email: authUser.email!,
             role: 'individual', // Default role for OAuth users
-            forest_preference: null, // User can set this later
+            forest_preference: null, // Will be set during onboarding
           });
 
         if (userInsertError) {
-          console.error('[AuthService] Error creating user:', userInsertError);
-          throw userInsertError;
+          // Ignore duplicate key errors (user already exists)
+          if (userInsertError.code === '23505') {
+            console.log('[AuthService] User record already exists (duplicate key)');
+          }
+          // Ignore RLS policy errors - these indicate the trigger needs to be deployed
+          else if (userInsertError.code === '42501') {
+            console.error('[AuthService] RLS policy error - migration 023 needs to be deployed');
+            console.error('[AuthService] Run: supabase db push');
+            throw new Error('Database setup incomplete. Please contact support.');
+          }
+          // Other errors should be thrown
+          else {
+            console.error('[AuthService] Error creating user record:', userInsertError);
+            throw userInsertError;
+          }
+        } else {
+          console.log('[AuthService] User record created successfully');
         }
+      } else {
+        console.log('[AuthService] User record exists:', existingUser);
+      }
 
-        console.log('[AuthService] User record created successfully');
+      // Step 2: Check if profile exists in user_profiles table
+      const { data: existingProfile, error: profileFetchError } = await supabase
+        .from('user_profiles')
+        .select('id')
+        .eq('id', userId)
+        .maybeSingle();
 
-        // STEP 2: Now create profile with Google data
+      if (profileFetchError && profileFetchError.code !== 'PGRST116') {
+        console.error('[AuthService] Error checking profile:', profileFetchError);
+        throw profileFetchError;
+      }
+
+      if (!existingProfile) {
         console.log('[AuthService] Creating profile for OAuth user');
 
-        // Extract profile data from OAuth metadata
         const profileData: any = {
           id: userId,
-          full_name: metadata?.full_name || authUser.user_metadata?.full_name || authUser.email?.split('@')[0] || 'User',
+          full_name: fullName,
         };
 
-        if (metadata?.avatar_url || authUser.user_metadata?.avatar_url) {
-          profileData.avatar_url = metadata?.avatar_url || authUser.user_metadata?.avatar_url;
+        if (avatarUrl) {
+          profileData.avatar_url = avatarUrl;
         }
 
-        const { error: profileInsertError } = await supabase
-          .from('user_profiles')
-          .insert(profileData);
+        // Create the profile with retry logic
+        let retries = 3;
+        let lastError: any = null;
 
-        if (profileInsertError) {
+        while (retries > 0) {
+          const { error: profileInsertError } = await supabase
+            .from('user_profiles')
+            .insert(profileData);
+
+          if (!profileInsertError) {
+            console.log('[AuthService] Profile created successfully for OAuth user');
+            return;
+          }
+
+          // If it's a foreign key violation, wait and retry
+          if (profileInsertError.code === '23503' && retries > 1) {
+            console.log(`[AuthService] Foreign key violation, retrying... (${retries - 1} attempts left)`);
+            lastError = profileInsertError;
+            await new Promise(resolve => setTimeout(resolve, 500)); // Wait 500ms
+            retries--;
+            continue;
+          }
+
+          // For other errors or last retry, throw immediately
           console.error('[AuthService] Error creating profile:', profileInsertError);
-          
-          // Rollback: Delete the user record we just created
-          await supabase.from('users').delete().eq('id', userId);
-          console.log('[AuthService] Rolled back user record due to profile creation failure');
-          
           throw profileInsertError;
         }
 
-        console.log('[AuthService] Profile created successfully for OAuth user');
+        // If we exhausted retries
+        if (lastError) {
+          console.error('[AuthService] Failed to create profile after retries:', lastError);
+          throw lastError;
+        }
       } else {
-        console.log('[AuthService] User record already exists for OAuth user');
+        console.log('[AuthService] Profile already exists for OAuth user');
       }
     } catch (error) {
       console.error('[AuthService] Failed to ensure user profile:', error);
